@@ -16,8 +16,6 @@ build:
 
 requirements:
   host:
-    #- blocked-matrix-utils
-    #- fortran-binary
     - pip
     - python >=3.6
   run:
@@ -32,7 +30,7 @@ test:
 about:
   home: https://github.com/vahtras/daltools
   summary: Misc utilities for extracting data from Dalton files
-  license: GPL-3.0
+  license: GPL-2.0-or-later
   #license_file: LICENSE
 
 extra:
