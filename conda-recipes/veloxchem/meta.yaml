@@ -1,0 +1,100 @@
+{% set name = "veloxchem" %}
+{% set version = "1.0rc1.post1" %}
+{% set sha256 = "1a8a667f4c81601daa43e1339d91f1594fb5525fe0869dce5e187c49430a769c" %}
+{% set pyver = PY_VER.replace(".", "") %}
+{% set build = 0 %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ../../../vlx-conda-build
+  sha256: {{ sha256 }}
+
+build:
+  number: {{ build }}
+  skip: true                   # [win]
+  binary_relocation: true
+  entry_points:
+    - vlx=veloxchem.main:main
+  #ignore_run_exports:
+  #  - mpi4py
+  #  - python
+  run_exports:
+    - {{ pin_subpackage('veloxchem', max_pin='x.x') }}
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    # so we can run tests in build.sh
+    #- pytest
+  host:
+    - llvm-openmp                  # [osx]
+    - libgomp                      #  [linux]
+    - pybind11 =*=*py{{ pyver }}*
+    - pybind11-abi
+    - python >=3.6
+    # TODO allow to choose between OpenMPI and MPICH
+    #- mpich
+    - mpi4py
+    - numpy >=1.13.0
+    # TODO allow to choose between MKL and OpenBLAS: https://conda-forge.org/docs/maintainer/knowledge_base.html?highlight=blas#blas
+    - mkl-devel
+    - xtb
+    - gtest
+  run:
+    - geometric
+    - h5py
+    - loprop
+    # TODO allow to choose between OpenMPI and MPICH
+    #- mpich
+    #- mpi4py
+    #- numpy >=1.13.0
+    - psutil
+    - {{ pin_compatible('python', max_pin='x.x') }}
+    # TODO allow to choose between MKL and OpenBLAS: https://conda-forge.org/docs/maintainer/knowledge_base.html?highlight=blas#blas
+    - mkl
+
+test:
+  requires:
+    - numpy
+    - pytest
+  imports:
+    - veloxchem
+  commands:
+    # Verify existence and execution
+    - test -d $SP_DIR/veloxchem
+    - ls -l $SP_DIR/veloxchem
+    - test -f $PREFIX/bin/vlx
+    - $PREFIX/bin/vlx --help
+    # Verify Python extension library
+    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`
+    - test -f $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT                      # [not win]
+    # Inspect linkage
+    - ldd -v $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT    # [linux]
+    - otool -L $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT  # [osx]
+    # run integration tests
+    - env OMP_NUM_THREADS=$CPU_COUNT mpirun -np 1 $PYTHON -m pytest --pyargs veloxchem
+    - export MPI_NUM_PROCS=2
+    - env OMP_NUM_THREADS=$($CPU_COUNT/$NUM_MPI_PROCS) mpirun -np $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers
+
+outputs:
+  - name: veloxchem
+    files:
+      - {{ SP_DIR }}/veloxchem  # [not win]
+
+about:
+  home: https://veloxchem.org
+  dev_url: https://gitlab.com/veloxchem/veloxchem
+  doc_url: https://veloxchem.org/manual
+  doc_source_url: https://gitlab.com/veloxchem/veloxchem/-/blob/master/docs/index.rst
+  license: LGPL-3.0-or-later
+  license_url: https://opensource.org/licenses/LGPL-3.0
+  license_file: LICENSE
+  license_family: LGPL
+  summary: A Python-based, open source quantum chemistry program package
+
+extra:
+  recipe-maintainers:
+    - robertodr
