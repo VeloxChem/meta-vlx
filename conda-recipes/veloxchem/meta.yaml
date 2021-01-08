@@ -36,7 +36,6 @@ requirements:
     - pybind11-abi
     - python >=3.6
     # TODO allow to choose between OpenMPI and MPICH
-    #- mpich
     - mpi4py
     - numpy >=1.13.0
     # TODO allow to choose between MKL and OpenBLAS: https://conda-forge.org/docs/maintainer/knowledge_base.html?highlight=blas#blas
@@ -48,11 +47,10 @@ requirements:
     - h5py
     - loprop
     # TODO allow to choose between OpenMPI and MPICH
-    #- mpich
-    #- mpi4py
+    - mpi4py
     #- numpy >=1.13.0
     - psutil
-    - {{ pin_compatible('python', max_pin='x.x') }}
+    #- {{ pin_compatible('python', max_pin='x.x') }}
     # TODO allow to choose between MKL and OpenBLAS: https://conda-forge.org/docs/maintainer/knowledge_base.html?highlight=blas#blas
     - mkl
 
