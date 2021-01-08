@@ -1,7 +1,6 @@
 {% set name = "veloxchem" %}
 {% set version = "1.0rc1.post1" %}
 {% set sha256 = "1a8a667f4c81601daa43e1339d91f1594fb5525fe0869dce5e187c49430a769c" %}
-{% set pyver = PY_VER.replace(".", "") %}
 {% set build = 0 %}
 
 package:
@@ -14,49 +13,43 @@ source:
 
 build:
   number: {{ build }}
-  skip: true                   # [win]
+  skip: true                       # [win]
   binary_relocation: true
   entry_points:
     - vlx=veloxchem.main:main
-  #ignore_run_exports:
-  #  - mpi4py
-  #  - python
+  ignore_run_exports:
+    - mpi4py
   run_exports:
     - {{ pin_subpackage('veloxchem', max_pin='x.x') }}
 
 requirements:
   build:
     - {{ compiler('cxx') }}
-    # so we can run tests in build.sh
-    #- pytest
-  host:
     - llvm-openmp                  # [osx]
-    - libgomp                      #  [linux]
-    - pybind11 =*=*py{{ pyver }}*
+    - libgomp                      # [linux]
+  host:
+    - pybind11 >=2.6
     - pybind11-abi
-    - python >=3.6
-    # TODO allow to choose between OpenMPI and MPICH
+    - python {{ python }}
+    - libblas * *mkl
+    - mkl-devel
+    - {{ mpi }}
     - mpi4py
     - numpy >=1.13.0
-    # TODO allow to choose between MKL and OpenBLAS: https://conda-forge.org/docs/maintainer/knowledge_base.html?highlight=blas#blas
-    - mkl-devel
     - xtb
     - gtest
   run:
-    - geometric
-    - h5py
-    - loprop
-    # TODO allow to choose between OpenMPI and MPICH
-    - mpi4py
-    #- numpy >=1.13.0
-    - psutil
-    #- {{ pin_compatible('python', max_pin='x.x') }}
-    # TODO allow to choose between MKL and OpenBLAS: https://conda-forge.org/docs/maintainer/knowledge_base.html?highlight=blas#blas
+    - libblas * *mkl
     - mkl
+    - intel-openmp                 # [linux]
+    - psutil
+    - geometric
+    - loprop
+    - mpi4py
+    - h5py * *nompi*
 
 test:
   requires:
-    - numpy
     - pytest
   imports:
     - veloxchem
@@ -68,14 +61,14 @@ test:
     - $PREFIX/bin/vlx --help
     # Verify Python extension library
     - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`
-    - test -f $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT                      # [not win]
+    - test -f $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT   # [not win]
     # Inspect linkage
     - ldd -v $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT    # [linux]
     - otool -L $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT  # [osx]
     # run integration tests
     - env OMP_NUM_THREADS=$CPU_COUNT mpirun -np 1 $PYTHON -m pytest --pyargs veloxchem
     - export MPI_NUM_PROCS=2
-    - env OMP_NUM_THREADS=$($CPU_COUNT/$NUM_MPI_PROCS) mpirun -np $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers
+    - env OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS)) mpirun -np $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers
 
 outputs:
   - name: veloxchem
