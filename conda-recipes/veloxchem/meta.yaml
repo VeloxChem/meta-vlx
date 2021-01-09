@@ -19,6 +19,7 @@ build:
     - vlx=veloxchem.main:main
   ignore_run_exports:
     - mpi4py
+    - python
   run_exports:
     - {{ pin_subpackage('veloxchem', max_pin='x.x') }}
 
@@ -33,7 +34,7 @@ requirements:
     - python {{ python }}
     - libblas * *mkl
     - mkl-devel
-    - {{ mpi }}
+    - openmpi
     - mpi4py
     - numpy >=1.13.0
     - xtb
@@ -41,12 +42,12 @@ requirements:
   run:
     - libblas * *mkl
     - mkl
-    - intel-openmp                 # [linux]
     - psutil
     - geometric
     - loprop
     - mpi4py
     - h5py * *nompi*
+    - {{ pin_compatible('python', max_pin='x.x') }}
 
 test:
   requires:
@@ -58,6 +59,7 @@ test:
     - test -d $SP_DIR/veloxchem
     - ls -l $SP_DIR/veloxchem
     - test -f $PREFIX/bin/vlx
+    - $PREFIX/bin/vlx --version
     - $PREFIX/bin/vlx --help
     # Verify Python extension library
     - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`
