@@ -14,6 +14,15 @@ How to build these recipes:
     You should log out and log back in (or close and re-open the
     terminal) for the changes to take effect.
 
+    - On macOS, you need a non-broken SDK:
+
+      ```bash
+      $ curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.9.sdk.tar.xz > ${HOME}/MacOSX10.9.sdk.tar.xz
+      $ tar -xzf ${HOME}/MacOSX10.9.sdk.tar.xz
+      ```
+      and then you must edit `conda-recipes/veloxchem/conda_build_config.yaml`
+      such that `CONDA_BUILD_SYSROOT` points to the location of the SDK.
+
 2.  Install `conda-build`:
     <https://docs.conda.io/projects/conda-build/en/latest/> We also
     install `conda-verify`
