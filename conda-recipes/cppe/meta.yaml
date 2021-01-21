@@ -13,6 +13,7 @@ source:
 
 build:
   number: {{ build }}
+  skip: true  # [win]
   binary_relocation: true
   run_exports:
     - {{ pin_subpackage('cppe', max_pin='x.x') }}
