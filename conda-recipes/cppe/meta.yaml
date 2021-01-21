@@ -1,7 +1,6 @@
 {% set name = "cppe" %}
 {% set version = "0.3.1" %}
 {% set sha256 = "38d4230ba3ace78936049c23ad4b1fe9e704fd250ec57cc9733cb3904b62cf7c" %}
-{% set pyver = PY_VER.replace(".", "") %}
 {% set build = 0 %}
 
 package:
@@ -14,7 +13,6 @@ source:
 
 build:
   number: {{ build }}
-  skip: true  # [win]
   binary_relocation: true
   run_exports:
     - {{ pin_subpackage('cppe', max_pin='x.x') }}
@@ -24,12 +22,14 @@ requirements:
     - cmake >=3.5
     - {{ compiler('cxx') }}
     - ninja
-  host:
     - llvm-openmp  # [osx]
     - libgomp      # [linux]
-    - pybind11 =*=*py{{ pyver }}*
+  host:
+    - pybind11 >=2.6
     - pybind11-abi
-    - python >=3.6
+    - python
+  run:
+    - python
 
 test:
   requires:
