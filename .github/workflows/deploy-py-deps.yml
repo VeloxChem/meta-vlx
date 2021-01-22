@@ -31,5 +31,6 @@ jobs:
       env:
         ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
       run: |
+        conda config --set anaconda_upload yes
         cd $GITHUB_WORKSPACE/conda-recipes
         conda build ${{ matrix.recipes }} -c conda-forge --verify --user robertodr --token $ANACONDA_TOKEN
