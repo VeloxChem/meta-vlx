@@ -43,4 +43,4 @@ jobs:
         ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/conda-recipes
-        conda build ${{ matrix.recipes }} -c conda-forge --user robertodr --token $ANACONDA_TOKEN --label main --verify
+        conda build ${{ matrix.recipes }} --python 3.8 -c conda-forge --user robertodr --token $ANACONDA_TOKEN --label main --verify
