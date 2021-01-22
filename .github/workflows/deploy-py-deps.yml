@@ -21,7 +21,7 @@ jobs:
     - name: Cache conda
       uses: actions/cache@v1
       env:
-        CACHE_NUMBER: 0  # Increase this value to reset cache if .github/deploy.yml has not changed
+        CACHE_NUMBER: 1  # Increase this value to reset cache if .github/deploy.yml has not changed
       with:
         path: ~/conda_pkgs_dir
         key:
