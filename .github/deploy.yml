@@ -1,0 +1,7 @@
+name: deploy
+channels:
+  - conda-forge
+dependencies:
+  - anaconda-client
+  - conda-build
+  - conda-verify
