@@ -14,6 +14,8 @@ jobs:
     strategy:
       matrix:
         recipes: [fortran-binary, daltools, loprop]
+    with:
+      ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
 
     steps:
     - uses: actions/checkout@v2
@@ -28,8 +30,6 @@ jobs:
 
     - name: ${{ matrix.recipes }}
       shell: bash -l {0}
-      with:
-        ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/conda-recipes
         conda build ${{ matrix.recipes }} -c conda-forge --verify --user robertodr --token $ANACONDA_TOKEN
