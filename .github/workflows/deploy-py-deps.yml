@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        recipes: [fortran-binary, daltools, loprop]
+        recipes: [daltools, fortran-binary, loprop]
 
     steps:
     - uses: actions/checkout@v2
