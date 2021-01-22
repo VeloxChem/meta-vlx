@@ -1,4 +1,4 @@
-name: Deploy Python packages
+name: Deploy C++ packages
 
 on:
   push:
@@ -10,13 +10,22 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        recipes: [daltools, fortran-binary, loprop]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        recipes: [cppe]
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install macOS SDK
+        if: contains( matrix.os, 'macos')
+        working-directory: /Users/runner
+        run: |
+          curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.9.sdk.tar.xz > ~/MacOSX10.9.sdk.tar.xz
+          tar -xzf ~/MacOSX10.9.sdk.tar.xz
+          rm ~/MacOSX10.9.sdk.tar.xz
 
       - name: Cache conda
         uses: actions/cache@v1
@@ -25,7 +34,7 @@ jobs:
         with:
           path: ~/conda_pkgs_dir
           key:
-            py-deps-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('.github/deploy.yml') }}
+            cxx-deps-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('.github/deploy.yml') }}
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -43,4 +52,4 @@ jobs:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
-          conda build ${{ matrix.recipes }} --python 3.8 -c conda-forge --user robertodr --token $ANACONDA_TOKEN --label main --verify
+          conda build ${{ matrix.recipes }} -c conda-forge --user robertodr --token $ANACONDA_TOKEN --label main --verify
