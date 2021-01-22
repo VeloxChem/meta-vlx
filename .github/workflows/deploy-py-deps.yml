@@ -43,4 +43,4 @@ jobs:
       run: |
         conda config --set anaconda_upload yes
         cd $GITHUB_WORKSPACE/conda-recipes
-        conda build ${{ matrix.recipes }} -c conda-forge --verify --user robertodr --token $ANACONDA_TOKEN --label main
+        conda build ${{ matrix.recipes }} -c conda-forge --user robertodr --token $ANACONDA_TOKEN --label main
