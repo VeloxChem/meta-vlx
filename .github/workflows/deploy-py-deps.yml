@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        recipes: [daltools, fortran-binary, loprop]
+        recipes: [fortran-binary] #[daltools, fortran-binary, loprop]
 
     steps:
     - uses: actions/checkout@v2
@@ -34,6 +34,7 @@ jobs:
         activate-environment: deploy
         environment-file: .github/deploy.yml
         channel-priority: true
+        python-version: 3.8
         use-only-tar-bz2: true  # IMPORTANT: This needs to be set for caching to work properly!
 
     - name: Build and upload ${{ matrix.recipes }}
