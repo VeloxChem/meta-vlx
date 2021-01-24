@@ -1,7 +1,5 @@
 {% set name = "veloxchem" %}
 {% set version = "1.0rc1.post1" %}
-{% set sha256 = "1a8a667f4c81601daa43e1339d91f1594fb5525fe0869dce5e187c49430a769c" %}
-{% set build = 0 %}
 
 package:
   name: {{ name|lower }}
@@ -9,10 +7,10 @@ package:
 
 source:
   path: ../../../vlx-conda-build
-  sha256: {{ sha256 }}
+  #sha256: 1a8a667f4c81601daa43e1339d91f1594fb5525fe0869dce5e187c49430a769c
 
 build:
-  number: {{ build }}
+  number: 0
   skip: true                       # [win]
   binary_relocation: true
   entry_points:
@@ -26,25 +24,24 @@ build:
 requirements:
   build:
     - {{ compiler('cxx') }}
-    - llvm-openmp                  # [osx]
     - libgomp                      # [linux]
+    - llvm-openmp                  # [osx]
   host:
     - pybind11 >=2.6
-    - pybind11-abi
     - python {{ python }}
     - libblas * *mkl
     - mkl-devel
-    - openmpi
+    - {{ mpi }}
     - mpi4py
     - numpy >=1.13.0
     - xtb
     - gtest
   run:
-    - libblas * *mkl
-    - mkl
+    - cppe
     - psutil
     - geometric
     - loprop
+    - {{ mpi }}
     - mpi4py
     - h5py * *nompi*
     - {{ pin_compatible('python', max_pin='x.x') }}
