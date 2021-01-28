@@ -1,8 +1,0 @@
-CONDA_BUILD_SYSROOT:
-  - /Users/Flow/MacOSX10.9.sdk     # [osx]
-
-python:
-  - 3.9
-  - 3.8
-  - 3.7
-  - 3.6
