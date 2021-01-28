@@ -43,7 +43,7 @@ requirements:
     - loprop
     - {{ mpi }}
     - mpi4py
-    - h5py * *nompi*
+    - h5py
     - {{ pin_compatible('python', max_pin='x.x') }}
 
 test:
