@@ -73,14 +73,16 @@ test:
     - ldd -v $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT    # [linux]
     - otool -L $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT  # [osx]
     # run integration tests
-    - env OMP_NUM_THREADS=$CPU_COUNT mpiexec -n 1 $PYTHON -m pytest --pyargs veloxchem  # [not win]
-    - export MPI_NUM_PROCS=2  # [not win]
-    - env OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS)) mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers  # [not win]
+    - export OMP_NUM_THREADS=$CPU_COUNT                     # [not win]
+    - mpirun -n 1 $PYTHON -m pytest --pyargs veloxchem      # [not win]
+    - export MPI_NUM_PROCS=2                                # [not win]
+    - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS)) # [not win]
+    - mpirun -n $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers  # [not win]
     - set OMP_NUM_THREADS=%CPU_COUNT%                      # [win]
-    - mpiexec -n 1 $PYTHON -m pytest --pyargs veloxchem    # [win]
+    - mpiexec -n 1 $PYTHON -m pytest --pyargs veloxchem -k "not loprop"  # [win]
     - set MPI_NUM_PROCS=2                                  # [win]
     - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%" # [win]
-    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs veloxchem -m solvers  # [win]
+    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs veloxchem -m solvers -k "not loprop"  # [win]
 
 outputs:
   - name: veloxchem
