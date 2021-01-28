@@ -54,26 +54,39 @@ test:
     - veloxchem
   commands:
     # Verify existence and execution
-    - test -d $SP_DIR/veloxchem
-    - ls -l $SP_DIR/veloxchem
-    - test -f $PREFIX/bin/vlx
-    - $PREFIX/bin/vlx --version
-    - $PREFIX/bin/vlx --help
+    - test -d $SP_DIR/veloxchem  # [not win]
+    - ls -l $SP_DIR/veloxchem    # [not win]
+    - test -f $PREFIX/bin/vlx    # [not win]
+    - $PREFIX/bin/vlx --version  # [not win]
+    - $PREFIX/bin/vlx --help     # [not win]
+    - if not exist %SP_DIR%\\veloxchem exit 1  # [win]
+    - dir %SP_DIR%\\veloxchem                  # [win]
+    - if not exist %PREFIX%\\bin\\vlx exit 1   # [win]
+    - %PREFIX%\\bin\\vlx --version             # [win]
+    - %PREFIX%\\bin\\vlx --help                # [win]
     # Verify Python extension library
     - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [not win]
-    - test -f $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT   # [not win]
+    - FOR /F "tokens=* USEBACKQ" %g IN (`%PYTHON% -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`) DO (SET "PYLIB_EXT=%g")  # [win]
+    - test -f $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT                 # [not win]
+    - if not exist %SP_DIR\\veloxchem\\veloxchemlib%PYLIB_EXT% exit 1  # [win]
     # Inspect linkage
     - ldd -v $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT    # [linux]
     - otool -L $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT  # [osx]
     # run integration tests
-    - env OMP_NUM_THREADS=$CPU_COUNT mpirun -np 1 $PYTHON -m pytest --pyargs veloxchem
-    - export MPI_NUM_PROCS=2
-    - env OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS)) mpirun -np $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers
+    - env OMP_NUM_THREADS=$CPU_COUNT mpiexec -n 1 $PYTHON -m pytest --pyargs veloxchem  # [not win]
+    - export MPI_NUM_PROCS=2  # [not win]
+    - env OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS)) mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers  # [not win]
+    - set OMP_NUM_THREADS=%CPU_COUNT%                      # [win]
+    - mpiexec -n 1 $PYTHON -m pytest --pyargs veloxchem    # [win]
+    - set MPI_NUM_PROCS=2                                  # [win]
+    - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%" # [win]
+    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs veloxchem -m solvers  # [win]
 
 outputs:
   - name: veloxchem
     files:
       - {{ SP_DIR }}/veloxchem  # [not win]
+      - {{ SP_DIR}}\\veloxchem  # [win]
 
 about:
   home: https://veloxchem.org

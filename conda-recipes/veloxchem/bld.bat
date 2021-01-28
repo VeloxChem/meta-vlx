@@ -7,7 +7,8 @@ cmake -S"%SRC_DIR%" ^
       -DCMAKE_BUILD_TYPE:STRING=Release ^
       -DCMAKE_INSTALL_PREFIX:PATH="%PREFIX%" ^
       -DCMAKE_PREFIX_PATH:PATH="%LIBRARY_PREFIX%" ^
-      -DCMAKE_CXX_COMPILER:STRING=clang-cl
+      -DCMAKE_CXX_COMPILER:STRING=clang-cl ^
+      -DPYMOD_INSTALL_FULLDIR:PATH="%SP_DIR%\veloxchem"
 if errorlevel 1 exit 1
 
 :: build!
