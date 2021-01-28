@@ -11,7 +11,6 @@ source:
 
 build:
   number: 0
-  skip: true                       # [win]
   binary_relocation: true
   entry_points:
     - vlx=veloxchem.main:main
@@ -23,9 +22,11 @@ build:
 
 requirements:
   build:
+    - cmake >=3.17
     - {{ compiler('cxx') }}
     - libgomp                      # [linux]
     - llvm-openmp                  # [osx]
+    - ninja
   host:
     - pybind11 >=2.6
     - python {{ python }}
@@ -34,10 +35,10 @@ requirements:
     - {{ mpi }}
     - mpi4py
     - numpy >=1.13.0
-    - xtb
+    - xtb                          # [not win]
     - gtest
   run:
-    - cppe
+    - cppe                         # [not win]
     - psutil
     - geometric
     - loprop
@@ -59,7 +60,7 @@ test:
     - $PREFIX/bin/vlx --version
     - $PREFIX/bin/vlx --help
     # Verify Python extension library
-    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`
+    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [not win]
     - test -f $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT   # [not win]
     # Inspect linkage
     - ldd -v $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT    # [linux]

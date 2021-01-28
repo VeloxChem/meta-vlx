@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
 set -ex
 
-# configure
-$PYTHON ${SRC_DIR}/config/generate_setup.py
+# configure!
+cmake \
+    -S${SRC_DIR} \
+    -Bbuild \
+    -GNinja \
+    -DCMAKE_BUILD_TYPE:STRING=Release \
+    -DCMAKE_INSTALL_PREFIX:PATH=${PREFIX} \
+    -DCMAKE_PREFIX_PATH:PATH=${LIBRARY_PREFIX} \
+    -DCMAKE_CXX_COMPILER=${CXX}
 
-# build
-env VERBOSE=1 make -C ${SRC_DIR}/src release -j ${CPU_COUNT}
-env VERBOSE=1 make -C ${SRC_DIR}/unit_tests release -j ${CPU_COUNT}
+# build!
+cmake --build build --parallel ${CPU_COUNT} -- -v -d stats
 
-# test
-# unit tests
-${SRC_DIR}/build/bin/UnitTestVeloxChem.x
+# test!
+# we only run unit tests here, integration tests are run later on
+cd build
+ctest -L unit --output-on-failure
 
-# install
-cp -r ${SRC_DIR}/build/lib/veloxchem ${SP_DIR}
+# install!
+cd ..
+cmake --build build --target install

@@ -2,8 +2,9 @@ CONDA_BUILD_SYSROOT:
   - /Users/Flow/MacOSX10.9.sdk     # [osx]
 
 mpi:
-  - mpich
-  - openmpi
+  - msmpi    # [win]
+  - mpich    # [not win]
+  - openmpi  # [not win]
 
 python:
   - 3.9
