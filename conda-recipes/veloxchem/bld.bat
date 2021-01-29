@@ -9,7 +9,7 @@ cmake ^
     -DCMAKE_INSTALL_PREFIX:PATH="%LIBRARY_PREFIX%" ^
     -DCMAKE_PREFIX_PATH:PATH="%LIBRARY_PREFIX%" ^
     -DCMAKE_CXX_COMPILER:STRING=clang-cl ^
-    -DPython_EXECUTABLE="%PYTHON%" ^
+    -DPython_EXECUTABLE:STRING="%PYTHON%" ^
     -DPYMOD_INSTALL_FULLDIR:PATH="Lib\site-packages\veloxchem"
 if errorlevel 1 exit 1
 
