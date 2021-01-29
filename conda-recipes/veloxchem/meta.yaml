@@ -37,6 +37,7 @@ requirements:
     - numpy >=1.13.0
     - xtb                          # [unix]
     - gtest
+    - gmock
   run:
     - cppe                         # [unix]
     - psutil
