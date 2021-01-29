@@ -10,7 +10,8 @@ cmake \
     -DCMAKE_INSTALL_PREFIX:PATH=${PREFIX} \
     -DCMAKE_PREFIX_PATH:PATH=${LIBRARY_PREFIX} \
     -DCMAKE_CXX_COMPILER=${CXX} \
-    -DPYMOD_INSTALL_FULLDIR=${SP_DIR}/veloxchem
+    -DPython_EXECUTABLE=${PYTHON} \
+    -DPYMOD_INSTALL_FULLDIR=${SP_DIR#$PREFIX}/veloxchem
 
 # build!
 cmake --build build --parallel ${CPU_COUNT} -- -v -d stats
