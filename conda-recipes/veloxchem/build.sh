@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euxo
+set -ex
 
 # configure!
 cmake \
@@ -9,9 +9,9 @@ cmake \
     -DCMAKE_BUILD_TYPE:STRING=Release \
     -DCMAKE_INSTALL_PREFIX:PATH=${PREFIX} \
     -DCMAKE_PREFIX_PATH:PATH=${LIBRARY_PREFIX} \
-    -DCMAKE_CXX_COMPILER=${CXX} \
-    -DPython_EXECUTABLE=${PYTHON} \
-    -DPYMOD_INSTALL_FULLDIR=${SP_DIR#$PREFIX}/veloxchem
+    -DCMAKE_CXX_COMPILER:STRING=${CXX} \
+    -DPython_EXECUTABLE:STRING=${PYTHON} \
+    -DPYMOD_INSTALL_FULLDIR:PATH=${SP_DIR#$PREFIX}/veloxchem
 
 # build!
 cmake --build build --parallel ${CPU_COUNT} -- -v -d stats
