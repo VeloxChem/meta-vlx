@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - conda-recipes/veloxchem/*
+      - .github/workflows/deploy-cxx.yml
   pull_request:
     paths:
       - conda-recipes/veloxchem/*
+      - .github/workflows/deploy-cxx.yml
 
 jobs:
   build:
@@ -17,7 +19,14 @@ jobs:
         mpi: [msmpi, mpich, openmpi]
         python: [3.6, 3.7, 3.8, 3.9]
         recipes: [veloxchem]
-
+        exclude:
+          - os: macos-latest
+            mpi: msmpi
+            recipes: veloxchem
+          - os: ubuntu-latest
+            mpi: msmpi
+            recipes: veloxchem
+            
     steps:
       - uses: actions/checkout@v2
 
