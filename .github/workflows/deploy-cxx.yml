@@ -26,6 +26,12 @@ jobs:
           - os: ubuntu-latest
             mpi: msmpi
             recipes: veloxchem
+          - os: windows-latest
+            mpi: mpich
+            recipes: veloxchem
+          - os: windows-latest
+            mpi: openmpi
+            recipes: veloxchem
             
     steps:
       - uses: actions/checkout@v2
