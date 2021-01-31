@@ -37,7 +37,6 @@ requirements:
     - numpy >=1.13.0
     - xtb                          # [unix]
     - gtest
-    - gmock
   run:
     - cppe                         # [unix]
     - psutil
@@ -84,12 +83,6 @@ test:
     - set MPI_NUM_PROCS=2                                  # [win]
     - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%" # [win]
     - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs veloxchem -m solvers -k "not loprop"  # [win]
-
-outputs:
-  - name: veloxchem
-    files:
-      - {{ SP_DIR }}/veloxchem  # [unix]
-      - {{ PREFIX }}\\Lib\\site-packages\\veloxchem  # [win]
 
 about:
   home: https://veloxchem.org
