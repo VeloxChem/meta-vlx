@@ -25,7 +25,7 @@ requirements:
     - cmake >=3.17
     - {{ compiler('cxx') }}
     - libgomp                      # [linux]
-    - llvm-openmp                  # [osx]
+    - llvm-openmp                  # [osx or win]
     - ninja
   host:
     - pybind11 >=2.6
@@ -59,29 +59,25 @@ test:
     - test -f $PREFIX/bin/vlx    # [unix]
     - $PREFIX/bin/vlx --version  # [unix]
     - $PREFIX/bin/vlx --help     # [unix]
-    - if not exist %SP_DIR%\\veloxchem exit 1  # [win]
-    - dir %SP_DIR%\\veloxchem                  # [win]
-    - if not exist %SCRIPTS%\\vlx exit 1       # [win]
-    - call %SCRIPTS%\\vlx --version            # [win]
-    - call %SCRIPTS%\\vlx --help               # [win]
-    # Verify Python extension library
-    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
-    - FOR /F "tokens=* USEBACKQ" %g IN (`%PYTHON% -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`) DO (SET "PYLIB_EXT=%g")  # [win]
-    - test -f $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT                 # [unix]
-    - if not exist %SP_DIR\\veloxchem\\veloxchemlib%PYLIB_EXT% exit 1  # [win]
+    - if not exist %SP_DIR%\\veloxchem exit 1      # [win]
+    - dir %SP_DIR%\\veloxchem                      # [win]
+    - if not exist %SCRIPTS%\\vlx.exe exit 1       # [win]
+    - call %SCRIPTS%\\vlx.exe --version            # [win]
+    - call %SCRIPTS%\\vlx.exe --help               # [win]
     # Inspect linkage
+    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
     - ldd -v $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT    # [linux]
     - otool -L $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT  # [osx]
     # run integration tests
-    - export OMP_NUM_THREADS=$CPU_COUNT                     # [unix]
-    - mpirun -n 1 $PYTHON -m pytest --pyargs veloxchem      # [unix]
-    - export MPI_NUM_PROCS=2                                # [unix]
-    - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS)) # [unix]
+    - export OMP_NUM_THREADS=$CPU_COUNT                      # [unix]
+    - mpirun -n 1 $PYTHON -m pytest --pyargs veloxchem       # [unix]
+    - export MPI_NUM_PROCS=2                                 # [unix]
+    - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
     - mpirun -n $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers  # [unix]
-    - set OMP_NUM_THREADS=%CPU_COUNT%                      # [win]
-    - mpiexec -n 1 $PYTHON -m pytest --pyargs veloxchem -k "not loprop"  # [win]
-    - set MPI_NUM_PROCS=2                                  # [win]
-    - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%" # [win]
+    - set OMP_NUM_THREADS=%CPU_COUNT%                                     # [win]
+    - mpiexec -n 1 %PYTHON% -m pytest --pyargs veloxchem -k "not loprop"  # [win]
+    - set MPI_NUM_PROCS=2                                                 # [win]
+    - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%"                # [win]
     - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs veloxchem -m solvers -k "not loprop"  # [win]
 
 about:

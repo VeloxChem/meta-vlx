@@ -27,8 +27,6 @@ if errorlevel 1 exit 1
 
 :: install!
 cmake --build build --config Release --target install
-:: copy .lib file manually
-copy %SRC_DIR%\build\Lib\site-packages\veloxchem\veloxchemlib.lib %SP_DIR%\veloxchem\veloxchemlib.lib
 if errorlevel 1 exit 1
 
 :: Copy the [de]activate scripts to %PREFIX%\etc\conda\[de]activate.d.
