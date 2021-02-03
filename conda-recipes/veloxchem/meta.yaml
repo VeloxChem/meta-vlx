@@ -15,8 +15,10 @@ build:
   entry_points:
     - vlx=veloxchem.main:main
   ignore_run_exports:
+    - mpi
     - mpi4py
     - python
+    - xtb
   run_exports:
     - {{ pin_subpackage('veloxchem', max_pin='x.x') }}
 
@@ -30,7 +32,6 @@ requirements:
   host:
     - pybind11 >=2.6
     - python {{ python }}
-    - libblas * *mkl
     - mkl-devel
     - {{ mpi }}
     - mpi4py
@@ -41,6 +42,8 @@ requirements:
     - cppe                         # [unix]
     - psutil
     - geometric
+    - libblas * *mkl
+    - mkl
     - loprop
     - {{ mpi }}
     - mpi4py
