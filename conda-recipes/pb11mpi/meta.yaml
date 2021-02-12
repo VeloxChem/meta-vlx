@@ -1,0 +1,72 @@
+{% set name = "pb11mpi" %}
+{% set version = "@_version_@" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ../../../pb11mpi.tar.bz2
+  sha256: @_sha256_@
+
+build:
+  number: 0
+  binary_relocation: true
+  entry_points:
+    - pb11mpi=pb11mpi.__main__
+  ignore_run_exports:
+    - mpi
+    - mpi4py
+    - python
+  run_exports:
+    - {{ pin_subpackage('veloxchem', max_pin='x.x') }}
+
+requirements:
+  build:
+    - cmake >=3.17
+    - {{ compiler('cxx') }}
+    - ninja
+  host:
+    - pybind11 >=2.6
+    - python {{ python }}
+    - {{ mpi }}
+    - mpi4py
+  run:
+    - {{ mpi }}
+    - mpi4py
+    - {{ pin_compatible('python', max_pin='x.x') }}
+
+test:
+  requires:
+    - numpy
+  imports:
+    - pb11mpi
+  commands:
+    # Verify existence and execution
+    - test -d $SP_DIR/pb11mpi  # [unix]
+    - ls -l $SP_DIR/pb11mpi    # [unix]
+    - test -f $PREFIX/bin/pb11mpip   # [unix]
+    - $PREFIX/bin/pb11mpi --version  # [unix]
+    - $PREFIX/bin/pb11mpi --help     # [unix]
+    - if not exist %SP_DIR%\\pb11mpi exit 1      # [win]
+    - dir %SP_DIR%\\pb11mpi                      # [win]
+    - if not exist %SCRIPTS%\\pb11mpi.exe exit 1       # [win]
+    - call %SCRIPTS%\\pb11mpi.exe --version            # [win]
+    - call %SCRIPTS%\\pb11mpi.exe --help               # [win]
+    # Inspect linkage
+    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
+    - ldd -v $SP_DIR/pb11mpi/pb11mpilib$PYLIB_EXT    # [linux]
+    - otool -L $SP_DIR/pb11mpi/pb11mpilib$PYLIB_EXT  # [osx]
+    # run integration tests
+    - mpiexec -n 1 $PYTHON -m pb11mpi      # [unix]
+    - mpiexec -n 1 %PYTHON% -m pb11mpi     # [win]
+
+about:
+  home: https://enccs.se
+  dev_url: https://gitlab.com/robertodr/pybind11-mpi4py
+  license: MIT
+  summary: An example repository showing how to use MPI with a hybrid C++/Python code
+
+extra:
+  recipe-maintainers:
+    - robertodr
