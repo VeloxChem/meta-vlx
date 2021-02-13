@@ -3,32 +3,24 @@ name: Deploy C++ packages
 on:
   workflow_dispatch:
     inputs:
-      tbz2:
-        description: 'The tarball to download'
+      recipe:
+        description: 'Which recipe to build'
+        required: true
+      url:
+        description: 'The URL of the tarball to download'
         required: true
       sha256:
         description: 'The SHA256 of the tarball'
-        required: true
-      recipe:
-        description: 'Which recipe to build'
         required: true
       version:
         description: 'Version of the conda package'
         required: true
       channel:
         description: 'The anaconda.org channel'
-        required: false
-        default: 'robertodr'
+        required: true
       label:
         description: 'Label of the conda package'
-        required: false
-        default: 'main'
-  push:
-    paths:
-      - .github/workflows/deploy-cxx.yml
-  pull_request:
-    paths:
-      - .github/workflows/deploy-cxx.yml
+        required: true
 
 jobs:
   build:
@@ -55,16 +47,17 @@ jobs:
         run: |
           Build triggered with the following parameters
 
-           > Recipe for package ${{ github.event.inputs.recipe }}
-           > Conda package version ${{ github.event.inputs.version }}
-           > Conda package label ${{ github.event.inputs.label }}
-           > OS, Python version, MPI implementation ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
+           > Recipe for package: ${{ github.event.inputs.recipe }}
+           > Conda package version: ${{ github.event.inputs.version }}
+           > Conda package channel: ${{ github.event.inputs.channel }}
+           > Conda package label: ${{ github.event.inputs.label }}
+           > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
 
       - name: Get tarball from GitLab
         env:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
         run: |
-          curl --location --header "PRIVATE-TOKEN: $GITLAB_PAT" "${{ github.event.inputs.tbz2 }}" --output ${{ github.event.inputs.recipe }}.tar.bz2
+          curl --location --header "PRIVATE-TOKEN: $GITLAB_PAT" "${{ github.event.inputs.url }}" --output ${{ github.event.inputs.recipe }}.tar.bz2
 
       - name: Install macOS SDK
         if: contains(matrix.os, 'macos')
@@ -110,7 +103,9 @@ jobs:
           cd $GITHUB_WORKSPACE/conda-recipes
           conda build ${{ github.event.inputs.recipe }} \
                 -c conda-forge \ 
-                --user veloxchem --token $ANACONDA_TOKEN --label ${{ github.event.inputs.label }} \
+                --user ${{ github.event.inputs.channel }} \
+                --token $ANACONDA_TOKEN \
+                --label ${{ github.event.inputs.label }} \
                 --verify \
                 --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}"
           
@@ -123,7 +118,9 @@ jobs:
           cd $GITHUB_WORKSPACE/conda-recipes
           conda build ${{ github.event.inputs.recipe }} \
                 -c conda-forge \ 
-                --user veloxchem --token $ANACONDA_TOKEN --label ${{ github.event.inputs.label }} \
+                --user ${{ github.event.inputs.channel }} \
+                --token $ANACONDA_TOKEN \
+                --label ${{ github.event.inputs.label }} \
                 --verify \
                 --variants "{'python': ['${{ matrix.python }}']}"
 
