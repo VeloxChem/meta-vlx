@@ -45,13 +45,13 @@ jobs:
 
       - name: Build summary
         run: |
-          Build triggered with the following parameters
+          echo "Build triggered with the following parameters"
 
-           > Recipe for package: ${{ github.event.inputs.recipe }}
-           > Conda package version: ${{ github.event.inputs.version }}
-           > Conda package channel: ${{ github.event.inputs.channel }}
-           > Conda package label: ${{ github.event.inputs.label }}
-           > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
+          echo " > Recipe for package: ${{ github.event.inputs.recipe }}"
+          echo " > Conda package version: ${{ github.event.inputs.version }}"
+          echo " > Conda package channel: ${{ github.event.inputs.channel }}"
+          echo " > Conda package label: ${{ github.event.inputs.label }}"
+          echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
 
       - name: Get tarball from GitLab
         env:
@@ -61,7 +61,7 @@ jobs:
 
       - name: Install macOS SDK
         if: contains(matrix.os, 'macos')
-        working-directory: /Users/runner
+        working-directory: $HOME
         run: |
           curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.9.sdk.tar.xz > ~/MacOSX10.9.sdk.tar.xz
           tar -xzf ~/MacOSX10.9.sdk.tar.xz
