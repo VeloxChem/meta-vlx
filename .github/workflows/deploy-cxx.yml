@@ -61,7 +61,7 @@ jobs:
 
       - name: Install macOS SDK
         if: contains(matrix.os, 'macos')
-        working-directory: $HOME
+        working-directory: /Users/runner
         run: |
           curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.9.sdk.tar.xz > ~/MacOSX10.9.sdk.tar.xz
           tar -xzf ~/MacOSX10.9.sdk.tar.xz
