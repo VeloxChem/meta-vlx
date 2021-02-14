@@ -101,14 +101,15 @@ jobs:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
-          conda build ${{ github.event.inputs.recipe }} \
-                -c conda-forge \ 
-                --user ${{ github.event.inputs.channel }} \
+          conda build \
+                --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
                 --token $ANACONDA_TOKEN \
+                --user ${{ github.event.inputs.channel }} \
                 --label ${{ github.event.inputs.label }} \
                 --verify \
-                --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}"
-          
+                -c conda-forge \
+                ${{ github.event.inputs.recipe }}
+
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet windows-latest, Python ${{ matrix.python }}, and msmpi
         if: contains(matrix.os, 'windows')
         shell: bash -l {0}
@@ -116,13 +117,14 @@ jobs:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
-          conda build ${{ github.event.inputs.recipe }} \
-                -c conda-forge \ 
-                --user ${{ github.event.inputs.channel }} \
+          conda build \
+                --variants "{'python': ['${{ matrix.python }}']}" \
                 --token $ANACONDA_TOKEN \
+                --user ${{ github.event.inputs.channel }} \
                 --label ${{ github.event.inputs.label }} \
                 --verify \
-                --variants "{'python': ['${{ matrix.python }}']}"
+                -c conda-forge \
+                ${{ github.event.inputs.recipe }}
 
       - name: Clean up tarball
         run: |
