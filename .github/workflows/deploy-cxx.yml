@@ -67,7 +67,7 @@ jobs:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
         run: |
           # write checksum to file
-          printf "${{ github.event.inputs.patch }}" > $GITHUB_WORKSPACE/${{ github.event.inputs.recipe }}.tar.bz2.sha256
+          printf '${{ github.event.inputs.patch }}' > $GITHUB_WORKSPACE/${{ github.event.inputs.recipe }}.tar.bz2.sha256
           # download tarball
           curl --location \
                --header "PRIVATE-TOKEN: $GITLAB_PAT" \
@@ -81,7 +81,7 @@ jobs:
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
           mkdir -p $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches
-          printf "${{ github.event.inputs.patch }}" > $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches/version.patch
+          printf '${{ github.event.inputs.patch }}' > $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches/version.patch
 
       - name: Install macOS SDK
         if: contains(matrix.os, 'macos')
@@ -151,6 +151,7 @@ jobs:
                 -c conda-forge \
                 ${{ github.event.inputs.recipe }}
 
-      - name: Clean up tarball
+      - name: Clean up source code
         run: |
           rm ${{ github.event.inputs.recipe }}.tar.bz2
+          rm -rf ${{ github.event.inputs.recipe }}
