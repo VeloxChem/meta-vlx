@@ -16,7 +16,7 @@ on:
         description: 'Version of the conda package'
         required: true
       build:
-        description: 'Buildd number of the conda package'
+        description: 'Build number of the conda package'
         required: true
       channel:
         description: 'The anaconda.org channel'
