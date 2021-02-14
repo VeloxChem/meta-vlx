@@ -19,7 +19,7 @@ build:
     - mpi4py
     - python
   run_exports:
-    - {{ pin_subpackage('veloxchem', max_pin='x.x') }}
+    - {{ pin_subpackage('pb11mpi', max_pin='x.x') }}
 
 requirements:
   build:
@@ -31,8 +31,10 @@ requirements:
     - python {{ python }}
     - {{ mpi }}
     - mpi4py
+    - xtb
   run:
     - {{ mpi }}
+    - xtb
     - mpi4py
     - {{ pin_compatible('python', max_pin='x.x') }}
 
