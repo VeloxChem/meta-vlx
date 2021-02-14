@@ -109,7 +109,7 @@ jobs:
                  "@_version_@=${{ github.event.inputs.version }}" \
                  "@_sha256_@=${{ github.event.inputs.sha256 }}" \
                  "@_build_@=${{ github.event.inputs.build }}" \
-                --asset \
+                --file \
                 $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/meta.yaml
 
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
