@@ -14,7 +14,7 @@ build:
   number: @_build_@
   binary_relocation: true
   entry_points:
-    - pb11mpi=pb11mpi.__main__
+    - pb11mpi=pb11mpi.main:main
   ignore_run_exports:
     - mpi
     - mpi4py
