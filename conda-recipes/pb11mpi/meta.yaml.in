@@ -8,6 +8,8 @@ package:
 source:
   path: ../../../pb11mpi.tar.bz2
   sha256: @_sha256_@
+  patches:
+    - patches/version.patch
 
 build:
   number: @_build_@
@@ -34,7 +36,6 @@ requirements:
     - xtb
   run:
     - {{ mpi }}
-    - xtb
     - mpi4py
     - {{ pin_compatible('python', max_pin='x.x') }}
 

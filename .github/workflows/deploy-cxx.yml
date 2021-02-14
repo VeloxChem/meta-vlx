@@ -24,6 +24,9 @@ on:
       label:
         description: 'Label of the conda package'
         required: true
+      patch:
+        description: 'Patch to apply'
+        required: true
 
 jobs:
   build:
@@ -61,6 +64,10 @@ jobs:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
         run: |
           curl --location --header "PRIVATE-TOKEN: $GITLAB_PAT" "${{ github.event.inputs.url }}" --output ${{ github.event.inputs.recipe }}.tar.bz2
+
+      - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
+        run: |
+          echo "${{ github.event.inputs.patch }}" > $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches/version.patch
 
       - name: Install macOS SDK
         if: contains(matrix.os, 'macos')
