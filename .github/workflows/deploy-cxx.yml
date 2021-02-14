@@ -66,7 +66,9 @@ jobs:
         env:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
         run: |
+          pwd
           curl --location --header "PRIVATE-TOKEN: $GITLAB_PAT" "${{ github.event.inputs.url }}" --output ${{ github.event.inputs.recipe }}.tar.bz2
+          ls $PWD
 
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
