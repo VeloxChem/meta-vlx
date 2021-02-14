@@ -66,9 +66,7 @@ jobs:
         env:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
         run: |
-          pwd
           curl --location --header "PRIVATE-TOKEN: $GITLAB_PAT" "${{ github.event.inputs.url }}" --output ${{ github.event.inputs.recipe }}.tar.bz2
-          ls $PWD
 
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
@@ -106,7 +104,7 @@ jobs:
 
       - name: Configure meta.yaml.in
         run: |
-          python search-replace.py \
+          python $GITHUB_WORKSPACE/.github/search-replace.py \
                  --replace \
                  "@_version_@=${{ github.event.inputs.version }}" \
                  "@_sha256_@=${{ github.event.inputs.sha256 }}" \
