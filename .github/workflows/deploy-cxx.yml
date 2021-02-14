@@ -62,11 +62,21 @@ jobs:
           echo " > Conda package label: ${{ github.event.inputs.label }}"
           echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
 
-      - name: Get tarball from GitLab
+      - name: Get tarball from GitLab, verify sha256 checksum, and unpack it
         env:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
         run: |
-          curl --location --header "PRIVATE-TOKEN: $GITLAB_PAT" "${{ github.event.inputs.url }}" --output ${{ github.event.inputs.recipe }}.tar.bz2
+          # write checksum to file
+          printf "${{ github.event.inputs.patch }}" > $GITHUB_WORKSPACE/${{ github.event.inputs.recipe }}.tar.bz2.sha256
+          # download tarball
+          curl --location \
+               --header "PRIVATE-TOKEN: $GITLAB_PAT" \
+               "${{ github.event.inputs.url }}" \
+               --output ${{ github.event.inputs.recipe }}.tar.bz2
+          # verify checksum
+          sha256sum -c ${{ github.event.inputs.recipe }}.tar.bz2.sha256
+          # untar
+          tar xjvf ${{ github.event.inputs.recipe }}.tar.bz2
 
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
@@ -107,7 +117,6 @@ jobs:
           python $GITHUB_WORKSPACE/.github/search-replace.py \
                  --replace \
                  "@_version_@=${{ github.event.inputs.version }}" \
-                 "@_sha256_@=${{ github.event.inputs.sha256 }}" \
                  "@_build_@=${{ github.event.inputs.build }}" \
                 --file \
                 $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/meta.yaml

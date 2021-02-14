@@ -6,8 +6,7 @@ package:
   version: {{ version }}
 
 source:
-  path: ../../pb11mpi.tar.bz2
-  sha256: @_sha256_@
+  path: ../../pb11mpi
   patches:
     - patches/version.patch
 
