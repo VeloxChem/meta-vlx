@@ -31,6 +31,9 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -68,7 +71,7 @@ jobs:
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
           mkdir -p $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches
-          echo "${{ github.event.inputs.patch }}" > $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches/version.patch
+          printf "${{ github.event.inputs.patch }}" > $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches/version.patch
 
       - name: Install macOS SDK
         if: contains(matrix.os, 'macos')
@@ -111,7 +114,6 @@ jobs:
 
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
-        shell: bash -l {0}
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
@@ -127,7 +129,6 @@ jobs:
 
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet windows-latest, Python ${{ matrix.python }}, and msmpi
         if: contains(matrix.os, 'windows')
-        shell: bash -l {0}
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
