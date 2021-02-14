@@ -67,14 +67,14 @@ jobs:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
         run: |
           # write checksum to file
-          printf '${{ github.event.inputs.patch }}' > $GITHUB_WORKSPACE/${{ github.event.inputs.recipe }}.tar.bz2.sha256
+          printf '${{ github.event.inputs.sha256 }}' > $GITHUB_WORKSPACE/${{ github.event.inputs.recipe }}.tar.bz2.sha256
           # download tarball
           curl --location \
                --header "PRIVATE-TOKEN: $GITLAB_PAT" \
                "${{ github.event.inputs.url }}" \
                --output ${{ github.event.inputs.recipe }}.tar.bz2
           # verify checksum
-          sha256sum -c ${{ github.event.inputs.recipe }}.tar.bz2.sha256
+          sha256sum --strict -c ${{ github.event.inputs.recipe }}.tar.bz2.sha256
           # untar
           tar xjvf ${{ github.event.inputs.recipe }}.tar.bz2
 
