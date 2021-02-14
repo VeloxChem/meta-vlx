@@ -67,6 +67,7 @@ jobs:
 
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
+          mkdir -p $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches
           echo "${{ github.event.inputs.patch }}" > $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches/version.patch
 
       - name: Install macOS SDK
