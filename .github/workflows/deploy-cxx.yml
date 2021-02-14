@@ -15,6 +15,9 @@ on:
       version:
         description: 'Version of the conda package'
         required: true
+      build:
+        description: 'Buildd number of the conda package'
+        required: true
       channel:
         description: 'The anaconda.org channel'
         required: true
@@ -88,11 +91,15 @@ jobs:
           python-version: 3.8
           use-only-tar-bz2: true  # IMPORTANT: This needs to be set for caching to work properly!
 
-      - name: Configure meta.yaml
+      - name: Configure meta.yaml.in
         run: |
-          cd $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}
-          sed -i -e "s/@_version_@/${{ github.event.inputs.version }}/g" meta.yaml
-          sed -i -e "s/@_sha256_@/${{ github.event.inputs.sha256 }}/g" meta.yaml
+          python search-replace.py \
+                 --replace \
+                 "@_version_@=${{ github.event.inputs.version }}" \
+                 "@_sha256_@=${{ github.event.inputs.sha256 }}" \
+                 "@_build_@=${{ github.event.inputs.build }}" \
+                --asset \
+                $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/meta.yaml
 
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')

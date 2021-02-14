@@ -10,7 +10,7 @@ source:
   sha256: @_sha256_@
 
 build:
-  number: 0
+  number: @_build_@
   binary_relocation: true
   entry_points:
     - pb11mpi=pb11mpi.__main__
@@ -47,7 +47,7 @@ test:
     # Verify existence and execution
     - test -d $SP_DIR/pb11mpi  # [unix]
     - ls -l $SP_DIR/pb11mpi    # [unix]
-    - test -f $PREFIX/bin/pb11mpip   # [unix]
+    - test -f $PREFIX/bin/pb11mpi   # [unix]
     - $PREFIX/bin/pb11mpi --version  # [unix]
     - $PREFIX/bin/pb11mpi --help     # [unix]
     - if not exist %SP_DIR%\\pb11mpi exit 1      # [win]
