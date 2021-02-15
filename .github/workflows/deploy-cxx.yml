@@ -76,7 +76,7 @@ jobs:
           # verify checksum
           sha256sum --strict -c ${{ github.event.inputs.recipe }}.tar.bz2.sha256
           # untar
-          tar xjvf ${{ github.event.inputs.recipe }}.tar.bz2
+          tar xj ${{ github.event.inputs.recipe }}.tar.bz2
 
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
