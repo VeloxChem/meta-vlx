@@ -67,7 +67,7 @@ jobs:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
         run: |
           # write checksum to file
-          printf '${{ github.event.inputs.sha256 }}' > $GITHUB_WORKSPACE/${{ github.event.inputs.recipe }}.tar.bz2.sha256
+          printf '${{ github.event.inputs.sha256 }}  ${{ github.event.inputs.recipe }}.tar.bz2' > $GITHUB_WORKSPACE/${{ github.event.inputs.recipe }}.tar.bz2.sha256
           # download tarball
           curl --location \
                --header "PRIVATE-TOKEN: $GITLAB_PAT" \
@@ -154,4 +154,5 @@ jobs:
       - name: Clean up source code
         run: |
           rm ${{ github.event.inputs.recipe }}.tar.bz2
+          rm ${{ github.event.inputs.recipe }}.tar.bz2.sha256
           rm -rf ${{ github.event.inputs.recipe }}

@@ -13,8 +13,6 @@ source:
 build:
   number: @_build_@
   binary_relocation: true
-  entry_points:
-    - pb11mpi=pb11mpi.main:main
   ignore_run_exports:
     - mpi
     - mpi4py
@@ -48,13 +46,8 @@ test:
     - test -d $SP_DIR/pb11mpi  # [unix]
     - ls -l $SP_DIR/pb11mpi    # [unix]
     - test -f $PREFIX/bin/pb11mpi   # [unix]
-    - $PREFIX/bin/pb11mpi --version  # [unix]
-    - $PREFIX/bin/pb11mpi --help     # [unix]
     - if not exist %SP_DIR%\\pb11mpi exit 1      # [win]
     - dir %SP_DIR%\\pb11mpi                      # [win]
-    - if not exist %SCRIPTS%\\pb11mpi.exe exit 1       # [win]
-    - call %SCRIPTS%\\pb11mpi.exe --version            # [win]
-    - call %SCRIPTS%\\pb11mpi.exe --help               # [win]
     # Inspect linkage
     - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
     - ldd -v $SP_DIR/pb11mpi/pb11mpilib$PYLIB_EXT    # [linux]
