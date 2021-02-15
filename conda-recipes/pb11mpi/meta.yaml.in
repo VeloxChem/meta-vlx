@@ -44,7 +44,6 @@ test:
     # Verify existence and execution
     - test -d $SP_DIR/pb11mpi  # [unix]
     - ls -l $SP_DIR/pb11mpi    # [unix]
-    - test -f $PREFIX/bin/pb11mpi   # [unix]
     - if not exist %SP_DIR%\\pb11mpi exit 1      # [win]
     - dir %SP_DIR%\\pb11mpi                      # [win]
     # Inspect linkage
