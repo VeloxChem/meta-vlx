@@ -67,20 +67,26 @@ jobs:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
         run: |
           # write checksum to file
+          echo ">>> Write $GITHUB_WORKSPACE/${{ github.event.inputs.recipe }}.tar.bz2.sha256"
           printf '${{ github.event.inputs.sha256 }}  ${{ github.event.inputs.recipe }}.tar.bz2' > $GITHUB_WORKSPACE/${{ github.event.inputs.recipe }}.tar.bz2.sha256
           # download tarball
+          echo ">>> Download ${{ github.event.inputs.recipe }}.tar.bz2"
           curl --location \
                --header "PRIVATE-TOKEN: $GITLAB_PAT" \
                "${{ github.event.inputs.url }}" \
                --output ${{ github.event.inputs.recipe }}.tar.bz2
           # verify checksum
-          sha256sum --strict -c ${{ github.event.inputs.recipe }}.tar.bz2.sha256
+          echo ">>> Verify SHA256 checksum"
+          sha256sum --strict --check ${{ github.event.inputs.recipe }}.tar.bz2.sha256
           # untar
-          tar xj ${{ github.event.inputs.recipe }}.tar.bz2
+          echo ">>> Untar archive"
+          tar xf ${{ github.event.inputs.recipe }}.tar.bz2
 
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
+          echo ">>> Create folder for patches"
           mkdir -p $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches
+          echo ">>> Write patch to $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches/version.patch"
           printf '${{ github.event.inputs.patch }}' > $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches/version.patch
 
       - name: Install macOS SDK

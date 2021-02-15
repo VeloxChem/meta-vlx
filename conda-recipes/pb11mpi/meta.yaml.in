@@ -30,7 +30,6 @@ requirements:
     - python {{ python }}
     - {{ mpi }}
     - mpi4py
-    - xtb  # [unix]
   run:
     - {{ mpi }}
     - mpi4py
