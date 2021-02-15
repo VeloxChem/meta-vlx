@@ -48,8 +48,8 @@ test:
     - dir %SP_DIR%\\pb11mpi                      # [win]
     # Inspect linkage
     - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
-    - ldd -v $SP_DIR/pb11mpi/pb11mpilib$PYLIB_EXT    # [linux]
-    - otool -L $SP_DIR/pb11mpi/pb11mpilib$PYLIB_EXT  # [osx]
+    - ldd -v $SP_DIR/pb11mpi/_pb11mpi$PYLIB_EXT    # [linux]
+    - otool -L $SP_DIR/pb11mpi/_pb11mpi$PYLIB_EXT  # [osx]
     # run integration tests
     - mpiexec -n 1 $PYTHON -m pb11mpi      # [unix]
     - mpiexec -n 1 %PYTHON% -m pb11mpi     # [win]
