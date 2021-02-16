@@ -28,10 +28,13 @@ requirements:
   host:
     - pybind11 >=2.6
     - python {{ python }}
+    - mkl-devel
     - {{ mpi }}
     - mpi4py
   run:
     - {{ mpi }}
+    - libblas * *mkl
+    - mkl
     - mpi4py
     - {{ pin_compatible('python', max_pin='x.x') }}
 
