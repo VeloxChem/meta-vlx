@@ -24,6 +24,8 @@ requirements:
   build:
     - cmake >=3.17
     - {{ compiler('cxx') }}
+    - libgomp                      # [linux]
+    - llvm-openmp                  # [osx or win]
     - ninja
   host:
     - pybind11 >=2.6
