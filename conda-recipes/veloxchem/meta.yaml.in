@@ -1,16 +1,17 @@
 {% set name = "veloxchem" %}
-{% set version = "1.0rc1.post1" %}
+{% set version = "@_version_@" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  path: ../../../vlx-conda-build
-  #sha256: 1a8a667f4c81601daa43e1339d91f1594fb5525fe0869dce5e187c49430a769c
+  path: ../../veloxchem
+  patches:
+    - patches/version.patch
 
 build:
-  number: 0
+  number: @_build_@
   binary_relocation: true
   entry_points:
     - vlx=veloxchem.main:main
@@ -18,7 +19,6 @@ build:
     - mpi
     - mpi4py
     - python
-    - xtb
   run_exports:
     - {{ pin_subpackage('veloxchem', max_pin='x.x') }}
 
@@ -29,6 +29,7 @@ requirements:
     - libgomp                      # [linux]
     - llvm-openmp                  # [osx or win]
     - ninja
+    - pkg-config                   # [unix]
   host:
     - pybind11 >=2.6
     - python {{ python }}
