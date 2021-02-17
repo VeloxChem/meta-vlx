@@ -99,26 +99,14 @@ jobs:
           tar -xzf ~/MacOSX10.9.sdk.tar.xz
           rm ~/MacOSX10.9.sdk.tar.xz
 
-      - name: Cache conda
-        uses: actions/cache@v1
-        env:
-          CACHE_NUMBER: 0  # Increase this value to reset cache if .github/deploy.yml has not changed
-        with:
-          path: ~/conda_pkgs_dir
-          key:
-            cxx-deps-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('.github/deploy.yml') }}
-
       - uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
           auto-update-conda: true
           auto-activate-base: false
           activate-environment: deploy
-          channels: conda-forge,defaults
           environment-file: .github/deploy.yml
-          channel-priority: true
           python-version: 3.8
-          use-only-tar-bz2: true  # IMPORTANT: This needs to be set for caching to work properly!
 
       - name: Configure meta.yaml.in
         run: |
