@@ -1,5 +1,5 @@
 CONDA_BUILD_SYSROOT:
-  - /Users/Flow/MacOSX10.9.sdk     # [osx]
+  - /Users/runner/MacOSX10.9.sdk     # [osx]
 
 mpi:
   - msmpi    # [win]
