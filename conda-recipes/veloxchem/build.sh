@@ -4,6 +4,8 @@ set -ex
 # clean up unwanted compiler flags
 CXXFLAGS="${CXXFLAGS//-march=nocona}"
 CXXFLAGS="${CXXFLAGS//-mtune=haswell}"
+CXXFLAGS="${CXXFLAGS//-march=core2}"
+CXXFLAGS="${CXXFLAGS//-mssse3}"
 
 # configure!
 cmake \
