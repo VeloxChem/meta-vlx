@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -ex
 
+# clean up unwanted compiler flags
+CXXFLAGS="${CXXFLAGS//-march=nocona}"
+CXXFLAGS="${CXXFLAGS//-mtune=haswell}"
+
 # configure!
 cmake \
     -S"${SRC_DIR}" \
