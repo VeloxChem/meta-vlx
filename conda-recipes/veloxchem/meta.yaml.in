@@ -33,22 +33,26 @@ requirements:
   host:
     - pybind11 >=2.6
     - python {{ python }}
-    - mkl-devel
+    - mkl 2020.*
+    - mkl-devel 2020.*
     - {{ mpi }}
     - mpi4py
     - numpy >=1.13.0
     - xtb                          # [unix]
     - gtest
+    - gmock
   run:
-    - cppe                         # [unix]
     - psutil
-    - geometric
     - libblas * *mkl
-    - mkl
-    - loprop
+    - mkl 2020.*
+    - geometric
+    - cppe
     - {{ mpi }}
     - mpi4py
     - h5py
+    - loprop >=0.3.4
+    - {{ pin_compatible('mkl', upper_bound='2021.0') }}
+    - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('python', max_pin='x.x') }}
 
 test:
@@ -91,7 +95,9 @@ about:
   doc_source_url: https://gitlab.com/veloxchem/veloxchem/-/blob/master/docs/index.rst
   license: LGPL-3.0-or-later
   license_url: https://opensource.org/licenses/LGPL-3.0
-  license_file: LICENSE
+  license_file:
+    - COPYING
+    - COPYING.LESSER
   license_family: LGPL
   summary: A Python-based, open source quantum chemistry program package
 
