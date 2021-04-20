@@ -46,8 +46,7 @@ requirements:
     - libblas * *mkl
     - mkl 2020.*
     - geometric
-    # VeloxChem requires CPPE==0.2.1 which is not on conda-forge
-    #- cppe                         # [unix]
+    - cppe 0.2.1                   # [unix]
     - {{ mpi }}
     - mpi4py
     - h5py
