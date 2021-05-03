@@ -28,9 +28,14 @@ on:
         description: 'Patch to apply'
         required: true
 
+concurrency: 
+  group: latest-deploy-group
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    name: Deploy to Anaconda.org
     defaults:
       run:
         shell: bash -l {0}
