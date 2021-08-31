@@ -42,7 +42,9 @@ requirements:
     - gtest
     - gmock
   run:
+    - dataclasses                  # [py==36]
     - psutil
+    - mdanalysis >=1.0
     - libblas * *mkl
     - mkl 2020.*
     - geometric
