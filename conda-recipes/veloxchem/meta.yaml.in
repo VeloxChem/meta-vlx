@@ -16,7 +16,7 @@ build:
   entry_points:
     - vlx=veloxchem.main:main
   ignore_run_exports:
-    - mpi
+    - {{ mpi }}
     - mpi4py
     - python
   run_exports:
