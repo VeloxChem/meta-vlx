@@ -110,7 +110,10 @@ jobs:
           auto-activate-base: false
           activate-environment: deploy
           environment-file: .github/deploy.yml
-          python-version: 3.9
+          python-version: ${{ matrix.python }}
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          use-mamba: true
 
       - name: Configure meta.yaml.in
         run: |
