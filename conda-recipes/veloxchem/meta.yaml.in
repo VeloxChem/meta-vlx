@@ -31,29 +31,29 @@ requirements:
     - ninja
     - pkg-config                   # [unix]
   host:
-    - pybind11 >=2.6
+    - pybind11
     - python {{ python }}
-    - mkl 2020.*
-    - mkl-devel 2020.*
+    - mkl
+    - mkl-devel
     - {{ mpi }}
     - mpi4py
-    - numpy >=1.13.0
+    - numpy
     - xtb                          # [unix]
     - gtest
     - gmock
   run:
     - dataclasses                  # [py==36]
     - psutil
-    - mdanalysis >=1.0
+    - mdanalysis
     - libblas * *mkl
-    - mkl 2020.*
+    - mkl
     - geometric
     - cppe 0.2.1                   # [unix]
     - {{ mpi }}
     - mpi4py
     - h5py
-    - loprop >=0.3.4
-    - {{ pin_compatible('mkl', upper_bound='2021.0') }}
+    - loprop
+    - {{ pin_compatible('mkl') }}
     - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('python', max_pin='x.x') }}
 
