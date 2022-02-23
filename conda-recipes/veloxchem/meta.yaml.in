@@ -33,11 +33,11 @@ requirements:
   host:
     - pybind11
     - python {{ python }}
-    - mkl
-    - mkl-devel
+    - mkl 2020.*
+    - mkl-devel 2020.*
     - {{ mpi }}
     - mpi4py
-    - numpy
+    - numpy 1.19.*
     - xtb                          # [unix]
     - gtest
     - gmock
@@ -46,14 +46,14 @@ requirements:
     - psutil
     - mdanalysis
     - libblas * *mkl
-    - mkl
+    - mkl 2020.*
     - geometric
     - cppe 0.2.1                   # [unix]
     - {{ mpi }}
     - mpi4py
     - h5py
     - loprop
-    - {{ pin_compatible('mkl') }}
+    - {{ pin_compatible('mkl', upper_bound='2021.0') }}
     - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('python', max_pin='x.x') }}
 
