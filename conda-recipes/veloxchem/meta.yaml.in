@@ -86,9 +86,9 @@ test:
     - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers  # [unix]
     - set OMP_NUM_THREADS=%CPU_COUNT%                        # [win]
     - mpiexec -n 1 %PYTHON% -m pytest --pyargs veloxchem     # [win]
-    - set MPI_NUM_PROCS=2                                    # [win]
-    - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%"   # [win]
-    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs veloxchem -m solvers  # [win]
+    #- set MPI_NUM_PROCS=2                                    # [win]
+    #- set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%"   # [win]
+    #- mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs veloxchem -m solvers  # [win]
 
 about:
   home: https://veloxchem.org
