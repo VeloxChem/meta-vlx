@@ -30,9 +30,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force
         g++ \
         gcc \
         git \
+        googletest \
         intel-oneapi-compiler-dpcpp-cpp \
         intel-oneapi-mkl \
         intel-oneapi-mkl-devel \
+        libgtest-dev \
         libopenblas-openmp-dev \
         libopenblas-dev \
         intel-oneapi-mpi \
@@ -43,7 +45,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force
         openmpi-bin \
         python3 \
         python3-pip \
-	    python-is-python3
+	python-is-python3
 RUN apt clean --yes -qq
 RUN rm -rf /var/lib/apt/lists/*
 
