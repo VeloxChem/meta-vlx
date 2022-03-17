@@ -31,7 +31,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force
         gcc \
         git \
         googletest \
-        intel-oneapi-compiler-dpcpp-cpp \
+        intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
         intel-oneapi-mkl \
         intel-oneapi-mkl-devel \
         libgtest-dev \
@@ -51,8 +51,9 @@ RUN rm -rf /var/lib/apt/lists/*
 
 FROM deps AS prep-env
 # copy scripts
-COPY prepare-intel-environment.sh /opt/docker/etc/prepare-intel-environment.sh
-COPY prepare-gnu-environment.sh /opt/docker/etc/prepare-gnu-environment.sh
+COPY intel-env.sh /opt/docker/etc/intel-env.sh
+COPY gnu+mkl-env.sh /opt/docker/etc/gnu+mkl-env.sh
+COPY gnu-env.sh /opt/docker/etc/gnu-env.sh
 
 FROM prep-env
 CMD [ "/bin/bash" ]
