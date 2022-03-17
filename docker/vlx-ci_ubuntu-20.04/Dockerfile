@@ -45,7 +45,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force
         openmpi-bin \
         python3 \
         python3-pip \
-	python-is-python3
+        python3-venv \
+        python-is-python3
 RUN apt clean --yes -qq
 RUN rm -rf /var/lib/apt/lists/*
 
