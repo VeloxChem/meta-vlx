@@ -52,7 +52,7 @@ RUN rm -rf /var/lib/apt/lists/*
 FROM deps AS prep-env
 # copy scripts
 COPY intel-env.sh /opt/docker/etc/intel-env.sh
-COPY gnu+mkl-env.sh /opt/docker/etc/gnu+mkl-env.sh
+COPY gnu-mkl-env.sh /opt/docker/etc/gnu-mkl-env.sh
 COPY gnu-env.sh /opt/docker/etc/gnu-env.sh
 
 FROM prep-env
