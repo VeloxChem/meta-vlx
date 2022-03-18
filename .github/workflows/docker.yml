@@ -36,69 +36,69 @@ jobs:
           echo "Added, modified, renamed files: $changes"
           echo ::set-output name=changed_files::$(echo $changes | jq -c .)
 
-  build-test-containers:
-    name: "Build Docker containers"
+  #build-test-containers:
+  #  name: "Build Docker containers"
 
-    needs:
-      - changes
+  #  needs:
+  #    - changes
 
-    runs-on: ubuntu-latest
+  #  runs-on: ubuntu-latest
 
-    #strategy:
-    #  # Keep going on other deployments if anything bloops
-    #  fail-fast: false
-    #  matrix:
-    #    image:
-    #      - 'vlx-ci_ubuntu-20.04'
+  #  strategy:
+  #    # Keep going on other deployments if anything bloops
+  #    fail-fast: false
+  #    matrix:
+  #      image:
+  #        - 'vlx-ci_ubuntu-20.04'
 
-    name: Build Docker container ${{ matrix.image }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  #  name: Build Docker container ${{ matrix.image }}
+  #  steps:
+  #    - name: Checkout
+  #      uses: actions/checkout@v3
 
-      - name: Continue if any Docker recipe was changed
-        run: |
-          sudo apt-get install -y jq
+  #    - name: Continue if any Docker recipe was changed
+  #      run: |
+  #        sudo apt-get install -y jq
 
-          echo "Added, modified, removed files:"
-          echo '${{ needs.changes.outputs.changed_files }}' | tee changed_files.json
-          changed="$(cat changed_files.json | jq 'any(.[]; . == "${{ matrix.image }}")')"
-          if [[ "$changed" == "true" ]]; then
-             echo "Container to build: ${{ matrix.image }}"
-             echo "keepgoing=true" >> $GITHUB_ENV
-          else
-             echo "Nothing to build!"
-          fi
+  #        echo "Added, modified, removed files:"
+  #        echo '${{ needs.changes.outputs.changed_files }}' | tee changed_files.json
+  #        changed="$(cat changed_files.json | jq 'any(.[]; . == "${{ matrix.image }}")')"
+  #        if [[ "$changed" == "true" ]]; then
+  #           echo "Container to build: ${{ matrix.image }}"
+  #           echo "keepgoing=true" >> $GITHUB_ENV
+  #        else
+  #           echo "Nothing to build!"
+  #        fi
 
-      - name: Docker meta
-        if: ${{ env.keepgoing == 'true' }}
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: |
-            ghcr.io/${{ github.repository }}/${{ matrix.image }}
-          flavor: |
-            latest=true
-          tags: |
-            type=sha
+  #    - name: Docker meta
+  #      if: ${{ env.keepgoing == 'true' }}
+  #      id: meta
+  #      uses: docker/metadata-action@v3
+  #      with:
+  #        images: |
+  #          ghcr.io/${{ github.repository }}/${{ matrix.image }}
+  #        flavor: |
+  #          latest=true
+  #        tags: |
+  #          type=sha
 
-      - name: Set up Docker Buildx
-        if: ${{ env.keepgoing == 'true' }}
-        uses: docker/setup-buildx-action@v1
+  #    - name: Set up Docker Buildx
+  #      if: ${{ env.keepgoing == 'true' }}
+  #      uses: docker/setup-buildx-action@v1
 
-      - name: Login to GitHub Container Registry
-        if: ${{ env.keepgoing == 'true' }}
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #    - name: Login to GitHub Container Registry
+  #      if: ${{ env.keepgoing == 'true' }}
+  #      uses: docker/login-action@v1
+  #      with:
+  #        registry: ghcr.io
+  #        username: ${{ github.repository_owner }}
+  #        password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker images
-        if: ${{ env.keepgoing == 'true' }}
-        uses: docker/build-push-action@v2
-        with:
-          context: docker/${{ matrix.image }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+  #    - name: Build and push Docker images
+  #      if: ${{ env.keepgoing == 'true' }}
+  #      uses: docker/build-push-action@v2
+  #      with:
+  #        context: docker/${{ matrix.image }}
+  #        push: true
+  #        tags: ${{ steps.meta.outputs.tags }}
+  #        labels: ${{ steps.meta.outputs.labels }}
