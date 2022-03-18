@@ -3,6 +3,7 @@ FROM ubuntu:20.04
 # add a timestamp for the build. Also, bust the cache.
 ADD http://worldclockapi.com/api/json/utc/now /opt/docker/etc/timestamp
 
+# install software
 RUN apt update --yes -qq -o Acquire::CompressionTypes::Order::=gz \
     && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
        apt-transport-https \
