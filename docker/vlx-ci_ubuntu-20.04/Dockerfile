@@ -1,9 +1,9 @@
-FROM ubuntu:20.04 AS base
+FROM ubuntu:20.04
 
-# Add a timestamp for the build. Also, bust the cache.
+# add a timestamp for the build. Also, bust the cache.
 ADD http://worldclockapi.com/api/json/utc/now /opt/docker/etc/timestamp
 
-# Install system packages
+# install system packages
 RUN apt update --yes -qq \
     && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
        apt-transport-https \
@@ -15,16 +15,7 @@ RUN apt update --yes -qq \
     && echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list \
     && apt update --yes -qq \
     && apt upgrade --yes -qq \
-    && apt remove --yes -qq \
-       apt-transport-https \
-       ca-certificates \
-       gnupg \
-       software-properties-common \
-       wget \
-    && apt autoremove --purge --yes -qq
-
-FROM base AS deps
-RUN DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
+    DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
     build-essential \
     cmake \
     g++ \
@@ -48,14 +39,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force
     python3-venv \
     python-is-python3 \
     rsync \
+    && apt remove --yes -qq \
+       apt-transport-https \
+       ca-certificates \
+       gnupg \
+       software-properties-common \
+       wget \
+    && apt autoremove --purge --yes -qq \
     && apt clean --yes -qq \
     && rm -rf /var/lib/apt/lists/*
 
-FROM deps AS prep-env
 # copy scripts
-COPY intel-env.sh /opt/docker/etc/intel-env.sh
-COPY gnu-mkl-env.sh /opt/docker/etc/gnu-mkl-env.sh
-COPY gnu-env.sh /opt/docker/etc/gnu-env.sh
+COPY intel-env.sh gnu-mkl-env.sh gnu-env.sh /opt/docker/etc
 
-FROM prep-env
 CMD [ "/bin/bash" ]
