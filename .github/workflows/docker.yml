@@ -48,7 +48,7 @@ jobs:
       # Keep going on other deployments if anything bloops
       fail-fast: false
       matrix:
-        - vlx-ci_ubuntu-20.04
+        - 'vlx-ci_ubuntu-20.04'
 
     name: Build Docker container ${{ matrix.image }}
     steps:
