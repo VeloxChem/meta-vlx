@@ -15,30 +15,30 @@ RUN apt update --yes -qq \
     && echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list \
     && apt update --yes -qq \
     && apt upgrade --yes -qq \
-    DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
-    build-essential \
-    cmake \
-    g++ \
-    gcc \
-    git \
-    googletest \
-    intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
-    intel-oneapi-mkl \
-    intel-oneapi-mkl-devel \
-    libgtest-dev \
-    libopenblas-openmp-dev \
-    libopenblas-dev \
-    intel-oneapi-mpi \
-    intel-oneapi-mpi-devel \
-    intel-oneapi-openmp \
-    libopenmpi-dev \
-    libpython3-dev \
-    openmpi-bin \
-    python3 \
-    python3-pip \
-    python3-venv \
-    python-is-python3 \
-    rsync \
+    && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
+       build-essential \
+       cmake \
+       g++ \
+       gcc \
+       git \
+       googletest \
+       intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+       intel-oneapi-mkl \
+       intel-oneapi-mkl-devel \
+       libgtest-dev \
+       libopenblas-openmp-dev \
+       libopenblas-dev \
+       intel-oneapi-mpi \
+       intel-oneapi-mpi-devel \
+       intel-oneapi-openmp \
+       libopenmpi-dev \
+       libpython3-dev \
+       openmpi-bin \
+       python3 \
+       python3-pip \
+       python3-venv \
+       python-is-python3 \
+       rsync \
     && apt remove --yes -qq \
        apt-transport-https \
        ca-certificates \
