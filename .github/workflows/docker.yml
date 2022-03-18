@@ -36,30 +36,28 @@ jobs:
           echo "Added, modified, renamed files: $changes"
           echo ::set-output name=changed_files::$(echo $changes | jq -c .)
 
-  #build-test-containers:
-  #  name: "Build Docker containers"
+  build-test-containers:
+    name: "Build Docker containers"
 
-  #  needs:
-  #    - changes
+    needs:
+      - changes
 
-  #  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-  #  strategy:
-  #    # Keep going on other deployments if anything bloops
-  #    fail-fast: false
-  #    matrix:
-  #      image:
-  #        - 'vlx-ci_ubuntu-20.04'
+    strategy:
+      # Keep going on other deployments if anything bloops
+      fail-fast: false
+      matrix:
+        image:
+          - 'vlx-ci_ubuntu-20.04'
 
-  #  name: Build Docker container ${{ matrix.image }}
-  #  steps:
-  #    - name: Checkout
-  #      uses: actions/checkout@v3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-  #    - name: Continue if any Docker recipe was changed
-  #      run: |
-  #        sudo apt-get install -y jq
-
+      - name: Continue if any Docker recipe was changed
+        run: |
+          sudo apt-get install -y jq
   #        echo "Added, modified, removed files:"
   #        echo '${{ needs.changes.outputs.changed_files }}' | tee changed_files.json
   #        changed="$(cat changed_files.json | jq 'any(.[]; . == "${{ matrix.image }}")')"
