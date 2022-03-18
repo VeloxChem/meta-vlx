@@ -50,6 +50,7 @@ jobs:
       matrix:
           - vlx-ci_ubuntu-20.04
 
+    name: Build Docker container ${{ matrix.image }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
