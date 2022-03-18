@@ -58,15 +58,15 @@ jobs:
       - name: Continue if any Docker recipe was changed
         run: |
           sudo apt-get install -y jq
-  #        echo "Added, modified, removed files:"
-  #        echo '${{ needs.changes.outputs.changed_files }}' | tee changed_files.json
-  #        changed="$(cat changed_files.json | jq 'any(.[]; . == "${{ matrix.image }}")')"
-  #        if [[ "$changed" == "true" ]]; then
-  #           echo "Container to build: ${{ matrix.image }}"
-  #           echo "keepgoing=true" >> $GITHUB_ENV
-  #        else
-  #           echo "Nothing to build!"
-  #        fi
+          echo "Added, modified, removed files:"
+          echo '${{ needs.changes.outputs.changed_files }}' | tee changed_files.json
+          changed="$(cat changed_files.json | jq 'any(.[]; . == "${{ matrix.image }}")')"
+          if [[ "$changed" == "true" ]]; then
+             echo "Container to build: ${{ matrix.image }}"
+             echo "keepgoing=true" >> $GITHUB_ENV
+          else
+             echo "Nothing to build!"
+          fi
 
   #    - name: Docker meta
   #      if: ${{ env.keepgoing == 'true' }}
