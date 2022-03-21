@@ -11,8 +11,8 @@ RUN apt update --yes -qq \
        intel-oneapi-mkl-devel \
        intel-oneapi-mpi \
        intel-oneapi-mpi-devel \
-       intel-oneapi-python \
        intel-oneapi-openmp \
+       intel-oneapi-python \
     && apt clean --yes -qq \
     && rm -rf /var/lib/apt/lists/*
 
