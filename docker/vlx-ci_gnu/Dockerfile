@@ -8,7 +8,8 @@ RUN apt update --yes -qq \
     && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
        g++ \
        gcc \
-       libopenblas-dev \
+       liblapacke \
+       liblapacke-dev \
        libopenblas-openmp-dev \
        libopenmpi-dev \
        libpython3-dev \
