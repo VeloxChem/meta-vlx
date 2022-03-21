@@ -11,12 +11,12 @@ RUN apt update --yes -qq \
        libopenblas-dev \
        libopenblas-openmp-dev \
        libopenmpi-dev \
-       libpython3-dev \                                                         │    │
+       libpython3-dev \
        openmpi-bin \
        python-is-python3 \
-       python3 \                                                                │    │
-       python3-pip \                                                            │    │
-       python3-venv \                                                           │    │
+       python3 \
+       python3-pip \
+       python3-venv \
     && apt clean --yes -qq \
     && rm -rf /var/lib/apt/lists/*
 
