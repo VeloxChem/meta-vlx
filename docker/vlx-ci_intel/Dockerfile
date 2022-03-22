@@ -12,7 +12,7 @@ RUN apt update --yes -qq \
        intel-oneapi-mpi \
        intel-oneapi-mpi-devel \
        intel-oneapi-openmp \
-       intel-oneapi-python \
+    && apt autoremove --yes -qq \
     && apt clean --yes -qq \
     && rm -rf /var/lib/apt/lists/*
 
