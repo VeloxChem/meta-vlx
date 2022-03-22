@@ -25,6 +25,11 @@ RUN apt update --yes -qq \
        git \
        googletest \
        libgtest-dev \
+       libpython3-dev \
+       python-is-python3 \
+       python3 \
+       python3-pip \
+       python3-venv \
        rsync \
     && apt clean --yes -qq \
     && rm -rf /var/lib/apt/lists/*
