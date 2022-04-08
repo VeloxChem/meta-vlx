@@ -5,7 +5,8 @@ ADD http://worldclockapi.com/api/json/utc/now /opt/docker/etc/timestamp
 
 # install software
 RUN apt update --yes -qq \
-    && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
+    && DEBIAN_FRONTEND=noninteractive apt install --yes -qq \
+       -o Dpkg::Options::="--force-confnew" \
        intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
        intel-oneapi-mkl \
        intel-oneapi-mkl-devel \

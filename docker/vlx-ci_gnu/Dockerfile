@@ -5,7 +5,8 @@ ADD http://worldclockapi.com/api/json/utc/now /opt/docker/etc/timestamp
 
 # install software
 RUN apt update --yes -qq \
-    && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
+    && DEBIAN_FRONTEND=noninteractive apt install --yes -qq \
+       -o Dpkg::Options::="--force-confnew" \
        g++ \
        gcc \
        liblapacke \
