@@ -3,7 +3,7 @@ CONDA_BUILD_SYSROOT:
 
 mpi:
   - msmpi >=10.1.1,<10.1.2  # [win]
-  - mpich >=3.4.3,<4.0.2    # [not win]
+  #- mpich >=3.4.3,<4.0.2    # [not win]
   - openmpi >=4.1.0         # [not win]
 
 python:
