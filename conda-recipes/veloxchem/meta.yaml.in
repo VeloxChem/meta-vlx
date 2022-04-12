@@ -37,7 +37,7 @@ requirements:
     - mkl-devel 2020.*
     - {{ mpi }}
     - mpi4py
-    - numpy 1.15.*
+    - numpy
     - xtb                          # [unix]
     - gtest
     - gmock
