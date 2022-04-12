@@ -2,9 +2,9 @@ CONDA_BUILD_SYSROOT:
   - /Users/runner/MacOSX10.9.sdk     # [osx]
 
 mpi:
-  - msmpi    # [win]
-  - mpich    # [not win]
-  - openmpi  # [not win]
+  - msmpi >=10.1.1,<10.1.2  # [win]
+  - mpich >=3.4.3,<4.0.2    # [not win]
+  - openmpi >=4.1.0         # [not win]
 
 python:
   #- 3.10
