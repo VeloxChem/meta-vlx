@@ -169,7 +169,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: Successful Conda deployment for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
-          to: roberto.di.remigio@it.uu.se,panor@kth.se,rinkevic@kth.se
+          to: roberto.di.remigio@it.uu.se,panor@kth.se,rinkevic@kth.se,delcey@kth.se
           from: MinazoBot
           body: |
             Greetings!
