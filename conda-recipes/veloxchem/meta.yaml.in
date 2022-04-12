@@ -48,7 +48,7 @@ requirements:
     - libblas * *mkl
     - mkl
     - geometric
-    - cppe 0.2.1                   # [unix]
+    - cppe >=0.2.1,<0.3.0          # [unix]
     - {{ mpi }}
     - mpi4py
     - h5py
