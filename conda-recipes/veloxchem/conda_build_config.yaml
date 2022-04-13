@@ -3,13 +3,13 @@ CONDA_BUILD_SYSROOT:
   - /Users/runner/MacOSX10.10.sdk  # [osx]
 
 mpi:
-  - msmpi >=10.1.1,<10.1.2  # [win]
-  #- mpich >=3.4.3,<4.0.2    # [not win]
-  - openmpi >=4.1.0         # [not win]
+  - msmpi    # [win]
+  - mpich    # [not win]
+  - openmpi  # [not win]
 
 python:
-  #- 3.10
-  - 3.9
-  - 3.8
-  - 3.7
-  - 3.6
+  - 3.10  # EOL: 04 Oct 2026
+  - 3.9   # EOL: 05 Oct 2025
+  - 3.8   # EOL: 14 Oct 2024
+  - 3.7   # EOL: 27 Jun 2023
+  #- 3.6   # EOL: 23 Dec 2021

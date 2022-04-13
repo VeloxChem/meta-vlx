@@ -24,36 +24,32 @@ build:
 
 requirements:
   build:
-    - cmake >=3.17,<=3.20
+    - cmake
     - {{ compiler('cxx') }}
-    - libgomp                      # [linux]
-    - llvm-openmp                  # [osx or win]
+    - {{ compiler('c') }}
+    - libgomp              # [linux]
+    - llvm-openmp          # [osx or win]
     - ninja
-    - pkg-config                   # [unix]
+    - pkg-config           # [unix]
   host:
-    - pybind11
+    - pybind11 >=2.6,<3.0
     - python {{ python }}
-    - mkl
-    - mkl-devel
+    - libblas
+    - liblapack
     - {{ mpi }}
-    - mpi4py
-    - numpy
-    - xtb                          # [unix]
+    - mpi4py >=3.0
+    - numpy >=1.15
+    - xtb                  # [unix]
     - gtest
     - gmock
   run:
-    - dataclasses                  # [py==36]
-    - psutil
-    - mdanalysis
-    - libblas * *mkl
-    - mkl
-    - geometric
-    - cppe >=0.2.1,<0.3.0          # [unix]
+    - psutil >=5.6
+    - mdanalysis >=1.0
+    - geometric >=0.9.7
+    - cppe                 # [unix]
     - {{ mpi }}
-    - mpi4py
-    - h5py
-    - loprop
-    - {{ pin_compatible('mkl') }}
+    - mpi4py >=3.0
+    - h5py >=2.8
     - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('python', max_pin='x.x') }}
 
@@ -79,6 +75,8 @@ test:
     - ldd -v $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT    # [linux]
     - otool -L $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT  # [osx]
     # run integration tests
+    - export OMPI_ALLOW_RUN_AS_ROOT=1                        # [mpi == 'openmpi']
+    - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1                # [mpi == 'openmpi']
     - export OMP_NUM_THREADS=$CPU_COUNT                      # [unix]
     - mpiexec -n 1 $PYTHON -m pytest --pyargs veloxchem      # [unix]
     - export MPI_NUM_PROCS=2                                 # [unix]
