@@ -1,5 +1,6 @@
 CONDA_BUILD_SYSROOT:
-  - /Users/runner/MacOSX10.9.sdk     # [osx]
+  #- /Users/runner/MacOSX10.9.sdk     # [osx] # retired Oct 2020
+  - /Users/runner/MacOSX10.10.sdk  # [osx]
 
 mpi:
   - msmpi >=10.1.1,<10.1.2  # [win]

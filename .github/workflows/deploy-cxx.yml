@@ -101,9 +101,7 @@ jobs:
         if: contains(matrix.os, 'macos')
         working-directory: /Users/runner
         run: |
-          curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.9.sdk.tar.xz > ~/MacOSX10.9.sdk.tar.xz
-          tar -xzf ~/MacOSX10.9.sdk.tar.xz
-          rm ~/MacOSX10.9.sdk.tar.xz
+          curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz | tar -xJ
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
