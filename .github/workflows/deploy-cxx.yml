@@ -50,7 +50,7 @@ jobs:
           - os: ubuntu-latest
             mpi: msmpi
           - os: windows-latest
-          - mpi: mpich
+            mpi: mpich
           - os: windows-latest
             mpi: openmpi
 
