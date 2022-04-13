@@ -175,7 +175,7 @@ jobs:
             I successfully deployed a Conda package with the following build parameters 
               > Recipe for package: ${{ github.event.inputs.recipe }}
               > Conda package version: ${{ github.event.inputs.version }}
-              > Conda package build numbern: ${{ github.event.inputs.build }}
+              > Conda package build number: ${{ github.event.inputs.build }}
               > Conda package channel: ${{ github.event.inputs.channel }}
               > Conda package label: ${{ github.event.inputs.label }}
               > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
