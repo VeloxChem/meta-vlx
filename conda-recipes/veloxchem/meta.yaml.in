@@ -24,7 +24,7 @@ build:
 
 requirements:
   build:
-    - cmake
+    - cmake >=3.18
     - {{ compiler('cxx') }}
     - {{ compiler('c') }}
     - libgomp              # [linux]
