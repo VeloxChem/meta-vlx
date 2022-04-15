@@ -157,24 +157,25 @@ jobs:
           rm ${{ github.event.inputs.recipe }}.tar.bz2.sha256
           rm -rf ${{ github.event.inputs.recipe }}
 
-      #- name: Send notification
-      #  uses: dawidd6/action-send-mail@v3
-      #  with:
-      #    server_address: smtp.gmail.com
-      #    server_port: 465
-      #    username: ${{secrets.MAIL_USERNAME}}
-      #    password: ${{secrets.MAIL_PASSWORD}}
-      #    subject: Successful Conda deployment for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
-      #    to: roberto.di.remigio@it.uu.se,panor@kth.se,rinkevic@kth.se,delcey@kth.se
-      #    from: MinazoBot
-      #    body: |
-      #      Greetings!
-      #      I successfully deployed a Conda package with the following build parameters
-      #        > Recipe for package: ${{ github.event.inputs.recipe }}
-      #        > Conda package version: ${{ github.event.inputs.version }}
-      #        > Conda package build number: ${{ github.event.inputs.build }}
-      #        > Conda package channel: ${{ github.event.inputs.channel }}
-      #        > Conda package label: ${{ github.event.inputs.label }}
-      #        > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
-      #      Best regards,
-      #        MinazoBot
+      - name: Send notification
+        if: steps.build.outcome = 'success'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: Successful Conda deployment for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+          to: roberto.di.remigio@it.uu.se,panor@kth.se,rinkevic@kth.se,delcey@kth.se
+          from: MinazoBot
+          body: |
+            Greetings!
+            I successfully deployed a Conda package with the following build parameters
+              > Recipe for package: ${{ github.event.inputs.recipe }}
+              > Conda package version: ${{ github.event.inputs.version }}
+              > Conda package build number: ${{ github.event.inputs.build }}
+              > Conda package channel: ${{ github.event.inputs.channel }}
+              > Conda package label: ${{ github.event.inputs.label }}
+              > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
+            Best regards,
+              MinazoBot
