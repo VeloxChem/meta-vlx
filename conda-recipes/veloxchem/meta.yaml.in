@@ -31,20 +31,24 @@ requirements:
     - llvm-openmp          # [osx or win]
     - ninja
     - pkg-config           # [unix]
-  host:
-    - pybind11 >=2.6,<3.0
-    - python {{ python }}
-    - libblas
-    - liblapack
-    - {{ mpi }}
-    - mpi4py >=3.0
-    - numpy >=1.15
-    - xtb                  # [unix]
     - gtest
     - gmock
+    - pybind11 >=2.6,<3.0
+  host:
+    - python {{ python }}
+    - pybind11-abi
+    - {{ mpi }}
+    - mpi4py >=3.0
+    - libblas
+    - libcblas
+    - liblapack
+    - liblapacke
+    - numpy >=1.15
+    - xtb                  # [unix]
   run:
     - psutil >=5.6
     - mdanalysis >=1.0
+    - openmm
     - geometric >=0.9.7
     - cppe                 # [unix]
     - {{ mpi }}

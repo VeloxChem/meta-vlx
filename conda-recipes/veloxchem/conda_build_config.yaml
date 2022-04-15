@@ -1,6 +1,16 @@
 CONDA_BUILD_SYSROOT:
-  #- /Users/runner/MacOSX10.9.sdk     # [osx] # retired Oct 2020
   - /Users/runner/MacOSX10.10.sdk  # [osx]
+  #- /Users/runner/MacOSX10.9.sdk  # [osx] # retired Oct 2020
+
+# the following pinnings are necessary to allow switching the BLAS/LAPACK
+# implementation as runtime, thus replicating the behavior of conda-forge
+# packages documented here:
+# https://conda-forge.org/docs/maintainer/knowledge_base.html#how-it-works
+libblas:
+  - 3.8 *netlib
+
+liblapack:
+  - 3.8 *netlib
 
 mpi:
   - msmpi    # [win]
