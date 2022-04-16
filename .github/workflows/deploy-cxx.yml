@@ -121,29 +121,13 @@ jobs:
                 $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/meta.yaml
 
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
-        if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
+        id: condabuild
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
           conda build \
                 --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
-                --token $ANACONDA_TOKEN \
-                --user ${{ github.event.inputs.channel }} \
-                --label ${{ github.event.inputs.label }} \
-                --verify \
-                -c conda-forge \
-                ${{ github.event.inputs.recipe }}
-
-      - name: Build and upload ${{ github.event.inputs.recipe }} for triplet windows-latest, Python ${{ matrix.python }}, and msmpi
-        if: contains(matrix.os, 'windows')
-        continue-on-error: true
-        env:
-          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
-        run: |
-          cd $GITHUB_WORKSPACE/conda-recipes
-          conda build \
-                --variants "{'python': ['${{ matrix.python }}']}" \
                 --token $ANACONDA_TOKEN \
                 --user ${{ github.event.inputs.channel }} \
                 --label ${{ github.event.inputs.label }} \
@@ -158,7 +142,7 @@ jobs:
           rm -rf ${{ github.event.inputs.recipe }}
 
       - name: Send notification
-        if: steps.build.outcome = 'success'
+        if: steps.condabuild.outcome == 'success'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
