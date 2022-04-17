@@ -10,7 +10,7 @@ channel_targets:
 
 c_compiler:
   - gcc    # [linux]
-  - clang  # [osx]
+  - clang  # [osx or win]
 
 c_compiler_version:
   - '10'  # [linux]
@@ -19,7 +19,7 @@ c_compiler_version:
 
 cxx_compiler:
   - gxx      # [linux]
-  - clangxx  # [osx]
+  - clangxx  # [osx or win]
 
 cxx_compiler_version:
   - '10'  # [linux]
