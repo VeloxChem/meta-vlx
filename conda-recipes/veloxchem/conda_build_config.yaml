@@ -10,19 +10,21 @@ channel_targets:
 
 c_compiler:
   - gcc    # [linux]
-  - clang  # [osx or win]
+  - clang  # [osx]
 
 c_compiler_version:
   - '10'  # [linux]
-  - '12'  # [osx or win]
+  - '12'  # [osx]
+  - '13'  # [win]
 
 cxx_compiler:
   - gxx      # [linux]
-  - clangxx  # [osx or win]
+  - clangxx  # [osx]
 
 cxx_compiler_version:
   - '10'  # [linux]
-  - '12'  # [osx or win]
+  - '12'  # [osx]
+  - '13'  # [win]
   
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
 # implementation as runtime, thus replicating the behavior of conda-forge
