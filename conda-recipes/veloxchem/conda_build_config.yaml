@@ -2,6 +2,28 @@ CONDA_BUILD_SYSROOT:
   - /Users/runner/MacOSX10.10.sdk  # [osx]
   #- /Users/runner/MacOSX10.9.sdk  # [osx] # retired Oct 2020
 
+channel_sources:
+  - conda-forge
+
+channel_targets:
+  - conda-forge main
+
+c_compiler:
+  - gcc    # [linux]
+  - clang  # [osx or win]
+
+c_compiler_version:
+  - '10'  # [linux]
+  - '12'  # [osx or win]
+
+cxx_compiler:
+  - gxx      # [linux]
+  - clangxx  # [osx or win]
+
+cxx_compiler_version:
+  - '10'  # [linux]
+  - '12'  # [osx or win]
+  
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
 # implementation as runtime, thus replicating the behavior of conda-forge
 # packages documented here:
@@ -9,7 +31,13 @@ CONDA_BUILD_SYSROOT:
 libblas:
   - 3.8 *netlib
 
+libcblas:
+  - 3.8 *netlib
+
 liblapack:
+  - 3.8 *netlib
+
+liblapacke:
   - 3.8 *netlib
 
 mpi:
