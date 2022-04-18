@@ -36,6 +36,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     name: Deploy to Anaconda.org
+    timeout-minutes: 90
     defaults:
       run:
         shell: bash -l {0}
