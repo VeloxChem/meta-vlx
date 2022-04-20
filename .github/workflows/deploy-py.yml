@@ -43,7 +43,7 @@ jobs:
         shell: bash -l {0}
     strategy:
       matrix:
-        recipes:
+        recipe:
           - geometric
 
     steps:

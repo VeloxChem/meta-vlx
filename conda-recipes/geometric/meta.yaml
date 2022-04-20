@@ -19,13 +19,13 @@ build:
 
 requirements:
   host:
+    - pip
     - python
     - setuptools
-    - pip
   run:
     - {{ pin_compatible('numpy', lower_bound='1.11') }}
-    - python
     - networkx
+    - python
     - six
 
 test:
