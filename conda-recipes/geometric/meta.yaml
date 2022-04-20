@@ -32,12 +32,9 @@ test:
   imports:
     - geometric
   requires:
-    - openmm
     - pytest
-    - qcengine
-    - rdkit
   commands:
-    - $PYTHON -m pytest --pyargs geometric -vv
+    - $PYTHON -m pytest --pyargs geometric -v -k json
 
 about:
   home: http://github.com/leeping/geomeTRIC/
