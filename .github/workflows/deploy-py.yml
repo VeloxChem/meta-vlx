@@ -1,0 +1,87 @@
+name: Deploy Python packages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: latest-deploy-group
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Changed Conda recipes
+    runs-on: ubuntu-latest
+
+    outputs:
+      changed_files: ${{ steps.combine.outputs.changed_files }}
+
+    steps:
+      - id: files
+        uses: Ana06/get-changed-files@v2.1.0
+        with:
+          format: 'json'
+
+      - id: combine
+        run: |
+          echo '${{ steps.files.outputs.added_modified }}' | tee added_modified.json
+          echo '${{ steps.files.outputs.renamed }}' | tee renamed.json
+          changes="$(cat added_modified.json renamed.json | jq -r -s 'add | unique | sort')"
+          echo "Added, modified, renamed files: $changes"
+          echo ::set-output name=changed_files::$(echo $changes | jq -c .)
+
+  build:
+    name: Deploy to Anaconda.org
+    needs:
+      - changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      matrix:
+        recipes:
+          - geometric
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Continue if the Conda recipe was changed
+        run: |
+          apk add jq
+          echo "Added, modified, removed files:"
+          echo '${{ needs.changes.outputs.changed_files }}' | tee changed_files.json
+          changed="$(cat changed_files.json | jq 'any(.[]; . == "conda-recipes/${{ matrix.recipe }}/meta.yaml")')"
+          if [[ "$changed" == "true" ]]; then
+             echo "Recipe to build: conda-recipes/${{ matrix.recipe }}/meta.yaml"
+             echo "keepgoing=true" >> $GITHUB_ENV
+          else
+             echo "Nothing to build!"
+          fi
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          auto-activate-base: false
+          activate-environment: deploy
+          environment-file: .github/deploy.yml
+          use-mamba: true
+
+      - name: Build and upload ${{ matrix.recipe }} Python package
+        id: condabuild
+        if: ${{ env.keepgoing == 'true' }}
+        continue-on-error: true
+        env:
+          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+        run: |
+          cd $GITHUB_WORKSPACE/conda-recipes
+          conda build \
+                --token $ANACONDA_TOKEN \
+                --user veloxchem \
+                --label main \
+                --verify \
+                -c conda-forge \
+                ${{ matrix.recipe }}
