@@ -54,6 +54,11 @@ jobs:
             mpi: mpich
           - os: windows-latest
             mpi: openmpi
+          # exclude Python 3.10 for macOS and Windows
+          - os: macos-latest
+            python: '3.10'
+          - os: windows-latest
+            python: '3.10'
 
     steps:
       - uses: actions/checkout@v2
@@ -134,6 +139,7 @@ jobs:
                 --user ${{ github.event.inputs.channel }} \
                 --label ${{ github.event.inputs.label }} \
                 --verify \
+                -c veloxchem/label/main \
                 -c conda-forge \
                 ${{ github.event.inputs.recipe }}
 

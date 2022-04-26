@@ -51,9 +51,10 @@ requirements:
     - psutil >=5.6
     - mdanalysis >=1.0
     - openmm
-    - geometric >=0.9.7
+    # use this with -c veloxchem/label/main to ensure we use our own version of
+    # the geometric package
+    - geometric >0.9.7.2
     - cppe  # [unix]
-    - {{ mpi }}
     - mpi4py >=3.0
     - h5py >=2.8
     - {{ pin_compatible('numpy') }}
