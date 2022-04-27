@@ -16,8 +16,6 @@ build:
   entry_points:
     - vlx=veloxchem.main:main
   ignore_run_exports:
-    - {{ mpi }}
-    - mpi4py
     - python
   run_exports:
     - {{ pin_subpackage('veloxchem', max_pin='x.x') }}
@@ -54,8 +52,8 @@ requirements:
     # the geometric package
     - geometric >0.9.7.2
     - cppe  # [unix]
-    - mpi4py >=3.0
     - h5py >=2.8
+    - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('python', max_pin='x.x') }}
 
