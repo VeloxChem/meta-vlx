@@ -36,7 +36,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     name: Deploy to Anaconda.org
-    timeout-minutes: 90
+    timeout-minutes: 120
     defaults:
       run:
         shell: bash -l {0}
@@ -54,11 +54,6 @@ jobs:
             mpi: mpich
           - os: windows-latest
             mpi: openmpi
-          # exclude Python 3.10 for macOS and Windows
-          - os: macos-latest
-            python: '3.10'
-          - os: windows-latest
-            python: '3.10'
 
     steps:
       - uses: actions/checkout@v2
