@@ -14,10 +14,9 @@ RUN apt update --yes -qq \
     && wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null \
     && echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list \
     && mkdir -p /opt/cmake \
-    && curl -Ls https://github.com/Kitware/CMake/releases/download/v3.23.0/cmake-3.23.0-linux-x86_64.tar.gz | tar -xz -C /opt/cmake --strip-components=1 \
+    && curl -Ls https://github.com/Kitware/CMake/releases/download/v3.23.1/cmake-3.23.1-linux-x86_64.tar.gz | tar -xz -C /opt/cmake --strip-components=1 \
     && apt remove --purge --yes -qq \
        apt-transport-https \
-       ca-certificates \
        gnupg \
        software-properties-common \
        wget \
@@ -36,4 +35,5 @@ RUN apt update --yes -qq \
        python3-venv \
        rsync \
     && apt clean --yes -qq \
+    && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
