@@ -16,6 +16,7 @@ RUN apt update --yes -qq \
        openmpi-bin \
     && apt autoremove --yes -qq \
     && apt clean --yes -qq \
+    && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 COPY gnu-env.sh /opt/docker/etc

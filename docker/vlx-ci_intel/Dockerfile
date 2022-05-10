@@ -15,6 +15,7 @@ RUN apt update --yes -qq \
        intel-oneapi-openmp \
     && apt autoremove --yes -qq \
     && apt clean --yes -qq \
+    && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 COPY intel-env.sh /opt/docker/etc
