@@ -1,4 +1,4 @@
-FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:latest
+FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:sha-e0f7c31
 
 # add a timestamp for the build. Also, bust the cache.
 ADD http://worldclockapi.com/api/json/utc/now /opt/docker/etc/timestamp
