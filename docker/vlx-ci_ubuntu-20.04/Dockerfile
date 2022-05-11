@@ -28,6 +28,7 @@ RUN apt update --yes -qq \
        libgtest-dev \
        libhdf5-dev \
        libpython3-dev \
+       ninja-build \
        python-is-python3 \
        python3 \
        python3-pip \
