@@ -24,7 +24,6 @@ requirements:
   build:
     - cmake >=3.18
     - {{ compiler('cxx') }}
-    - {{ compiler('c') }}
     - libgomp      # [linux]
     - llvm-openmp  # [osx or win]
     - ninja
