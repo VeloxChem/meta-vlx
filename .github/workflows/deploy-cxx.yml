@@ -157,12 +157,17 @@ jobs:
           from: MinazoBot
           body: |
             Greetings!
-            I successfully deployed a Conda package with the following build parameters
+            I successfully deployed a Conda package with the following build parameters:
               > Recipe for package: ${{ github.event.inputs.recipe }}
               > Conda package version: ${{ github.event.inputs.version }}
               > Conda package build number: ${{ github.event.inputs.build }}
               > Conda package channel: ${{ github.event.inputs.channel }}
               > Conda package label: ${{ github.event.inputs.label }}
               > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
+
+            You can install it with:
+
+              $ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge
+
             Best regards,
               MinazoBot
