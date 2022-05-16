@@ -59,6 +59,7 @@ requirements:
 test:
   requires:
     - pytest
+    - libopenblas=*=*openmp*  # [linux]
   imports:
     - veloxchem
   commands:
@@ -81,15 +82,15 @@ test:
     - export OMPI_ALLOW_RUN_AS_ROOT=1                        # [mpi == 'openmpi']
     - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1                # [mpi == 'openmpi']
     - export OMP_NUM_THREADS=$CPU_COUNT                      # [unix]
-    - mpiexec -n 1 $PYTHON -m pytest --pyargs veloxchem      # [unix]
+    - mpiexec -n 1 $PYTHON -m pytest -s --pyargs veloxchem   # [unix]
     - export MPI_NUM_PROCS=2                                 # [unix]
     - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
-    - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --pyargs veloxchem -m solvers  # [unix]
+    - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest -s --pyargs veloxchem -m solvers  # [unix]
     - set OMP_NUM_THREADS=%CPU_COUNT%                        # [win]
-    - mpiexec -n 1 %PYTHON% -m pytest --pyargs veloxchem     # [win]
+    - mpiexec -n 1 %PYTHON% -m pytest -s --pyargs veloxchem  # [win]
     - set MPI_NUM_PROCS=2                                    # [win]
     - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%"   # [win]
-    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs veloxchem -m solvers  # [win]
+    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest -s --pyargs veloxchem -m solvers  # [win]
 
 about:
   home: https://veloxchem.org
