@@ -1,4 +1,6 @@
-FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:sha-a72e0dd
+FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:sha-99d965c
+
+LABEL org.opencontainers.image.description "GNU-based VeloxChem CI container"
 
 # add a timestamp for the build. Also, bust the cache.
 ADD https://timeapi.io/api/Time/current/zone?timeZone=Europe/Stockholm /opt/docker/etc/timestamp
