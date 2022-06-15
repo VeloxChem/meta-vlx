@@ -1,7 +1,7 @@
-FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:sha-e9aa53c
+FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:sha-a72e0dd
 
 # add a timestamp for the build. Also, bust the cache.
-ADD http://worldclockapi.com/api/json/utc/now /opt/docker/etc/timestamp
+ADD https://timeapi.io/api/Time/current/zone?timeZone=Europe/Stockholm /opt/docker/etc/timestamp
 
 # install software
 RUN apt update --yes -qq \
