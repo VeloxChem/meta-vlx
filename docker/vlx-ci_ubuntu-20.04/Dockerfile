@@ -29,6 +29,7 @@ RUN apt update --yes -qq \
        libhdf5-dev \
        libpython3-dev \
        ninja-build \
+       pkg-config \
        python-is-python3 \
        python3 \
        python3-pip \
