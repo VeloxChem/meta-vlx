@@ -1,4 +1,6 @@
-FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:sha-a72e0dd
+FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:sha-99d965c
+
+LABEL org.opencontainers.image.description "Intel-based VeloxChem CI container"
 
 # add a timestamp for the build. Also, bust the cache.
 ADD https://timeapi.io/api/Time/current/zone?timeZone=Europe/Stockholm /opt/docker/etc/timestamp
@@ -23,7 +25,6 @@ RUN apt update --yes -qq \
     && cd .. \
     && python -m pip uninstall --yes meson > /dev/null 2>&1 \
     && rm -rf xtb-6.5.0 \
-    && apt remove --purge --yes -qq intel-oneapi-compiler-fortran \
     && apt autoremove --yes -qq \
     && apt clean --yes -qq \
     && update-ca-certificates \
