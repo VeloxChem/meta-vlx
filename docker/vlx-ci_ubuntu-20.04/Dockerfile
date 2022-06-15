@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 # add a timestamp for the build. Also, bust the cache.
-ADD http://worldclockapi.com/api/json/utc/now /opt/docker/etc/timestamp
+ADD https://timeapi.io/api/Time/current/zone?timeZone=Europe/Stockholm /opt/docker/etc/timestamp
 
 RUN apt update --yes -qq \
     && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
