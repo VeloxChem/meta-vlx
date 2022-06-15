@@ -1,7 +1,7 @@
 FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:sha-a72e0dd
 
 # add a timestamp for the build. Also, bust the cache.
-ADD http://worldclockapi.com/api/json/utc/now /opt/docker/etc/timestamp
+ADD https://timeapi.io/api/Time/current/zone?timeZone=Europe/Stockholm /opt/docker/etc/timestamp
 
 # install software
 RUN apt update --yes -qq \
@@ -21,9 +21,9 @@ RUN apt update --yes -qq \
     && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.5.0.tar.gz | tar xz \
     && cd xtb-6.5.0 \
     && FC=ifort CC=icc /usr/local/bin/meson setup build --buildtype=release > /dev/null 2>&1 \
-    && ninja -C build install &> /dev/null \
+    && ninja -C build install > /dev/null 2>&1 \
     && cd .. \
-    && python -m pip uninstall meson \
+    && python -m pip uninstall --yes meson > /dev/null 2>&1 \
     && rm -rf xtb-6.5.0
 
 COPY intel-env.sh /opt/docker/etc
