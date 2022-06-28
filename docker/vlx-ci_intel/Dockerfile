@@ -16,14 +16,12 @@ RUN apt update --yes -qq \
        intel-oneapi-mpi \
        intel-oneapi-mpi-devel \
        intel-oneapi-openmp \
-    && python -m pip install meson > /dev/null 2>&1 \
     && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.5.0.tar.gz | tar xz \
     && cd xtb-6.5.0 \
     && . /opt/intel/oneapi/setvars.sh \
-    && FC=ifort CC=icc /usr/local/bin/meson setup build --buildtype=release -Dfortran_args=-qopenmp > /dev/null 2>&1 \
-    && ninja -C build install > /dev/null 2>&1 \
+    && /opt/cmake/bin/cmake -S. -Bbuild -GNinja -DCMAKE_Fortran_COMPILER=ifort -DCMAKE_C_COMPILER=icc -DCMAKE_BUILD_TYPE=Release > /dev/null 2>&1 \
+    && /opt/cmake/bin/cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
-    && python -m pip uninstall --yes meson > /dev/null 2>&1 \
     && rm -rf xtb-6.5.0 \
     && apt autoremove --yes -qq \
     && apt clean --yes -qq \

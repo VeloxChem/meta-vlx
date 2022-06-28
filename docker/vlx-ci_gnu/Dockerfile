@@ -20,13 +20,11 @@ RUN apt update --yes -qq \
     && apt clean --yes -qq \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && python -m pip install meson > /dev/null 2>&1 \
     && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.5.0.tar.gz | tar xz \
     && cd xtb-6.5.0 \
-    && FC=gfortran CC=gcc /usr/local/bin/meson setup build --buildtype=release -Dla_backend=openblas > /dev/null 2>&1 \
-    && ninja -C build install > /dev/null 2>&1 \
+    && /opt/cmake/bin/cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLA_VENDOR=OpenBLAS > /dev/null 2>&1 \
+    && /opt/cmake/bin/cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
-    && python -m pip uninstall --yes meson > /dev/null 2>&1 \
     && rm -rf xtb-6.5.0
 
 COPY gnu-env.sh /opt/docker/etc
