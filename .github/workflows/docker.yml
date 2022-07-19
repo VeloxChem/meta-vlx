@@ -49,6 +49,7 @@ jobs:
       fail-fast: false
       matrix:
         image:
+          - 'vlx-ci_ubuntu-22.04'
           - 'vlx-ci_ubuntu-20.04'
           - 'vlx-ci_intel'
           - 'vlx-ci_gnu'
