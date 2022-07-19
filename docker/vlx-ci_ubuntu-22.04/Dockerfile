@@ -23,6 +23,7 @@ RUN apt update --yes -qq \
     && apt upgrade --yes -qq \
     && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
        build-essential \
+       cmake \
        git \
        googletest \
        libgtest-dev \
