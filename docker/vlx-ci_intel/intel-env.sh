@@ -8,6 +8,5 @@ export MPICC=mpiicc
 
 export GTESTLIB="/usr/lib/x86_64-linux-gnu"
 export XTBHOME="/usr/local"
-export PATH="/opt/cmake/bin":$PATH
 
 exec "$@"

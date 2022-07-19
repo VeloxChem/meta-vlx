@@ -1,4 +1,4 @@
-FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-20.04:sha-99d965c
+FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-22.04:sha-4cbb816
 
 LABEL org.opencontainers.image.description "Intel-based VeloxChem CI container"
 
@@ -19,8 +19,8 @@ RUN apt update --yes -qq \
     && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.5.0.tar.gz | tar xz \
     && cd xtb-6.5.0 \
     && . /opt/intel/oneapi/setvars.sh \
-    && /opt/cmake/bin/cmake -S. -Bbuild -GNinja -DCMAKE_Fortran_COMPILER=ifort -DCMAKE_C_COMPILER=icc -DCMAKE_BUILD_TYPE=Release > /dev/null 2>&1 \
-    && /opt/cmake/bin/cmake --build build --target install > /dev/null 2>&1 \
+    && cmake -S. -Bbuild -GNinja -DCMAKE_Fortran_COMPILER=ifort -DCMAKE_C_COMPILER=icc -DCMAKE_BUILD_TYPE=Release > /dev/null 2>&1 \
+    && cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
     && rm -rf xtb-6.5.0 \
     && apt autoremove --yes -qq \
