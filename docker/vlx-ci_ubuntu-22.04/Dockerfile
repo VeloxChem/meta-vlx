@@ -13,13 +13,16 @@ RUN apt update --yes -qq \
        gnupg \
        software-properties-common \
        wget \
+       bzip2 \
     && wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null \
     && echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list \
+    && wget -qO- https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba \
     && apt remove --purge --yes -qq \
        apt-transport-https \
        gnupg \
        software-properties-common \
        wget \
+       bzip2 \
     && apt upgrade --yes -qq \
     && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
        build-essential \
@@ -38,5 +41,4 @@ RUN apt update --yes -qq \
        python3-venv \
        rsync \
     && apt clean --yes -qq \
-    && update-ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    && micromamba shell init --shell=bash --prefix=~/micromamba
