@@ -21,7 +21,7 @@ cmake \
     -DPYMOD_INSTALL_FULLDIR:PATH="${SP_DIR#$PREFIX/}/veloxchem"
 
 # build!
-cmake --build build --parallel "${CPU_COUNT}" -- -v -d stats
+cmake --build build --parallel "${CPU_COUNT}" --target utests -- -v -d stats
 
 # test!
 # we only run unit tests here, integration tests are run later on
