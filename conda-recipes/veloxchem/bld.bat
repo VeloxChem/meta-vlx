@@ -16,7 +16,7 @@ cmake ^
 if errorlevel 1 exit 1
 
 :: build!
-cmake --build build --config Release --parallel %CPU_COUNT% -- -v -d stats
+cmake --build build --config Release --parallel %CPU_COUNT% --target utests -- -v -d stats
 if errorlevel 1 exit 1
 
 :: test!
