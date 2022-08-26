@@ -1,6 +1,7 @@
 {% set name = "geomeTRIC" %}
 {% set version = "0.9.8a0" %}
-{% set sha256 = "80588b6d17549e0fec7d9249f0a1e5731831339f5fb2fb4585d5239ebb170351" %}
+{% set sha256 = "9fe5b7915ddd6ca71440d6908e2ddccffe1e8cbf32ca537d5e1180b53faccb99" %}
+{% set build = 1 %}
 
 package:
   name: {{ name|lower }}
@@ -12,7 +13,7 @@ source:
 
 build:
   noarch: python
-  number: 0
+  number: {{ build }}
   script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv"
   entry_points:
     - geometric-optimize = geometric.optimize:main
