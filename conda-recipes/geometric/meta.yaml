@@ -1,14 +1,14 @@
 {% set name = "geomeTRIC" %}
 {% set version = "0.9.8a0" %}
-{% set sha256 = "fe3e380b1c0fff357500b6959d79b760f4db11a14c46893f818fc1a0b200cfe5" %}
-{% set build = 2 %}
+{% set sha256 = "7df0f5e3c886febc927fb57923b990d3afa5903fc6e3dce73e230759e9546752" %}
+{% set build = 1 %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/leeping/{{ name }}/archive/master.tar.gz
+  url: https://github.com/robertodr/{{ name }}/archive/vlx.tar.gz
   sha256: {{ sha256 }}
 
 build:
