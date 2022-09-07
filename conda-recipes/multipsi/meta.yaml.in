@@ -37,7 +37,7 @@ requirements:
     - liblapacke
     - numpy >=1.15
   run:
-    - veloxchem >=1.0rc2 *_9
+    - veloxchem >=1.0rc2
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('python', max_pin='x.x') }}
@@ -83,7 +83,6 @@ about:
     - COPYING
     - COPYING.LESSER
   license_family: LGPL
-  summary: A Python-based, open source quantum chemistry program package
   summary: A multireference quantum chemistry extension of VeloxChem
 
 extra:
