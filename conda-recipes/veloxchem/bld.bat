@@ -16,7 +16,6 @@ cmake ^
 if errorlevel 1 exit 1
 
 :: build!
-:: FIXME temporarily disable compiling unit tests
 cmake --build build --config Release --parallel %CPU_COUNT% -- -v -d stats
 if errorlevel 1 exit 1
 
