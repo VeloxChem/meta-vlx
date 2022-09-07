@@ -1,0 +1,78 @@
+{% set name = "multipsi" %}
+{% set version = "0.0.1" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ../../multipsi
+
+build:
+  number: 0
+  binary_relocation: true
+  ignore_run_exports:
+    - {{ mpi }}
+    - mpi4py
+    - python
+  run_exports:
+    - {{ pin_subpackage('multipsi', max_pin='x.x') }}
+
+requirements:
+  build:
+    - cmake >=3.18
+    - {{ compiler('cxx') }}
+    - libgomp                      # [linux]
+    - llvm-openmp                  # [osx or win]
+  host:
+    - python {{ python }}
+    - pybind11 >=2.6,<3.0
+    - {{ mpi }}
+    - numpy >=1.15.0
+    - mpi4py >=3.0
+    - libblas
+    - libcblas
+    - liblapack
+    - liblapacke
+    - numpy >=1.15
+  run:
+    - veloxchem >=1.0rc2 *_9
+    - {{ mpi }}
+    - mpi4py >=3.0
+    - {{ pin_compatible('numpy') }}
+    - {{ pin_compatible('python', max_pin='x.x') }}
+
+test:
+  requires:
+    - pytest
+  imports:
+    - multipsi
+  commands:
+    # Verify existence and execution
+    - test -d $SP_DIR/multipsi  # [unix]
+    - ls -l $SP_DIR/multipsi    # [unix]
+    # Inspect linkage
+    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
+    - ldd -v $SP_DIR/multipsi/multipsilib.so    # [linux]
+    - otool -L $SP_DIR/multipsi/multipsilib.so  # [osx]
+    # run integration tests
+    - export OMP_NUM_THREADS=$CPU_COUNT                      # [unix]
+    - mpiexec -n 1 $PYTHON -m pytest --pyargs multipsi       # [unix]
+    - export MPI_NUM_PROCS=2                                 # [unix]
+    - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
+    - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --pyargs multipsi  # [unix]
+
+about:
+  dev_url: https://gitlab.com/MGDelcey/multipsi
+  doc_url: https://mgdelcey.github.io/mtpman/
+  license: LGPL-3.0-or-later
+  license_url: https://opensource.org/licenses/LGPL-3.0
+  license_file:
+    - LICENSE
+  license_family: LGPL
+  summary: A multireference quantum chemistry extension of veloxchem
+
+extra:
+  recipe-maintainers:
+    - delcey
+

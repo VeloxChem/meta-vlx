@@ -1,0 +1,92 @@
+{% set name = "multipsi" %}
+{% set version = "@_version_@" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ../../multipsi
+  patches:
+    - patches/version.patch
+
+build:
+  number: @_build_@
+  binary_relocation: true
+  ignore_run_exports:
+    - python
+  run_exports:
+    - {{ pin_subpackage('multipsi', max_pin='x.x') }}
+
+requirements:
+  build:
+    - cmake >=3.18
+    - {{ compiler('cxx') }}
+    - libgomp      # [linux]
+    - llvm-openmp  # [osx or win]
+    - ninja
+    - pybind11 >=2.6,<3.0
+  host:
+    - python {{ python }}
+    - pybind11-abi
+    - {{ mpi }}
+    - mpi4py >=3.0
+    - libblas
+    - libcblas
+    - liblapack
+    - liblapacke
+    - numpy >=1.15
+  run:
+    - veloxchem >=1.0rc2 *_9
+    - {{ pin_compatible('mpi4py') }}
+    - {{ pin_compatible('numpy') }}
+    - {{ pin_compatible('python', max_pin='x.x') }}
+
+test:
+  requires:
+    - pytest
+    - libopenblas=*=*openmp*  # [linux]
+  imports:
+    - multipsi
+  commands:
+    # Verify existence and execution
+    - test -d $SP_DIR/multipsi  # [unix]
+    - ls -l $SP_DIR/multipsi    # [unix]
+    - if not exist %SP_DIR%\\multipsi exit 1      # [win]
+    - dir %SP_DIR%\\multipsi                      # [win]
+    # Inspect linkage
+    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
+    - ldd -v $SP_DIR/multipsi/multipsilib$PYLIB_EXT    # [linux]
+    - otool -L $SP_DIR/multipsi/multipsilib$PYLIB_EXT  # [osx]
+    # run integration tests
+    - export OMPI_ALLOW_RUN_AS_ROOT=1                        # [mpi == 'openmpi']
+    - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1                # [mpi == 'openmpi']
+    - export OMP_NUM_THREADS=$CPU_COUNT                      # [unix]
+    - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO --pyargs multipsi   # [unix]
+    - export MPI_NUM_PROCS=2                                 # [unix]
+    - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
+    - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO --pyargs multipsi  # [unix]
+    - set OMP_NUM_THREADS=%CPU_COUNT%                        # [win]
+    - mpiexec -n 1 %PYTHON% -m pytest --capture=no --log-cli-level=INFO --pyargs multipsi  # [win]
+    - set MPI_NUM_PROCS=2                                    # [win]
+    - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%"   # [win]
+    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --capture=no --log-cli-level=INFO --pyargs multipsi  # [win]
+
+about:
+  home: https://multipsi.org
+  dev_url: https://gitlab.com/MGDelcey/multipsi
+  doc_url: https://mgdelcey.github.io/mtpman/
+  doc_source_url: https://github.com/MGDelcey/mtpman/blob/master/docs/intro.md
+  license: LGPL-3.0-or-later
+  license_url: https://opensource.org/licenses/LGPL-3.0
+  license_file:
+    - COPYING
+    - COPYING.LESSER
+  license_family: LGPL
+  summary: A Python-based, open source quantum chemistry program package
+  summary: A multireference quantum chemistry extension of VeloxChem
+
+extra:
+  recipe-maintainers:
+    - delcey
+    - robertodr

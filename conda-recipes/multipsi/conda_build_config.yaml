@@ -1,0 +1,48 @@
+CONDA_BUILD_SYSROOT:
+  - /Users/runner/MacOSX10.10.sdk  # [osx]
+  #- /Users/runner/MacOSX10.9.sdk  # [osx] # retired Oct 2020
+
+channel_sources:
+  - conda-forge
+  - veloxchem
+
+target_platform:
+  - linux-64  # [linux]
+  - osx-64    # [osx]
+  - win-64    # [win]
+
+cxx_compiler:
+  - gxx      # [linux]
+  - clangxx  # [osx]
+
+cxx_compiler_version:
+  - '10'  # [linux]
+  - '12'  # [osx]
+  
+# the following pinnings are necessary to allow switching the BLAS/LAPACK
+# implementation as runtime, thus replicating the behavior of conda-forge
+# packages documented here:
+# https://conda-forge.org/docs/maintainer/knowledge_base.html#how-it-works
+libblas:
+  - 3.8 *netlib
+
+libcblas:
+  - 3.8 *netlib
+
+liblapack:
+  - 3.8 *netlib
+
+liblapacke:
+  - 3.8 *netlib
+
+mpi:
+  - msmpi    # [win]
+  - mpich    # [not win]
+  - openmpi  # [not win]
+
+python:
+  #- 3.6     # EOL: 23 Dec 2021
+  - 3.7      # EOL: 27 Jun 2023
+  - 3.8      # EOL: 14 Oct 2024
+  - 3.9      # EOL: 05 Oct 2025
+  - '3.10'   # EOL: 04 Oct 2026
