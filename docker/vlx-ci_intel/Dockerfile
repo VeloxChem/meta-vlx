@@ -1,6 +1,6 @@
 FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-22.04:sha-2d80890
 
-LABEL org.opencontainers.image.description "Intel-based VeloxChem CI container"
+LABEL org.opencontainers.image.description "Intel-based container for VeloxChem CI"
 
 # add a timestamp for the build. Also, bust the cache.
 ADD https://timeapi.io/api/Time/current/zone?timeZone=Europe/Stockholm /opt/docker/etc/timestamp
