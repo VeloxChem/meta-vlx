@@ -145,7 +145,7 @@ jobs:
           rm -rf ${{ github.event.inputs.recipe }}
 
       - name: Send notification
-        if: steps.condabuild.outcome == 'success'
+        if: steps.condabuild.outcome == 'failure'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -157,17 +157,13 @@ jobs:
           from: MinazoBot
           body: |
             Greetings!
-            I successfully deployed a Conda package with the following build parameters:
+            The deployment DID NOT succeed for a Conda package with the following build parameters:
               > Recipe for package: ${{ github.event.inputs.recipe }}
               > Conda package version: ${{ github.event.inputs.version }}
               > Conda package build number: ${{ github.event.inputs.build }}
               > Conda package channel: ${{ github.event.inputs.channel }}
               > Conda package label: ${{ github.event.inputs.label }}
               > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
-
-            You can install it with:
-
-              $ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge
 
             Best regards,
               MinazoBot
