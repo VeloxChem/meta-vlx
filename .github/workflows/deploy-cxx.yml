@@ -34,9 +34,8 @@ concurrency:
 
 jobs:
   create-summary-json:
-    name: Create summary.json file
-    runs-on: ubuntu-latest
     name: Create summary.json for deployments to Anaconda.org for ${{ github.event.inputs.recipe }}
+    runs-on: ubuntu-latest
     outputs:
       summary: $${ steps.create-summary-json.outputs.summary_json }}
 
