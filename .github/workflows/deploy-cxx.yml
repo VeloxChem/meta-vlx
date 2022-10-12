@@ -159,7 +159,7 @@ jobs:
           rm ${{ github.event.inputs.recipe }}.tar.bz2.sha256
           rm -rf ${{ github.event.inputs.recipe }}
 
-      - name: Generate summary of build ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+      - name: Deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         id: summarize
         run: |
           echo '${{ needs.create-summary-json.outputs.summary_json }}' | jq -c '. += [ {"os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" } ]' | tee summary.json
