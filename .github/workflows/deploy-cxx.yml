@@ -72,7 +72,7 @@ jobs:
           echo " > Conda package label: ${{ github.event.inputs.label }}"
           echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
 
-          echo "BUILD_JSON=\'[ {"os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "failure" } ]\'" >> $GITHUB_OUTPUT
+          echo "BUILD_JSON="[ {\"os\": \"${{ matrix.os }}\", \"python\": \"${{ matrix.python }}\", \"mpi\": \"${{ matrix.mpi }}\", \"outcome\": \"failure\" } ]" >> $GITHUB_OUTPUT
 
       - name: Get tarball from GitLab, verify sha256 checksum, and unpack it
         env:
@@ -93,6 +93,8 @@ jobs:
           # untar
           echo ">>> Untar archive"
           tar xvf ${{ github.event.inputs.recipe }}.tar.bz2
+
+          echo "${{ steps.build-summary.outputs.BUILD_JSON }}"
 
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
