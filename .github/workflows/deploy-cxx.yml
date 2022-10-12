@@ -42,7 +42,7 @@ jobs:
     steps:
       - id: create-summary-json
         run: |
-          echo ::set-output name=summary_json::$(echo "[]")
+          echo "summary_json=$(echo "[]")" >> $GITHUB_OUTPUT
 
   build:
     name: Deploy to Anaconda.org
@@ -163,7 +163,7 @@ jobs:
         id: summarize
         run: |
           echo '${{ needs.create-summary-json.outputs.summary_json }}' | jq -c '. += [ {"os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" } ]' | tee summary.json
-          echo ::set-output name=summary_json::$(cat summary.json)
+          echo "summary_json=$(cat summary.json)" >> $GITHUB_OUTPUT
 
       - name: Send notification
         if: steps.condabuild.outcome == 'failure'
