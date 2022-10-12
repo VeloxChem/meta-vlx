@@ -36,11 +36,9 @@ jobs:
   create-summary-json:
     name: Create summary.json for deployments to Anaconda.org for ${{ github.event.inputs.recipe }}
     runs-on: ubuntu-latest
-    outputs:
-      summary: $${ steps.create-summary-json.outputs.summary_json }}
 
     steps:
-      - id: create-summary-json
+      - id: empty-summary-json
         run: |
           echo "summary_json=$(echo "[]")" >> $GITHUB_OUTPUT
 
@@ -48,8 +46,6 @@ jobs:
     name: Deploy to Anaconda.org
     timeout-minutes: 120
     runs-on: ${{ matrix.os }}
-    outputs:
-      summary: ${{ steps.summarize.outputs.summary_json }}
     needs:
       create-summary-json
     defaults:
