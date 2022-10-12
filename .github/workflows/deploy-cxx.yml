@@ -159,10 +159,10 @@ jobs:
           rm ${{ github.event.inputs.recipe }}.tar.bz2.sha256
           rm -rf ${{ github.event.inputs.recipe }}
 
-      - id: summarize
-        name: Generate summary of build ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+      - name: Generate summary of build ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+        id: summarize
         run: |
-          echo '${{ needs.create-summary-json.outputs.summary_json }}' | jq -c '. += [ {"os": "${{  }}", "python": "${{ }}", "mpi": "${{ }}", "success": ${{ }} } ]' | tee summary.json
+          echo '${{ needs.create-summary-json.outputs.summary_json }}' | jq -c '. += [ {"os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" } ]' | tee summary.json
           echo ::set-output name=summary_json::$(cat summary.json)
 
       - name: Send notification
@@ -200,7 +200,7 @@ jobs:
           echo '${{ needs.build.outputs.summary_json }}' | tee summary.json
 
           # list of successful deployments
-          success="$(cat summary.json | jq '.[] | select(.success == true)')"
+          success="$(cat summary.json | jq '.[] | select(.outcome == "success")')"
 
           success_msg="Deployment succedeed for:"
           row_msg="\n  - OS: %s, Python: %s, MPI: %s"
@@ -216,7 +216,7 @@ jobs:
 
 
           # list of unsuccessful deployments
-          failure="$(cat summary.json | jq '.[] | select(.success == false)')"
+          failure="$(cat summary.json | jq '.[] | select(.outcome == "failure")')"
 
           failure_msg="Deployment FAILED for:"
           row_msg="\n  - OS: %s, Python: %s, MPI: %s"
