@@ -162,8 +162,7 @@ jobs:
       - id: summarize
         name: Generate summary of build ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         run: |
-          echo '${{ needs.create-summary-json.outputs.summary_json }}' |
-          jq -c '. += [ {"os": "${{  }}", "python": "${{ }}", "mpi": "${{ }}", "success": ${{ }} } ]' | tee summary.json
+          echo '${{ needs.create-summary-json.outputs.summary_json }}' | jq -c '. += [ {"os": "${{  }}", "python": "${{ }}", "mpi": "${{ }}", "success": ${{ }} } ]' | tee summary.json
           echo ::set-output name=summary_json::$(cat summary.json)
 
       - name: Send notification
