@@ -185,6 +185,9 @@ jobs:
               > Conda package label: ${{ github.event.inputs.label }}
               > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
 
+            Find the build logs here:
+              > ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
             Best regards,
               MinazoBot
 
