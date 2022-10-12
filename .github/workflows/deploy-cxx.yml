@@ -70,7 +70,7 @@ jobs:
         python: [3.7, 3.8, 3.9, '3.10']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
 
       - name: Build summary
         run: |
@@ -117,7 +117,7 @@ jobs:
         run: |
           curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz | tar -xJ
 
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v2.1.1
         with:
           auto-update-conda: true
           auto-activate-base: false
@@ -166,7 +166,7 @@ jobs:
 
       - name: Send notification
         if: steps.condabuild.outcome == 'failure'
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@v3.7.0
         with:
           server_address: smtp.gmail.com
           server_port: 465
@@ -231,7 +231,7 @@ jobs:
           echo "failure_msg=${failure_msg}" >> $GITHUB_ENV
 
       - name: Send notification
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@v3.7.0
         with:
           server_address: smtp.gmail.com
           server_port: 465
