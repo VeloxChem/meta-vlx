@@ -176,7 +176,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: UNSUCCESSFUL Conda deployment of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
-          to: roberto@algorithmiq.fi,panor@kth.se,rinkevic@kth.se,delcey@kth.se,lxin@kth.se
+          to: roberto@algorithmiq.fi
           from: MinazoBot
           body: |
             Greetings!
@@ -240,7 +240,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: Summary of Conda deployments of ${{ github.event.inputs.recipe }}
-          to: roberto@algorithmiq.fi,panor@kth.se,rinkevic@kth.se,delcey@kth.se,lxin@kth.se
+          to: roberto@algorithmiq.fi
           from: MinazoBot
           body: |
             Greetings!
