@@ -33,10 +33,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  create-summary-json:
+    name: Create summary.json file
+    runs-on: ubuntu-latest
+    name: Create summary.json for deployments to Anaconda.org for ${{ github.event.inputs.recipe }}
+    outputs:
+      summary: $${ steps.create-summary-json.outputs.summary_json }}
+
+    steps:
+      - id: create-summary-json
+        run: |
+          echo ::set-output name=summary_json::$(echo "[]")
+
   build:
-    runs-on: ${{ matrix.os }}
     name: Deploy to Anaconda.org
     timeout-minutes: 120
+    runs-on: ${{ matrix.os }}
+    outputs:
+      summary: ${{ steps.summarize.outputs.summary_json }}
+    needs:
+      create-summary-json
     defaults:
       run:
         shell: bash -l {0}
@@ -144,6 +160,13 @@ jobs:
           rm ${{ github.event.inputs.recipe }}.tar.bz2.sha256
           rm -rf ${{ github.event.inputs.recipe }}
 
+      - id: summarize
+        name: Generate summary of build ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+        run: |
+          echo '${{ needs.create-summary-json.outputs.summary_json }}' |
+          jq -c '. += [ {"os": "${{  }}", "python": "${{ }}", "mpi": "${{ }}", "success": ${{ }} } ]' | tee summary.json
+          echo ::set-output name=summary_json::$(cat summary.json)
+
       - name: Send notification
         if: steps.condabuild.outcome == 'failure'
         uses: dawidd6/action-send-mail@v3
@@ -152,7 +175,7 @@ jobs:
           server_port: 465
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
-          subject: Successful Conda deployment of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+          subject: UNSUCCESSFUL Conda deployment of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
           to: roberto@algorithmiq.fi,panor@kth.se,rinkevic@kth.se,delcey@kth.se,lxin@kth.se
           from: MinazoBot
           body: |
@@ -164,6 +187,71 @@ jobs:
               > Conda package channel: ${{ github.event.inputs.channel }}
               > Conda package label: ${{ github.event.inputs.label }}
               > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
+
+            Best regards,
+              MinazoBot
+
+  summary-email:
+    runs-on: ubuntu-latest
+    name: Summary of deployment to Anaconda.org for ${{ github.event.inputs.recipe }}
+    needs: build
+
+    steps:
+      - name: Create email body
+        run: |
+          echo '${{ needs.build.outputs.summary_json }}' | tee summary.json
+
+          # list of successful deployments
+          success="$(cat summary.json | jq '.[] | select(.success == true)')"
+
+          success_msg="Deployment succedeed for:"
+          row_msg="\n  - OS: %s, Python: %s, MPI: %s"
+
+          for row in $(echo "${success}" | jq -r '.[]'); do
+            os="$(echo ${row} | jq -r '.os')"
+            python="$(echo ${row} | jq -r '.python')"
+            mpi="$(echo ${row} | jq -r '.mpi')"
+            success_msg+="$(printf ${row_msg} ${os} ${python} ${mpi}"
+          done
+
+          echo "success_msg=${success_msg}" >> $GITHUB_ENV
+
+
+          # list of unsuccessful deployments
+          failure="$(cat summary.json | jq '.[] | select(.success == false)')"
+
+          failure_msg="Deployment FAILED for:"
+          row_msg="\n  - OS: %s, Python: %s, MPI: %s"
+
+          for row in $(echo "${failure}" | jq -r '.[]'); do
+            os="$(echo ${row} | jq -r '.os')"
+            python="$(echo ${row} | jq -r '.python')"
+            mpi="$(echo ${row} | jq -r '.mpi')"
+            failure_msg+="$(printf ${row_msg} ${os} ${python} ${mpi}"
+          done
+
+          echo "failure_msg=${failure_msg}" >> $GITHUB_ENV
+
+      - name: Send notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: Summary of Conda deployments of ${{ github.event.inputs.recipe }}
+          to: roberto@algorithmiq.fi,panor@kth.se,rinkevic@kth.se,delcey@kth.se,lxin@kth.se
+          from: MinazoBot
+          body: |
+            Greetings!
+
+            ${{ env.success_msg }}
+
+            You can install with:
+
+              $ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge
+
+            ${{ env.failure_msg }}
 
             Best regards,
               MinazoBot
