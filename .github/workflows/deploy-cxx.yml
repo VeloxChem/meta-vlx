@@ -187,6 +187,7 @@ jobs:
 
   summary-email:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     name: Summary of deployment to Anaconda.org for ${{ github.event.inputs.recipe }}
     needs: build
 
