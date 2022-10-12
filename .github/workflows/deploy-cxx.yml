@@ -65,7 +65,7 @@ jobs:
         #    mpi: mpich
         #  - os: windows-latest
         #    mpi: openmpi
-        os: ubuntu-latest
+        os: [ubuntu-latest]
         mpi: [mpich, openmpi]
         python: [3.7, 3.8, 3.9, '3.10']
 
