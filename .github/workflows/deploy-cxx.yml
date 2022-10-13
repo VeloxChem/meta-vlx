@@ -72,9 +72,6 @@ jobs:
           echo " > Conda package label: ${{ github.event.inputs.label }}"
           echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
 
-          echo '[ {"os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "failure" } ]' | tee tmp.json
-          echo "BUILD_JSON="$(cat tmp.json)"" >> $GITHUB_OUTPUT
-
       - name: Get tarball from GitLab, verify sha256 checksum, and unpack it
         env:
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
@@ -94,8 +91,6 @@ jobs:
           # untar
           echo ">>> Untar archive"
           tar xvf ${{ github.event.inputs.recipe }}.tar.bz2
-
-          echo "${{ steps.build-summary.outputs.BUILD_JSON }}"
 
       - name: Write patch to conda-recipes/${{ github.event.inputs.recipe }}/patches
         run: |
@@ -156,21 +151,12 @@ jobs:
       - name: Deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         id: summarize
         run: |
-          build_json="${{ steps.build-summary.outputs.BUILD_JSON }}"
-          build_json="$(echo $build_json | jq -c '.[] .outcome = "${{ steps.condabuild.outcome }}"')"
-          echo "build_json: $build_json"
-
-          summary_json=""
-          if [ ! -z "${{ steps.summarize.outputs.SUMMARY_JSON }} ]; then
-             summary_json="[]"
+          printf -v tmp "\n  - OS: %s, Python: %s, MPI: %s" "${{ matrix.python }}" "${{ matrix.os }}" "${{ matrix.mpi }}"
+          if [ "${{ steps.condabuild.outcome }}" == "success" ]; then
+             echo "SUCCESS+="${tmp}"" >> $GITHUB_OUTPUT
           else
-             summary_json="${{ steps.summarize.outputs.SUMMARY_JSON }}"
+             echo "FAILURE+="${tmp}"" >> $GITHUB_OUTPUT
           fi
-
-          echo '${summary_json}' | jq -c '. += ${build_json}'"
-          echo "summary_json: $summary_json"
-
-          echo "SUMMARY_JSON="$(echo ${summary_json})"" >> $GITHUB_OUTPUT
 
       - name: Send notification
         if: steps.condabuild.outcome == 'failure'
@@ -206,41 +192,6 @@ jobs:
     needs: build
 
     steps:
-      - name: Create email body
-        run: |
-          echo '${{ needs.build.outputs.SUMMARY_JSON }}' | tee summary.json
-
-          # list of successful deployments
-          success="$(cat summary.json | jq '.[] | select(.outcome == "success")')"
-
-          success_msg="Deployment succedeed for:"
-          row_msg="\n  - OS: %s, Python: %s, MPI: %s"
-
-          for row in $(echo "${success}" | jq -r '.[]'); do
-            os="$(echo ${row} | jq -r '.os')"
-            python="$(echo ${row} | jq -r '.python')"
-            mpi="$(echo ${row} | jq -r '.mpi')"
-            success_msg+="$(printf ${row_msg} ${os} ${python} ${mpi}"
-          done
-
-          echo "success_msg=${success_msg}" >> $GITHUB_ENV
-
-
-          # list of unsuccessful deployments
-          failure="$(cat summary.json | jq '.[] | select(.outcome == "failure")')"
-
-          failure_msg="Deployment FAILED for:"
-          row_msg="\n  - OS: %s, Python: %s, MPI: %s"
-
-          for row in $(echo "${failure}" | jq -r '.[]'); do
-            os="$(echo ${row} | jq -r '.os')"
-            python="$(echo ${row} | jq -r '.python')"
-            mpi="$(echo ${row} | jq -r '.mpi')"
-            failure_msg+="$(printf ${row_msg} ${os} ${python} ${mpi}"
-          done
-
-          echo "failure_msg=${failure_msg}" >> $GITHUB_ENV
-
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
         with:
@@ -254,13 +205,17 @@ jobs:
           body: |
             Greetings!
 
-            ${{ env.success_msg }}
+            Deployments to Anaconda.org succeeded for:
+
+            ${{ needs.build.outputs.SUCCESS }}
 
             You can install with:
 
               $ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge
 
-            ${{ env.failure_msg }}
+            Deployments to Anaconda.org failed for:
+
+            ${{ needs.build.outputs.FAILURE }}
 
             Best regards,
               MinazoBot
