@@ -233,7 +233,7 @@ jobs:
           done
 
           echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
-          echo "FAILURE${failure_msg}" >> $GITHUB_OUTPUT
+          echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
 
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
