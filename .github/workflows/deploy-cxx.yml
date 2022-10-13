@@ -201,16 +201,29 @@ jobs:
         working-directory: build_summaries
         run: |
 
-          full_json="[]"
+          success_msg=""
 
           for dir in "$PWD"/*/
           do
             echo "Reading JSON file: ${dir%*/}/summary.json"
             part="$(cat "${dir}/summary.json")"
-            echo '${full_json}' | jq -c '. += "${part}"'
-          done
+            echo "Extract data from ${part}"
 
-          echo "full_json ${full_json}"
+            for row in $(echo "${part}" | jq -r '.[]'); do
+              os="$(echo ${row} | jq -r '.os')"
+              echo "os ${os}"
+
+              python="$(echo ${row} | jq -r '.python')"
+              echo "python ${python}"
+
+              mpi="$(echo ${row} | jq -r '.mpi')"
+              echo "mpi ${mpi}"
+
+              success="$(echo ${row} | jq -r '.success')"
+              echo "success ${success}"
+
+            done
+          done
 
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
