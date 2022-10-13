@@ -241,7 +241,7 @@ jobs:
 
           # attach more strings if any job was failed
           if [ -z "${failure_msg}" ]; then
-            echo "FAILURE="Deployments to Anaconda.org succeeded for:<br/><br/>${failure_msg}" >> $GITHUB_OUTPUT
+            echo "FAILURE="Deployments to Anaconda.org succeeded for:<br/><br/> ${failure_msg}" >> $GITHUB_OUTPUT
           else
             echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
           fi
