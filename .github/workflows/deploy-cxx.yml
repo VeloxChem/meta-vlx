@@ -62,7 +62,6 @@ jobs:
       - uses: actions/checkout@v3.1.0
 
       - name: Build summary
-        id: build-summary
         run: |
           echo "Build triggered with the following parameters"
 
@@ -132,15 +131,15 @@ jobs:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
-          conda build \
-                --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
-                --token $ANACONDA_TOKEN \
-                --user ${{ github.event.inputs.channel }} \
-                --label ${{ github.event.inputs.label }} \
-                --verify \
-                -c veloxchem/label/main \
-                -c conda-forge \
-                ${{ github.event.inputs.recipe }}
+          #conda build \
+          #      --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
+          #      --token $ANACONDA_TOKEN \
+          #      --user ${{ github.event.inputs.channel }} \
+          #      --label ${{ github.event.inputs.label }} \
+          #      --verify \
+          #      -c veloxchem/label/main \
+          #      -c conda-forge \
+          #      ${{ github.event.inputs.recipe }}
 
       - name: Clean up source code
         run: |
@@ -148,15 +147,16 @@ jobs:
           rm ${{ github.event.inputs.recipe }}.tar.bz2.sha256
           rm -rf ${{ github.event.inputs.recipe }}
 
-      - name: Deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
-        id: summarize
+      - name: Write deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         run: |
-          printf -v tmp "\n  - OS: %s, Python: %s, MPI: %s" "${{ matrix.python }}" "${{ matrix.os }}" "${{ matrix.mpi }}"
-          if [ "${{ steps.condabuild.outcome }}" == "success" ]; then
-             echo "SUCCESS+="${tmp}"" >> $GITHUB_OUTPUT
-          else
-             echo "FAILURE+="${tmp}"" >> $GITHUB_OUTPUT
-          fi
+          echo '[ {"os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" } ]' | tee tmp.json
+
+      - name: Archive deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}.json
+          path: tmp.json
+          retention-days: 1
 
       - name: Send notification
         if: steps.condabuild.outcome == 'failure'
@@ -192,6 +192,17 @@ jobs:
     needs: build
 
     steps:
+      - name: Download all build summaries
+        uses: actions/download-artifact@v3
+
+      - name: Collate JSON files with build summaries
+        run: |
+
+        for json in $(ls *.json); do
+          echo "Reading JSON file: ${json}"
+          cat "${json}"
+        done
+
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
         with:
