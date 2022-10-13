@@ -223,7 +223,7 @@ jobs:
             outcome="$(echo ${part} | jq -r '.outcome')"
             echo "outcome ${outcome}"
 
-            printf -v tmp "  - OS: %s, Python: %s, MPI: %s\n" "${os}" "${python}" "${mpi}"
+            tmp="  - OS: ${os}, Python: ${python}, MPI: ${mpi}\n"
 
             if [ "${outcome}" == "success" ]; then
               success_msg+="${tmp}"
@@ -232,13 +232,8 @@ jobs:
             fi
           done
 
-          echo "success_msg:"
-          echo "${success_msg}"
-          echo "failure_msg:"
-          echo "${failure_msg}"
-
           echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
-          echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
+          echo "FAILURE${failure_msg}" >> $GITHUB_OUTPUT
 
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
