@@ -149,7 +149,7 @@ jobs:
 
       - name: Write deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         run: |
-          echo '[ { "os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" } ]' | jq -c '.' | tee summary.json
+          echo '{ "os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" }' | jq -c '.' | tee summary.json
 
       - name: Archive deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         uses: actions/upload-artifact@v3
@@ -209,20 +209,18 @@ jobs:
             part="$(cat "${dir}/summary.json")"
             echo "Extract data from ${part}"
 
-            for row in $(echo "${part}" | jq -r '.[]'); do
-              os="$(echo ${row} | jq -r '.os')"
-              echo "os ${os}"
+            os="$(echo ${part} | jq -r '.os')"
+            echo "os ${os}"
 
-              python="$(echo ${row} | jq -r '.python')"
-              echo "python ${python}"
+            python="$(echo ${part} | jq -r '.python')"
+            echo "python ${python}"
 
-              mpi="$(echo ${row} | jq -r '.mpi')"
-              echo "mpi ${mpi}"
+            mpi="$(echo ${part} | jq -r '.mpi')"
+            echo "mpi ${mpi}"
 
-              success="$(echo ${row} | jq -r '.success')"
-              echo "success ${success}"
+            success="$(echo ${part} | jq -r '.success')"
+            echo "success ${success}"
 
-            done
           done
 
       - name: Send notification
