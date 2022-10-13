@@ -198,6 +198,7 @@ jobs:
           path: build_summaries
 
       - name: Collate JSON files with build summaries
+        id: collate
         working-directory: build_summaries
         run: |
 
@@ -231,8 +232,13 @@ jobs:
             fi
           done
 
-          echo "success_msg: ${success_msg}"
-          echo "failure_msg: ${failure_msg}"
+          echo "success_msg:"
+          echo "${success_msg}"
+          echo "failure_msg:"
+          echo "${failure_msg}"
+
+          echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
+          echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
 
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
@@ -249,7 +255,7 @@ jobs:
 
             Deployments to Anaconda.org succeeded for:
 
-            ${{ needs.build.outputs.SUCCESS }}
+            ${{ steps.collate.outputs.SUCCESS }}
 
             You can install with:
 
@@ -257,7 +263,7 @@ jobs:
 
             Deployments to Anaconda.org failed for:
 
-            ${{ needs.build.outputs.FAILURE }}
+            ${{ steps.collate.outputs.FAILURE }}
 
             Best regards,
               MinazoBot
