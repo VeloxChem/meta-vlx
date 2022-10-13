@@ -149,13 +149,13 @@ jobs:
 
       - name: Write deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         run: |
-          echo '[ {"os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" } ]' | tee tmp.json
+          echo '[ {"os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" } ]' | tee summary.json
 
       - name: Archive deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         uses: actions/upload-artifact@v3
         with:
-          name: summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}.json
-          path: tmp.json
+          path: summary.json
+          name: build_summaries/summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}.json
           retention-days: 1
 
       - name: Send notification
@@ -194,9 +194,13 @@ jobs:
     steps:
       - name: Download all build summaries
         uses: actions/download-artifact@v3
+        with:
+          name: build_summaries
 
       - name: Collate JSON files with build summaries
+        working_directory: build_summaries
         run: |
+          ls -R
 
           for json in "$PWD"/*.json; do
             echo "Reading JSON file: ${json}"
