@@ -207,7 +207,7 @@ jobs:
           do
             echo "Reading JSON file: ${dir%*/}/summary.json"
             part="$(cat "${dir}/summary.json")"
-            echo '${full_json}' | jq -c '. += ${part}'
+            echo '${full_json}' | jq -c '. += "${part}"'
           done
 
           echo "full_json ${full_json}"
