@@ -198,7 +198,7 @@ jobs:
       - name: Collate JSON files with build summaries
         run: |
 
-          for json in $(ls *.json); do
+          for json in "$PWD"/*.json; do
             echo "Reading JSON file: ${json}"
             cat "${json}"
           done
