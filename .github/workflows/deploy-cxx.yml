@@ -103,6 +103,17 @@ jobs:
         run: |
           curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz | tar -xJ
 
+      - name: Cache conda
+        uses: actions/cache@v3.0.11
+        env:
+          # Increase this value to reset cache if .github/deploy.yml has not changed
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+            hashFiles('.github/deploy.yml') }}
+
       - uses: conda-incubator/setup-miniconda@v2.1.1
         with:
           auto-update-conda: true
@@ -111,6 +122,7 @@ jobs:
           environment-file: .github/deploy.yml
           python-version: ${{ matrix.python }}
           use-mamba: true
+          use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
 
       - name: Configure meta.yaml.in
         run: |
