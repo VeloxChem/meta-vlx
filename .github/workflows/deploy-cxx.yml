@@ -202,9 +202,10 @@ jobs:
         run: |
           ls -R
 
-          for json in "build_summary-*"/*.json; do
-            echo "Reading JSON file: ${json}"
-            cat "${json}"
+          for dir in "build_summary-*"; do
+            ls -R ${dir}
+            echo "Reading JSON file: ${dir}/summary.json"
+            cat "${dir}/summary.json"
           done
 
       - name: Send notification
