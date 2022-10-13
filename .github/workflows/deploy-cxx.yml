@@ -200,7 +200,8 @@ jobs:
       - name: Collate JSON files with build summaries
         working-directory: build_summaries
         run: |
-          for dir in "*/"; do
+          for dir in "$PWD"/*/
+          do
             echo "${dir}"
             ls -R "${dir}"
             echo "Reading JSON file: ${dir}/summary.json"
