@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: summary.json
-          name: summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}.json
+          name: build_summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}
           retention-days: 1
 
       - name: Send notification
@@ -202,7 +202,7 @@ jobs:
         run: |
           ls -R
 
-          for json in "$PWD"/*.json; do
+          for json in "build_summary-*"/*.json; do
             echo "Reading JSON file: ${json}"
             cat "${json}"
           done
