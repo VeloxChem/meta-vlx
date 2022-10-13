@@ -198,10 +198,10 @@ jobs:
       - name: Collate JSON files with build summaries
         run: |
 
-        for json in $(ls *.json); do
-          echo "Reading JSON file: ${json}"
-          cat "${json}"
-        done
+          for json in $(ls *.json); do
+            echo "Reading JSON file: ${json}"
+            cat "${json}"
+          done
 
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
