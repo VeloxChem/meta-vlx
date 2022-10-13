@@ -200,7 +200,7 @@ jobs:
       - name: Collate JSON files with build summaries
         working-directory: build_summaries
         run: |
-          for dir in "$(find . -mindepth 1 -maxdepth 1 -type d  \( ! -iname ".*" \) | sed 's|^\./||g')"; do
+          for dir in "*/"; do
             echo "${dir}"
             ls -R "${dir}"
             echo "Reading JSON file: ${dir}/summary.json"
