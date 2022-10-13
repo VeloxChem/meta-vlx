@@ -245,7 +245,7 @@ jobs:
           subject: "${{ github.event.inputs.recipe }}: summary of deployments to Anaconda.org"
           to: roberto@algorithmiq.fi
           from: MinazoBot
-          body: |
+          html_body: |
             Greetings!
 
             Deployments to Anaconda.org succeeded for:
