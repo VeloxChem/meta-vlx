@@ -149,7 +149,7 @@ jobs:
 
       - name: Write deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         run: |
-          echo '[ {"os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" } ]' | tee summary.json
+          echo '[ { "os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" } ]' | jq -c '.' | tee summary.json
 
       - name: Archive deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         uses: actions/upload-artifact@v3
@@ -200,13 +200,17 @@ jobs:
       - name: Collate JSON files with build summaries
         working-directory: build_summaries
         run: |
+
+          full_json="[]"
+
           for dir in "$PWD"/*/
           do
-            echo "${dir}"
-            ls -R "${dir}"
-            echo "Reading JSON file: ${dir}/summary.json"
-            cat "${dir}/summary.json"
+            echo "Reading JSON file: ${dir%*/}/summary.json"
+            part="$(cat "${dir}/summary.json")"
+            echo '${full_json}' | jq -c '. += ${part}'
           done
+
+          echo "full_json ${full_json}"
 
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
