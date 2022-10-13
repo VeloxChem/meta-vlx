@@ -223,7 +223,7 @@ jobs:
             outcome="$(echo ${part} | jq -r '.outcome')"
             echo "outcome ${outcome}"
 
-            tmp="  - OS: ${os}, Python: ${python}, MPI: ${mpi}\n"
+            tmp="  - OS: ${os}, Python: ${python}, MPI: ${mpi}<br/>"
 
             if [ "${outcome}" == "success" ]; then
               success_msg+="${tmp}"
@@ -246,19 +246,19 @@ jobs:
           to: roberto@algorithmiq.fi
           from: MinazoBot
           html_body: |
-            Greetings!
+            Greetings!<br/>
 
-            Deployments to Anaconda.org succeeded for:
+            Deployments to Anaconda.org succeeded for:<br/><br/>
 
-            ${{ steps.collate.outputs.SUCCESS }}
+            ${{ steps.collate.outputs.SUCCESS }}<br/>
 
-            You can install with:
+            You can install with:<br/><br/>
 
-              $ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge
+              $ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge<br/><br/>
 
-            Deployments to Anaconda.org failed for:
+            Deployments to Anaconda.org failed for:<br/><br/>
 
-            ${{ steps.collate.outputs.FAILURE }}
+            ${{ steps.collate.outputs.FAILURE }}<br/>
 
-            Best regards,
+            Best regards,<br/>
               MinazoBot
