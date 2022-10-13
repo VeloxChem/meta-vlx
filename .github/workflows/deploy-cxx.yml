@@ -202,6 +202,7 @@ jobs:
         run: |
 
           success_msg=""
+          failure_msg=""
 
           for dir in "$PWD"/*/
           do
@@ -218,10 +219,20 @@ jobs:
             mpi="$(echo ${part} | jq -r '.mpi')"
             echo "mpi ${mpi}"
 
-            success="$(echo ${part} | jq -r '.success')"
-            echo "success ${success}"
+            outcome="$(echo ${part} | jq -r '.outcome')"
+            echo "outcome ${outcome}"
 
+            printf -v tmp "  - OS: %s, Python: %s, MPI: %s\n" "${os}" "${python}" "${mpi}"
+
+            if [ "${outcome}" == "success" ]; then
+              success_msg+="${tmp}"
+            else
+              failure_msg+="${tmp}"
+            fi
           done
+
+          echo "success_msg: ${success_msg}"
+          echo "failure_msg: ${failure_msg}"
 
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
