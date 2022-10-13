@@ -234,7 +234,7 @@ jobs:
 
           # attach more strings if any job was successful
           if [ -z "${success_msg}" ]; then
-            echo "SUCCESS="Deployments to Anaconda.org succeeded for:<br/><br/>${success_msg}<br/>You can install with:<br/><br/>$ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge<br/>" >> $GITHUB_OUTPUT
+            echo "SUCCESS="Deployments to Anaconda.org succeeded for:<br/><br/>${success_msg}<br/>You can install with:<br/><br/>conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge<br/>" >> $GITHUB_OUTPUT
           else
             echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
           fi
