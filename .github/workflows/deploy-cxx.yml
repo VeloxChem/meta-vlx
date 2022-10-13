@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: summary.json
-          name: build_summaries/summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}.json
+          name: summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}.json
           retention-days: 1
 
       - name: Send notification
@@ -195,7 +195,7 @@ jobs:
       - name: Download all build summaries
         uses: actions/download-artifact@v3
         with:
-          name: build_summaries
+          path: build_summaries
 
       - name: Collate JSON files with build summaries
         working-directory: build_summaries
