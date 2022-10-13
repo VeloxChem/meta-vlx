@@ -246,7 +246,7 @@ jobs:
           to: roberto@algorithmiq.fi
           from: MinazoBot
           html_body: |
-            Greetings!<br/>
+            Greetings!<br/><br/>
 
             Deployments to Anaconda.org succeeded for:<br/><br/>
 
