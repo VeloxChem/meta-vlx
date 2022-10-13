@@ -232,8 +232,19 @@ jobs:
             fi
           done
 
-          echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
-          echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
+          # attach more strings if any job was successful
+          if [ -z "${success_msg}" ]; then
+            echo "SUCCESS="Deployments to Anaconda.org succeeded for:<br/><br/>${success_msg}<br/>You can install with:<br/><br/>$ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge<br/>" >> $GITHUB_OUTPUT
+          else
+            echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
+          fi
+
+          # attach more strings if any job was failed
+          if [ -z "${failure_msg}" ]; then
+            echo "FAILURE="Deployments to Anaconda.org succeeded for:<br/><br/>${failure_msg}" >> $GITHUB_OUTPUT
+          else
+            echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Send notification
         uses: dawidd6/action-send-mail@v3.7.0
@@ -248,15 +259,7 @@ jobs:
           html_body: |
             Greetings!<br/><br/>
 
-            Deployments to Anaconda.org succeeded for:<br/><br/>
-
             ${{ steps.collate.outputs.SUCCESS }}<br/>
-
-            You can install with:<br/><br/>
-
-              $ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge<br/><br/>
-
-            Deployments to Anaconda.org failed for:<br/><br/>
 
             ${{ steps.collate.outputs.FAILURE }}<br/>
 
