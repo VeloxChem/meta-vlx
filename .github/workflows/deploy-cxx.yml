@@ -198,7 +198,7 @@ jobs:
           name: build_summaries
 
       - name: Collate JSON files with build summaries
-        working_directory: build_summaries
+        working-directory: build_summaries
         run: |
           ls -R
 
