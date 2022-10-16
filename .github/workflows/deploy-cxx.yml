@@ -176,7 +176,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: "${{ github.event.inputs.recipe }}: UNSUCCESSFUL Conda deployment for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}"
-          to: roberto@algorithmiq.fi
+          to: roberto@algorithmiq.fi,panor@kth.se,rinkevic@kth.se,delcey@kth.se,lxin@kth.se
           from: MinazoBot
           body: |
             Greetings!
@@ -189,7 +189,7 @@ jobs:
               > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
 
             Find the build logs here:
-              > ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.job_id }}
+              > ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             Best regards,
               MinazoBot
@@ -252,7 +252,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: "${{ github.event.inputs.recipe }}: summary of deployments to Anaconda.org"
-          to: roberto@algorithmiq.fi
+          to: roberto@algorithmiq.fi,panor@kth.se,rinkevic@kth.se,delcey@kth.se,lxin@kth.se
           from: MinazoBot
           html_body: |
             Greetings!<br/><br/>
