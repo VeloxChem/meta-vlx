@@ -33,22 +33,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  job1:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - id: set-matrix
-        run: echo "matrix={\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}" >> $GITHUB_OUTPUT
-
-  job2:
-    needs: job1
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}
-    steps:
-      - run: build
-
   prepare-build-matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -81,7 +65,7 @@ jobs:
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "$(cat tmp.json)"
 
-          echo "MATRIX={\"include\": $(cat tmp.json | jq -R '.')}" >> $GITHUB_OUTPUT
+          echo "MATRIX={\"include\": $(cat tmp.json | jq -R '.' | sed 's/^"\(.*\)"$/\1/')}" >> $GITHUB_OUTPUT
 
   build:
     name: Deploy to Anaconda.org
