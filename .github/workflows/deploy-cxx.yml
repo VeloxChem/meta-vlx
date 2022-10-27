@@ -75,7 +75,7 @@ jobs:
       run:
         shell: bash -l {0}
     strategy:
-      matrix: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.prepare-build-matrix.outputs.MATRIX) }}
 
     steps:
       - uses: actions/checkout@v3.1.0
