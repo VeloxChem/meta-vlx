@@ -36,7 +36,8 @@ jobs:
   build:
     name: Deploy to Anaconda.org
     # skip multipsi builds on windows
-    if: !startsWith(matrix.os, 'windows') || ${{ github.event.inputs.recipe != 'multipsi' }}
+    if: |
+      !startsWith(matrix.os, 'windows') || ${{ github.event.inputs.recipe != 'multipsi' }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
