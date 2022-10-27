@@ -65,7 +65,7 @@ jobs:
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "$(cat matrix.json)"
 
-          echo "MATRIX=$(cat matrix.json)" >> $GITHUB_OUTPUT
+          echo "MATRIX=$(cat matrix.json | jq -R '.')" >> $GITHUB_OUTPUT
 
   build:
     name: Deploy to Anaconda.org
