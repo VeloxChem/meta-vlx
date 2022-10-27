@@ -47,7 +47,7 @@ jobs:
           # - MPI: openmpi, mpich
           echo '[ ["ubuntu-latest","macos-latest"], ["3.7", "3.8", "3.9", "3.10"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
-          cat foo.json | jq -nc '[inputs]' > tmp.json
+          cat foo.json | jq -nc '[inputs]' > matrix.json
 
           if [ "${{ github.event.inputs.recipe }}" == "multipsi" ]; then
             # we don't want to build multipsi on windows, so we append to the "base" build matrix in all other cases
@@ -57,15 +57,17 @@ jobs:
             # - MPI: msmpi
             echo '[ ["windows-latest"], ["3.7", "3.8", "3.9", "3.10"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
-            cat foo.json | jq -nc '[inputs]' > bar.json
+            cat foo.json | jq -nc '[inputs]' > win.json
 
-            jq -sc 'add' tmp.json bar.json > tmp.json
+            cp matrix.json base.json
+
+            jq -sc 'add' base.json win.json > matrix.json
           fi
 
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
-          echo "MATRIX={\"include\": $(cat tmp.json)}"
+          echo "MATRIX={\"include\": $(cat matrix.json)}"
 
-          echo "MATRIX={\"include\": $(cat tmp.json)}" >> $GITHUB_OUTPUT
+          echo "MATRIX={\"include\": $(cat matrix.json)}" >> $GITHUB_OUTPUT
 
   build:
     name: Deploy to Anaconda.org
