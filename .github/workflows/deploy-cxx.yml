@@ -49,7 +49,7 @@ jobs:
 
           cat foo.json | jq -nc '[inputs]' > tmp.json
 
-          if [ "${{ github.event.inputs.recipe }}" != "multipsi" ]; then
+          if [ "${{ github.event.inputs.recipe }}" == "multipsi" ]; then
             # we don't want to build multipsi on windows, so we append to the "base" build matrix in all other cases
             # append to the Cartesian products of:
             # - OS: windows-latest
@@ -63,15 +63,9 @@ jobs:
           fi
 
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
-          echo "$(cat tmp.json)"
-
-          echo "MATRIX={\"include\": $(cat tmp.json | jq -R '.' | sed 's/^"\(.*\)"$/\1/')}"
           echo "MATRIX={\"include\": $(cat tmp.json)}"
-          echo "MATRIX={\"include\": [{\"os\": \"ubuntu-latest\", \"python\": \"3.7\", \"mpi\": \"openmpi\"}]}"
 
-          echo "MATRIX={\"include\": $(cat tmp.json | jq -R '.' | sed 's/^"\(.*\)"$/\1/')}" >> $GITHUB_OUTPUT
           echo "MATRIX={\"include\": $(cat tmp.json)}" >> $GITHUB_OUTPUT
-          #echo "MATRIX={\"include\": [{\"os\": \"ubuntu-latest\", \"python\": \"3.7\", \"mpi\": \"openmpi\"}]}" >> $GITHUB_OUTPUT
 
   build:
     name: Deploy to Anaconda.org
