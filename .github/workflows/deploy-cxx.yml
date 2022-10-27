@@ -65,7 +65,8 @@ jobs:
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "$(cat tmp.json)"
 
-          echo "MATRIX={\"include\": $(cat tmp.json | jq -R '.' | sed 's/^"\(.*\)"$/\1/')}" >> $GITHUB_OUTPUT
+          #echo "MATRIX={\"include\": $(cat tmp.json | jq -R '.' | sed 's/^"\(.*\)"$/\1/')}" >> $GITHUB_OUTPUT
+          echo "MATRIX={\"include\": [{\"foo\": \"bar\"}]}" >> $GITHUB_OUTPUT
 
   build:
     name: Deploy to Anaconda.org
