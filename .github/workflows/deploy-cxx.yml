@@ -65,8 +65,9 @@ jobs:
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "$(cat tmp.json)"
 
-          #echo "MATRIX={\"include\": $(cat tmp.json | jq -R '.' | sed 's/^"\(.*\)"$/\1/')}" >> $GITHUB_OUTPUT
-          echo "MATRIX={\"include\": [{\"os\": \"ubuntu-latest\", \"python\": \"3.7\", \"mpi\": \"openmpi\"}]}" >> $GITHUB_OUTPUT
+          echo "MATRIX={\"include\": $(cat tmp.json | jq -R '.' | sed 's/^"\(.*\)"$/\1/')}"
+          echo "MATRIX={\"include\": $(cat tmp.json | jq -R '.' | sed 's/^"\(.*\)"$/\1/')}" >> $GITHUB_OUTPUT
+          #echo "MATRIX={\"include\": [{\"os\": \"ubuntu-latest\", \"python\": \"3.7\", \"mpi\": \"openmpi\"}]}" >> $GITHUB_OUTPUT
 
   build:
     name: Deploy to Anaconda.org
