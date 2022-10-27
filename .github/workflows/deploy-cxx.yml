@@ -33,29 +33,49 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  prepare-build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - id: set-matrix
+        run: |
+          # create "base" build matrix as Cartesian product of:
+          # - OS: ubunut-latest, macos-latest
+          # - Python: 3.7, 3.8, 3.8, 3.10
+          # - MPI: openmpi, mpich
+          echo '[ ["ubuntu-latest","macos-latest"], ["3.7", "3.8", "3.9", "3.10"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+
+          cat foo.json | jq -cn '[inputs]' > matrix.json
+
+          if [ "${{ github.event.inputs.recipe }}" != "multipsi" ]; then
+            # we don't want to build multipsi on windows, so we append to the "base" build matrix in all other cases
+            # append to the Cartesian products of:
+            # - OS: windows-latest
+            # - Python: 3.7, 3.8, 3.9, 3.10
+            # - MPI: msmpi
+            echo '[ ["windows-latest"], ["3.7", "3.8", "3.9", "3.10"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+
+            cat foo.json | jq '[input]' > bar.json
+
+            jq -sc 'add' matrix.json bar.json > matrix.json
+          fi
+
+          echo "Build matrix for ${{ github.event.inputs.recipe }}"
+          echo "$(cat matrix.json)"
+
+          echo "MATRIX=$(cat matrix.json)" >> $GITHUB_OUTPUT
+
   build:
     name: Deploy to Anaconda.org
+    needs: prepare-build-matrix
     runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash -l {0}
-    # skip multipsi builds on windows
-    if: |
-      ${{ !startsWith(matrix.os, 'windows') || !contains(github.event.inputs.recipe, 'multipsi') }}
     strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        mpi: [msmpi, mpich, openmpi]
-        python: [3.7, 3.8, 3.9, '3.10']
-        exclude:
-          - os: macos-latest
-            mpi: msmpi
-          - os: ubuntu-latest
-            mpi: msmpi
-          - os: windows-latest
-            mpi: mpich
-          - os: windows-latest
-            mpi: openmpi
+      matrix: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v3.1.0
