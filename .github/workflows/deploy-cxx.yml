@@ -37,7 +37,7 @@ jobs:
     name: Deploy to Anaconda.org
     # skip multipsi builds on windows
     if: |
-      !startsWith(matrix.os, 'windows') || ${{ github.event.inputs.recipe != 'multipsi' }}
+      ${{ matrix.os != 'windows-latest' || github.event.inputs.recipe != 'multipsi' }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -100,7 +100,7 @@ jobs:
           cat $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/patches/version.patch
 
       - name: Install macOS SDK
-        if: contains(matrix.os, 'macos')
+        if: startsWith(matrix.os, 'macos')
         working-directory: /Users/runner
         run: |
           curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz | tar -xJ
