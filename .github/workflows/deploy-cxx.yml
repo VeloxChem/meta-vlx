@@ -39,14 +39,14 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
+    # skip multipsi builds on windows
+    if: |
+      ${{ !startsWith(matrix.os, 'windows') || !contains(github.event.inputs.recipe, 'multipsi') }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         mpi: [msmpi, mpich, openmpi]
         python: [3.7, 3.8, 3.9, '3.10']
-        # skip multipsi builds on windows
-        should_deploy:
-          - ${{ matrix.os != 'windows-latest' || github.event.inputs.recipe != 'multipsi' }}
         exclude:
           - os: macos-latest
             mpi: msmpi
@@ -56,7 +56,6 @@ jobs:
             mpi: mpich
           - os: windows-latest
             mpi: openmpi
-          - should_deploy: true
 
     steps:
       - uses: actions/checkout@v3.1.0
