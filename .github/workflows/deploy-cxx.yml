@@ -49,7 +49,7 @@ jobs:
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
-          if [ "${{ github.event.inputs.recipe }}" == "multipsi" ]; then
+          if [ "${{ github.event.inputs.recipe }}" != "multipsi" ]; then
             # we don't want to build multipsi on windows, so we append to the "base" build matrix in all other cases
             # append to the Cartesian products of:
             # - OS: windows-latest
