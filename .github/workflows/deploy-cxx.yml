@@ -192,7 +192,7 @@ jobs:
           name: build_summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}
           retention-days: 1
 
-      - name: Send notification for failures
+      - name: Send notification for failure
         if: steps.condabuild.outcome != 'success'
         uses: dawidd6/action-send-mail@v3.7.0
         with:
@@ -201,7 +201,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: "${{ github.event.inputs.recipe }}: UNSUCCESSFUL Conda deployment for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}"
-          to: roberto@algorithmiq.fi,panor@kth.se,rinkevic@kth.se,delcey@kth.se,lxin@kth.se
+          to: roberto@algorithmiq.fi
           from: MinazoBot
           body: |
             Greetings!
