@@ -24,7 +24,7 @@ requirements:
     - python
     - setuptools
   run:
-    - {{ pin_compatible('numpy', lower_bound='1.11') }}
+    - {{ pin_compatible('numpy', lower_bound='1.18') }}
     - networkx
     - python
     - six
@@ -34,6 +34,10 @@ test:
     - geometric
   requires:
     - pytest
+    - rdkit
+    - openmm
+    - ase
+    - xtb-python
   commands:
     - $PYTHON -m pytest --pyargs geometric -v -k json
 
