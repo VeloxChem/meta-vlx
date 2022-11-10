@@ -12,6 +12,8 @@ source:
 
 build:
   number: @_build_@
+  script_env:
+    - OMPI_MCA_plm_rsh_agent=  # [mpi == 'openmpi' and linux]
   binary_relocation: true
   entry_points:
     - vlx=veloxchem.main:main
@@ -32,7 +34,7 @@ requirements:
     - gmock
     - pybind11 >=2.6,<3.0
   host:
-    - python {{ python }}
+    - python
     - pybind11-abi
     - {{ mpi }}
     - mpi4py >=3.0
@@ -52,9 +54,9 @@ requirements:
     - geometric >1.0
     - cppe  # [unix]
     - h5py >=2.8
+    - python
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
-    - {{ pin_compatible('python', max_pin='x.x') }}
 
 test:
   requires:
