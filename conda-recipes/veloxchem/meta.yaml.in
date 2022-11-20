@@ -9,7 +9,6 @@ source:
   path: ../../veloxchem
   patches:
     - patches/version.patch
-    - patches/geometric-as-posix.patch
 
 build:
   number: @_build_@
