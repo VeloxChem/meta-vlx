@@ -16,16 +16,22 @@ RUN apt update --yes -qq \
        libopenblas-openmp-dev \
        libopenmpi-dev \
        openmpi-bin \
-    && apt autoremove --yes -qq \
-    && apt clean --yes -qq \
-    && update-ca-certificates \
-    && rm -rf /var/lib/apt/lists/* \
     && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.5.0.tar.gz | tar xz \
     && cd xtb-6.5.0 \
     && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLA_VENDOR=OpenBLAS > /dev/null 2>&1 \
     && cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
-    && rm -rf xtb-6.5.0
+    && rm -rf xtb-6.5.0 \
+    && curl -Ls https://gitlab.com/libxc/libxc/-/archive/6.0.0/libxc-6.0.0.tar.gz | tar xz \
+    && cd libxc-6.0.0 \
+    && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DDISABLE_KXC=OFF -DDISABLE_LXC=OFF -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DENABLE_XHOST=ON > /dev/null 2>&1 \
+    && cmake --build build --target install > /dev/null 2>&1 \
+    && cd .. \
+    && rm -rf libxc-6.0.0 \
+    && apt autoremove --yes -qq \
+    && apt clean --yes -qq \
+    && update-ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY gnu-env.sh /opt/docker/etc
 
