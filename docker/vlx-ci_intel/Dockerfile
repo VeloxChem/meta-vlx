@@ -16,16 +16,16 @@ RUN apt update --yes -qq \
        intel-oneapi-mpi \
        intel-oneapi-mpi-devel \
        intel-oneapi-openmp \
+    && . /opt/intel/oneapi/setvars.sh \
     && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.5.0.tar.gz | tar xz \
     && cd xtb-6.5.0 \
-    && . /opt/intel/oneapi/setvars.sh \
-    && cmake -S. -Bbuild -GNinja -DCMAKE_Fortran_COMPILER=ifort -DCMAKE_C_COMPILER=icc -DCMAKE_BUILD_TYPE=Release > /dev/null 2>&1 \
+    && cmake -S. -Bbuild -GNinja -DCMAKE_Fortran_COMPILER=ifort -DCMAKE_C_COMPILER=icx -DCMAKE_BUILD_TYPE=Release > /dev/null 2>&1 \
     && cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
     && rm -rf xtb-6.5.0 \
     && curl -Ls https://gitlab.com/libxc/libxc/-/archive/6.0.0/libxc-6.0.0.tar.gz | tar xz \
     && cd libxc-6.0.0 \
-    && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=icc -DBUILD_SHARED_LIBS=ON -DENABLE_XHOST=ON -DDISABLE_KXC=OFF -DDISABLE_LXC=OFF -DBUILD_TESTING=OFF > /dev/null 2>&1 \
+    && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=icx -DBUILD_SHARED_LIBS=ON -DENABLE_XHOST=ON -DDISABLE_KXC=OFF -DDISABLE_LXC=OFF -DBUILD_TESTING=OFF > /dev/null 2>&1 \
     && cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
     && rm -rf libxc-6.0.0 \
