@@ -14,9 +14,6 @@ build:
   number: @_build_@
   script_env:
     - OMPI_MCA_plm_rsh_agent=  # [mpi == 'openmpi' and linux]
-  binary_relocation: true
-  run_exports:
-    - {{ pin_subpackage('multipsi', max_pin='x.x') }}
 
 requirements:
   build:
@@ -25,8 +22,8 @@ requirements:
     - libgomp  # [linux]
     - llvm-openmp  # [osx or win]
     - ninja
-    - pybind11 >=2.6,<3.0
   host:
+    - pybind11 >=2.6,<3.0
     - python {{ python }}
     - pybind11-abi
     - {{ mpi }}
@@ -38,7 +35,6 @@ requirements:
     - veloxchem >=1.0rc2*_60
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
-    - {{ pin_compatible('python', max_pin='x.x') }}
   run_constrained:
     - libopenblas * openmp*  # [unix]
 
@@ -47,14 +43,11 @@ test:
     - pytest
     - libopenblas  # [unix]   
     - mkl  # [win]
+    - pip
   imports:
     - multipsi
   commands:
-    # Verify existence and execution
-    - test -d $SP_DIR/multipsi  # [unix]
-    - ls -l $SP_DIR/multipsi  # [unix]
-    - if not exist %SP_DIR%\\multipsi exit 1  # [win]
-    - dir %SP_DIR%\\multipsi  # [win]
+    - pip check
     # Inspect linkage
     - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
     - ldd -v $SP_DIR/multipsi/multipsilib$PYLIB_EXT  # [linux]

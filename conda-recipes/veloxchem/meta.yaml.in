@@ -14,11 +14,8 @@ build:
   number: @_build_@
   script_env:
     - OMPI_MCA_plm_rsh_agent=  # [mpi == 'openmpi' and linux]
-  binary_relocation: true
   entry_points:
     - vlx=veloxchem.main:main
-  run_exports:
-    - {{ pin_subpackage('veloxchem', max_pin='x.x') }}
 
 requirements:
   build:
@@ -27,11 +24,10 @@ requirements:
     - libgomp  # [linux]
     - llvm-openmp  # [osx or win]
     - ninja
-    - pkg-config  # [unix]
-    - pybind11 >=2.6,<3.0
     - gtest
     - gmock
   host:
+    - pybind11 >=2.6,<3.0
     - python
     - pybind11-abi
     - {{ mpi }}
@@ -60,16 +56,11 @@ test:
     - pytest
     - libopenblas  # [unix]   
     - mkl  # [win]
+    - pip
   imports:
     - veloxchem
   commands:
-    # verify existence
-    - test -d $SP_DIR/veloxchem  # [unix]
-    - ls -l $SP_DIR/veloxchem  # [unix]
-    - test -f $PREFIX/bin/vlx  # [unix]
-    - if not exist %SP_DIR%\\veloxchem exit 1  # [win]
-    - dir %SP_DIR%\\veloxchem  # [win]
-    - if not exist %SCRIPTS%\\vlx.exe exit 1  # [win]
+    - pip check
     # verify we can execute the CLI
     - vlx --version
     - vlx --help
