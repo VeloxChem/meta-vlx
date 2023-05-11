@@ -12,24 +12,18 @@ cxx_compiler:
   - clangxx  # [osx]
 
 cxx_compiler_version:
-  - '10'  # [linux]
-  - '12'  # [osx]
+  - '12'  # [linux]
+  - '15'  # [osx]
   
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
 # implementation as runtime, thus replicating the behavior of conda-forge
 # packages documented here:
 # https://conda-forge.org/docs/maintainer/knowledge_base.html#how-it-works
-libblas:
-  - 3.8 *netlib
-
 libcblas:
-  - 3.8 *netlib
-
-liblapack:
-  - 3.8 *netlib
+  - 3.9 *netlib
 
 liblapacke:
-  - 3.8 *netlib
+  - 3.9 *netlib
 
 mpi:
   - msmpi    # [win]
@@ -38,7 +32,8 @@ mpi:
 
 python:
   #- 3.6     # EOL: 23 Dec 2021
-  - 3.7      # EOL: 27 Jun 2023
+  #- 3.7     # EOL: 27 Jun 2023
   - 3.8      # EOL: 14 Oct 2024
   - 3.9      # EOL: 05 Oct 2025
   - '3.10'   # EOL: 04 Oct 2026
+  - '3.11'   # EOL: 24 Oct 2027
