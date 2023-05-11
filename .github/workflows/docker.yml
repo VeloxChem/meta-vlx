@@ -74,7 +74,7 @@ jobs:
       - name: Docker meta
         if: ${{ env.keepgoing == 'true' }}
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: |
             ghcr.io/${{ github.repository }}/${{ matrix.image }}
