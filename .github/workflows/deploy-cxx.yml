@@ -194,7 +194,7 @@ jobs:
 
       - name: Send notification for failure
         if: steps.condabuild.outcome != 'success'
-        uses: dawidd6/action-send-mail@v3.7.0
+        uses: dawidd6/action-send-mail@v3.7.2
         with:
           server_address: smtp.gmail.com
           server_port: 465
@@ -270,7 +270,7 @@ jobs:
           echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
 
       - name: Send notification
-        uses: dawidd6/action-send-mail@v3.7.0
+        uses: dawidd6/action-send-mail@v3.7.2
         with:
           server_address: smtp.gmail.com
           server_port: 465
