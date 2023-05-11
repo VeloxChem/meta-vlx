@@ -43,9 +43,9 @@ jobs:
         run: |
           # create "base" build matrix as Cartesian product of:
           # - OS: ubunut-latest, macos-latest
-          # - Python: 3.7, 3.8, 3.8, 3.10
+          # - Python: 3.8, 3.8, 3.10, 3.11
           # - MPI: openmpi, mpich
-          echo '[ ["ubuntu-latest","macos-latest"], ["3.7", "3.8", "3.9", "3.10"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["ubuntu-latest","macos-latest"], ["3.8", "3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
@@ -53,9 +53,9 @@ jobs:
             # we don't want to build multipsi on windows, so we append to the "base" build matrix in all other cases
             # append to the Cartesian products of:
             # - OS: windows-latest
-            # - Python: 3.7, 3.8, 3.9, 3.10
+            # - Python: 3.8, 3.9, 3.10, 3.11
             # - MPI: msmpi
-            echo '[ ["windows-latest"], ["3.7", "3.8", "3.9", "3.10"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+            echo '[ ["windows-latest"], ["3.8", "3.9", "3.10", "3.11"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
             cat foo.json | jq -nc '[inputs]' > win.json
 
@@ -128,7 +128,7 @@ jobs:
           curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz | tar -xJ
 
       - name: Cache conda
-        uses: actions/cache@v3.3.1
+        uses: actions/cache@v3
         env:
           # Increase this value to reset cache if .github/deploy.yml has not changed
           CACHE_NUMBER: 0
@@ -137,7 +137,7 @@ jobs:
           key:
             ${{ matrix.os }}-${{ matrix.python }}-${{ matrix.mpi }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('.github/deploy.yml') }}
 
-      - uses: conda-incubator/setup-miniconda@v2.1.1
+      - uses: conda-incubator/setup-miniconda@v2
         timeout-minutes: 30
         with:
           auto-update-conda: true
@@ -194,7 +194,7 @@ jobs:
 
       - name: Send notification for failure
         if: steps.condabuild.outcome != 'success'
-        uses: dawidd6/action-send-mail@v3.7.2
+        uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 465
@@ -270,7 +270,7 @@ jobs:
           echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
 
       - name: Send notification
-        uses: dawidd6/action-send-mail@v3.7.2
+        uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 465
