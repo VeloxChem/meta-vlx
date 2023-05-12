@@ -1,6 +1,11 @@
 CONDA_BUILD_SYSROOT:
   - /Users/runner/MacOSX10.10.sdk  # [osx]
-  #- /Users/runner/MacOSX10.9.sdk  # [osx] # retired Oct 2020
+
+MACOSX_DEPLOYMENT_TARGET:
+  - '10.9'  # [osx]
+
+channel_sources:
+  - conda-forge
 
 target_platform:
   - linux-64  # [linux]
@@ -14,6 +19,9 @@ cxx_compiler:
 cxx_compiler_version:
   - '12'  # [linux]
   - '15'  # [osx]
+
+llvm_openmp:
+  - '15'  # [osx or win]
   
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
 # implementation as runtime, thus replicating the behavior of conda-forge
@@ -31,8 +39,6 @@ mpi:
   - openmpi  # [not win]
 
 python:
-  #- 3.6     # EOL: 23 Dec 2021
-  #- 3.7     # EOL: 27 Jun 2023
   - 3.8      # EOL: 14 Oct 2024
   - 3.9      # EOL: 05 Oct 2025
   - '3.10'   # EOL: 04 Oct 2026
