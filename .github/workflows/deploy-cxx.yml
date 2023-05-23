@@ -165,7 +165,7 @@ jobs:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
-          conda build \
+          conda mambabuild \
                 --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
                 --token $ANACONDA_TOKEN \
                 --user ${{ github.event.inputs.channel }} \
