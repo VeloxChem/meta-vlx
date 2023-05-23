@@ -9,7 +9,7 @@ cxx_compiler:
   - clangxx  # [osx]
 
 cxx_compiler_version:
-  - '11'  # [linux]
+  - '12'  # [linux]
   - '14'  # [osx]
 
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
