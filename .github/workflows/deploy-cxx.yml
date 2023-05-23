@@ -159,7 +159,7 @@ jobs:
 
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         id: condabuild
-        timeout-minutes: 90
+        timeout-minutes: 120
         continue-on-error: true
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
@@ -172,6 +172,7 @@ jobs:
                 --label ${{ github.event.inputs.label }} \
                 --verify \
                 -c conda-forge \
+                -c veloxchem/label/main \
                 ${{ github.event.inputs.recipe }}
 
       - name: Clean up source code
