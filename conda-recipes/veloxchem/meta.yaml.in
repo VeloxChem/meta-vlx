@@ -27,24 +27,24 @@ requirements:
     - gtest
     - gmock
   host:
-    - pybind11 >=2.6,<3.0
+    - pybind11
     - python
     - pybind11-abi
     - {{ mpi }}
-    - mpi4py >=3.0
+    - mpi4py
     - libcblas
     - liblapacke
-    - numpy >=1.17
+    - numpy
     - xtb  # [unix]
     - gtest  # [osx]
     - gmock  # [osx]
     - libxc >=5.2
   run:
-    - psutil >=5.6
+    - psutil
     - mdanalysis >=1.0
     - geometric
     - cppe  # [unix]
-    - h5py >=2.8
+    - h5py
     - python
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
