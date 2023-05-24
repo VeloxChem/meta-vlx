@@ -38,7 +38,7 @@ requirements:
     - xtb  # [unix]
     - gtest  # [osx]
     - gmock  # [osx]
-    - libxc-c >=6
+    - libxc-c 6* *cpu*
   run:
     - psutil
     - geometric
