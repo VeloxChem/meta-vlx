@@ -56,6 +56,12 @@ test:
     - libopenblas  # [unix]   
     - mkl  # [win]
     - pip
+    - scipy
+    - openmm
+    - matplotlib
+    - rdkit
+    - k3d
+    - mdanalysis
   imports:
     - veloxchem
   commands:
