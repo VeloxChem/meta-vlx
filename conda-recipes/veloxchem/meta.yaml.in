@@ -70,9 +70,9 @@ test:
     - vlx --version
     - vlx --help
     # Inspect linkage
-    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
-    - ldd -v $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT  # [linux]
-    - otool -L $SP_DIR/veloxchem/veloxchemlib$PYLIB_EXT  # [osx]
+    - ldd -v $SP_DIR/veloxchem/veloxchemlib*.so  # [linux]
+    - otool -L $SP_DIR/veloxchem/veloxchemlib*.so  # [osx]
+    - objdump.exe -p %SP_DIR%\\veloxchem\\veloxchemlib.*.pyd | findstr /i "dll"  # [win]
     # run integration tests
     - export OMPI_ALLOW_RUN_AS_ROOT=1  # [mpi == 'openmpi']
     - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1  # [mpi == 'openmpi']
