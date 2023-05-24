@@ -171,6 +171,7 @@ jobs:
                 --user ${{ github.event.inputs.channel }} \
                 --label ${{ github.event.inputs.label }} \
                 --verify \
+                -c conda-forge \
                 ${{ github.event.inputs.recipe }}
 
       - name: Clean up source code
