@@ -1,4 +1,4 @@
-FROM ghcr.io/enccs/meta-vlx/vlx-ci_ubuntu-22.04:sha-2d80890
+FROM ghcr.io/veloxchem/meta-vlx/vlx-ci_ubuntu-22.04:sha-56644e9
 
 LABEL org.opencontainers.image.description "GNU-based VeloxChem CI container"
 
