@@ -10,7 +10,7 @@ cxx_compiler:
   - clangxx  # [osx]
 
 cxx_compiler_version:
-  - '11'  # [linux]
+  - '12'  # [linux]
   - '14'  # [osx]
 
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
@@ -30,9 +30,9 @@ macos_machine:
   - x86_64-apple-darwin13.4.0  # [osx]
 
 numpy:
-  - '1.20'  # [not py==3.11]
-  - '1.23'  # [py==3.11]
-
+  - '1.21'  # [not py==311]
+  - '1.23'  # [py==311]
+  
 mpi:
   - msmpi    # [win]
   - mpich    # [not win]
