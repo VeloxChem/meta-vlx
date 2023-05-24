@@ -38,7 +38,7 @@ requirements:
     - xtb  # [unix]
     - gtest  # [osx]
     - gmock  # [osx]
-    - libxc >=5.2
+    - libxc
   run:
     - psutil
     - mdanalysis >=1.0
