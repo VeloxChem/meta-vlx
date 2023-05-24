@@ -38,10 +38,9 @@ requirements:
     - xtb  # [unix]
     - gtest  # [osx]
     - gmock  # [osx]
-    - libxc
+    - libxc >=6
   run:
     - psutil
-    - mdanalysis >=1.0
     - geometric
     - cppe  # [unix]
     - h5py
