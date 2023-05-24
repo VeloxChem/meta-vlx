@@ -1,6 +1,9 @@
 MACOSX_DEPLOYMENT_TARGET:
   - '10.9'  # [osx]
 
+cdt_name:
+  - cos6  # [linux]
+
 channel_sources:
   - conda-forge
 
