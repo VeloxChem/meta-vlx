@@ -171,8 +171,6 @@ jobs:
                 --user ${{ github.event.inputs.channel }} \
                 --label ${{ github.event.inputs.label }} \
                 --verify \
-                -c conda-forge \
-                -c veloxchem/label/main \
                 ${{ github.event.inputs.recipe }}
 
       - name: Clean up source code
