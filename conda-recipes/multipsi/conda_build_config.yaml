@@ -11,7 +11,7 @@ cxx_compiler:
 
 cxx_compiler_version:
   - '12'  # [linux]
-  - '14'  # [osx]
+  - '15'  # [osx]
 
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
 # implementation as runtime, thus replicating the behavior of conda-forge
@@ -24,7 +24,7 @@ liblapacke:
   - 3.9 *netlib
 
 llvm_openmp:
-  - '14'  # [osx or win]
+  - '15'  # [osx or win]
 
 macos_machine:
   - x86_64-apple-darwin13.4.0  # [osx]
