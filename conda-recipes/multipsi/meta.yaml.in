@@ -32,7 +32,7 @@ requirements:
     - liblapacke
     - numpy
   run:
-    - veloxchem >=1.0rc3*_97
+    - veloxchem >=1.0rc3*_96
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
   run_constrained:
