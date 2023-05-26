@@ -23,14 +23,14 @@ requirements:
     - llvm-openmp  # [osx or win]
     - ninja
   host:
-    - pybind11 >=2.6,<3.0
-    - python {{ python }}
+    - pybind11
+    - python
     - pybind11-abi
     - {{ mpi }}
-    - mpi4py >=3.0
+    - mpi4py
     - libcblas
     - liblapacke
-    - numpy >=1.15
+    - numpy
   run:
     - veloxchem >=1.0rc3*_97
     - {{ pin_compatible('mpi4py') }}
@@ -49,9 +49,8 @@ test:
   commands:
     - pip check
     # Inspect linkage
-    - export PYLIB_EXT=`$PYTHON -c 'from numpy import distutils; print(distutils.misc_util.get_shared_lib_extension(is_python_ext=True))'`  # [unix]
-    - ldd -v $SP_DIR/multipsi/multipsilib$PYLIB_EXT  # [linux]
-    - otool -L $SP_DIR/multipsi/multipsilib$PYLIB_EXT  # [osx]
+    - ldd -v $SP_DIR/multipsi/multipsilib*.so  # [linux]
+    - otool -L $SP_DIR/multipsi/multipsilib*.so  # [osx]
     # run integration tests
     - export OMPI_ALLOW_RUN_AS_ROOT=1  # [mpi == 'openmpi']
     - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1  # [mpi == 'openmpi']
