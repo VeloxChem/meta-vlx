@@ -16,10 +16,6 @@ jobs:
     name: "Changed Docker Recipes"
 
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: read
-      packages: write
 
     outputs:
       changed_files: ${{ steps.combine.outputs.changed_files }}
@@ -47,6 +43,10 @@ jobs:
       - changes
 
     runs-on: ubuntu-latest
+        
+    permissions:
+      contents: read
+      packages: write
 
     strategy:
       # Keep going on other deployments if anything bloops
