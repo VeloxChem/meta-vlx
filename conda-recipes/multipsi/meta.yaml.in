@@ -34,6 +34,7 @@ requirements:
     - scipy
   run:
     - veloxchem >=1.0rc3*_96
+    - python
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('scipy') }}
