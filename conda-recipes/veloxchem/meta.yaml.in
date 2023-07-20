@@ -60,9 +60,8 @@ test:
     - openmm
     - matplotlib
     - rdkit  # [not aarch64 and not ppc64le]
-    - reportlab <4.0  # to avoid pip check error
     - k3d
-    - mdanalysis  # [not aarch64 and not ppc64le]
+    # - mdanalysis  # [not aarch64 and not ppc64le]
     - m2w64-binutils  # [win]   # provides objdump.exe
   imports:
     - veloxchem
