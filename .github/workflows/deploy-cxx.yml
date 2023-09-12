@@ -49,20 +49,17 @@ jobs:
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
-          if [ "${{ github.event.inputs.recipe }}" != "multipsi" ]; then
-            # we don't want to build multipsi on windows, so we append to the "base" build matrix in all other cases
-            # append to the Cartesian products of:
-            # - OS: windows-latest
-            # - Python: 3.8, 3.9, 3.10, 3.11
-            # - MPI: msmpi
-            echo '[ ["windows-latest"], ["3.8", "3.9", "3.10", "3.11"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          # append to the Cartesian products of:
+          # - OS: windows-latest
+          # - Python: 3.8, 3.9, 3.10, 3.11
+          # - MPI: msmpi
+          echo '[ ["windows-latest"], ["3.8", "3.9", "3.10", "3.11"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
-            cat foo.json | jq -nc '[inputs]' > win.json
+          cat foo.json | jq -nc '[inputs]' > win.json
 
-            cp matrix.json base.json
+          cp matrix.json base.json
 
-            jq -sc 'add' base.json win.json > matrix.json
-          fi
+          jq -sc 'add' base.json win.json > matrix.json
 
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "MATRIX={\"include\": $(cat matrix.json)}"
