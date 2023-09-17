@@ -61,6 +61,8 @@ jobs:
 
           jq -sc 'add' base.json win.json > matrix.json
 
+          cp win.json matrix.json
+
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "MATRIX={\"include\": $(cat matrix.json)}"
 
@@ -263,7 +265,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: "${{ github.event.inputs.recipe }}: summary of deployments to Anaconda.org"
-          to: roberto@algorithmiq.fi,panor@kth.se,rinkevic@kth.se,delcey@kth.se,lxin@kth.se
+          to: roberto@algorithmiq.fi,lxin@kth.se
           from: MinazoBot
           html_body: |
             Greetings!<br/><br/>
