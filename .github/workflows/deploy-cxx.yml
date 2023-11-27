@@ -124,7 +124,7 @@ jobs:
         run: |
           curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz | tar -xJ
 
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v3
         timeout-minutes: 30
         with:
           auto-update-conda: true
