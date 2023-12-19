@@ -172,7 +172,7 @@ jobs:
           echo '{ "os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" }' | jq -c '.' | tee summary.json
 
       - name: Archive deployment summary of ${{ github.event.inputs.recipe }} for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: summary.json
           name: build_summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}
