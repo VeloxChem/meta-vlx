@@ -59,7 +59,7 @@ test:
     - scipy
     - openmm
     - matplotlib
-    - rdkit  # [not aarch64 and not ppc64le]
+    - openbabel
     - k3d
     # - mdanalysis  # [not aarch64 and not ppc64le]
     - m2w64-binutils  # [win]   # provides objdump.exe
