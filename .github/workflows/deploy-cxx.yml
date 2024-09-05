@@ -148,7 +148,7 @@ jobs:
       - name: Set up Visual Studio environment
         if: startsWith(matrix.os, 'windows')
         run: |
-          call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+          & "%PROGRAMFILES%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         id: condabuild
