@@ -145,6 +145,11 @@ jobs:
                 --file \
                 $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/meta.yaml
 
+      - name: Set up Visual Studio environment
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         id: condabuild
         timeout-minutes: 150
