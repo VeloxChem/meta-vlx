@@ -8,7 +8,9 @@ cmake ^
     -DCMAKE_BUILD_TYPE:STRING=Release ^
     -DCMAKE_INSTALL_PREFIX:PATH="%PREFIX%" ^
     -DCMAKE_CXX_COMPILER:STRING=clang-cl ^
+    -DCMAKE_CXX_FLAGS:STRING="--target=amd64-pc-windows-msvc" ^
     -DCMAKE_C_COMPILER:STRING=clang-cl ^
+    -DCMAKE_C_FLAGS:STRING="--target=amd64-pc-windows-msvc" ^
     -DENABLE_ARCH_FLAGS:BOOL=OFF ^
     -DVLX_LA_VENDOR:STRING="Generic" ^
     -DPython_EXECUTABLE:STRING="%PYTHON%" ^
