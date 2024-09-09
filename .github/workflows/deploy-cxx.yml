@@ -45,8 +45,7 @@ jobs:
           # - OS: ubunut-latest, macos-12
           # - Python: 3.8, 3.8, 3.10, 3.11
           # - MPI: openmpi, mpich
-          #echo '[ ["ubuntu-latest","macos-12"], ["3.8", "3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          echo '[ ["macos-12"], ["3.8", "3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["ubuntu-latest","macos-12"], ["3.8", "3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
@@ -54,13 +53,13 @@ jobs:
           # - OS: windows-2019
           # - Python: 3.8, 3.9, 3.10, 3.11
           # - MPI: msmpi
-          #echo '[ ["windows-2019"], ["3.8", "3.9", "3.10", "3.11"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["windows-2019"], ["3.8", "3.9", "3.10", "3.11"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
-          #cat foo.json | jq -nc '[inputs]' > win.json
+          cat foo.json | jq -nc '[inputs]' > win.json
 
-          #cp matrix.json base.json
+          cp matrix.json base.json
 
-          #jq -sc 'add' base.json win.json > matrix.json
+          jq -sc 'add' base.json win.json > matrix.json
 
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "MATRIX={\"include\": $(cat matrix.json)}"
@@ -264,7 +263,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: "${{ github.event.inputs.recipe }}: summary of deployments to Anaconda.org"
-          to: roberto@algorithmiq.fi,lxin@kth.se
+          to: roberto@algorithmiq.fi,panor@kth.se,rinkevic@kth.se,delcey@kth.se,lxin@kth.se
           from: MinazoBot
           html_body: |
             Greetings!<br/><br/>
