@@ -42,10 +42,10 @@ jobs:
       - id: set-matrix
         run: |
           # create "base" build matrix as Cartesian product of:
-          # - OS: ubunut-latest, macos-13
+          # - OS: ubunut-latest, macos-14
           # - Python: 3.8, 3.8, 3.10, 3.11
           # - MPI: openmpi, mpich
-          echo '[ ["ubuntu-latest","macos-13"], ["3.8", "3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["ubuntu-latest","macos-14"], ["3.8", "3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
@@ -122,7 +122,7 @@ jobs:
         if: startsWith(matrix.os, 'macos')
         working-directory: /Users/runner
         run: |
-          curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz | tar -xJ
+          curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX11.0.sdk.tar.xz | tar -xJ
 
       - uses: conda-incubator/setup-miniconda@v3
         timeout-minutes: 30
