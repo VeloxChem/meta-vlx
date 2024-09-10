@@ -11,6 +11,7 @@ export XTBHOME="$CONDA_PREFIX"
 
 # configure!
 cmake \
+    --log-level=DEBUG \
     -S"${SRC_DIR}" \
     -Bbuild \
     -GNinja \
