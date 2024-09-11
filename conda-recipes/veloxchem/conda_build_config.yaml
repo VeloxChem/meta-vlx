@@ -30,7 +30,8 @@ llvm_openmp:
   - '18'  # [osx]
 
 macos_machine:
-  - arm64-apple-darwin20.0.0  # [osx]
+  - arm64-apple-darwin20.0.0   # [osx and arm64]
+  - x86_64-apple-darwin13.4.0  # [osx and x86_64]
 
 numpy:
   - '1.21'  # [not py==311]
@@ -42,15 +43,16 @@ mpi:
   - openmpi  # [not win]
 
 python:
-  - 3.8.* *_cpython    # EOL: 14 Oct 2024
-  - 3.9.* *_cpython    # EOL: 05 Oct 2025
-  - 3.10.* *_cpython   # EOL: 04 Oct 2026
-  - 3.11.* *_cpython   # EOL: 24 Oct 2027
+  - '3.8'   # EOL: 14 Oct 2024
+  - '3.9'   # EOL: 05 Oct 2025
+  - '3.10'  # EOL: 04 Oct 2026
+  - '3.11'  # EOL: 24 Oct 2027
 
 target_platform:
   - linux-64  # [linux]
   - win-64    # [win]
-  - osx-arm64    # [osx]
+  - osx-arm64  # [osx and arm64]
+  - osx-64     # [osx and x86_64]
 
 CONDA_BUILD_SYSROOT:
   - /Users/runner/MacOSX11.0.sdk  # [osx]
