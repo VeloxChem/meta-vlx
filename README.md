@@ -10,14 +10,16 @@ which gets configured during execution of the
 ## Using `conda-build` locally
 
 1. Copy `meta.yaml.in` to `meta.yaml`.
+
 2. Configure the parametrized fields to suit your needs. 
-3. Install Miniconda: <https://docs.conda.io/en/latest/miniconda.html>
-   This will get us the latest Miniconda for Linux. Configure the
+
+3. Install Miniforge: <https://conda-forge.org/download/>
+   This will get us the latest Miniforge for Linux. Configure the
    installation as you see fit.
 
    ``` bash
-   $ curl -LO https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-   $ bash Miniconda3-latest-Linux-x86_64.sh
+   $ curl -LO https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+   $ bash Miniforge3-Linux-x86_64.sh
    ```
 
    You should log out and log back in (or close and re-open the
@@ -37,15 +39,17 @@ which gets configured during execution of the
    install `conda-verify`
 
    ``` bash
-   $ conda install conda-build conda-verify
-   $ conda update conda conda-build conda-verify
+   $ conda activate base
+   $ conda install conda-build conda-verify python=3.11
    ```
-5. Clone the VeloxChem repository into a folder called `vlx-conda-build`. This
-   clone **must be** at the same level as the clone of this repository.
+5. Clone the veloxchem repository. Note that the `veloxchem` folder
+   **must be** at the same level as the `conda-recipes` folder of
+   this repository.
 
 6. You can build the package with:
 
    ``` bash
+   $ cd conda-recipes
    $ conda build veloxchem -c conda-forge
    ```
 
@@ -55,6 +59,7 @@ which gets configured during execution of the
 
    ``` bash
    $ conda install anaconda-client
+   $ conda config --set anaconda_upload no
    ```
 
    You login with:
@@ -66,5 +71,5 @@ which gets configured during execution of the
    And upload with:
 
    ``` bash
-   $ anaconda upload /root/miniconda3/conda-bld/noarch/fortran-binary-1.0.6-py_0.tar.bz2
+   $ anaconda upload $HOME/miniforge3/conda-bld/linux-64/veloxchem-1.0rc3-py_0.tar.bz2 -u veloxchem -l test
    ```
