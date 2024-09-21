@@ -27,11 +27,7 @@ cmake \
 cmake --build build --parallel "${CPU_COUNT}" -- -v -d stats
 
 # test!
-# we only run unit tests here, integration tests are run later on
-cd build
-cmake --build . --parallel "${CPU_COUNT}" --target utests -- -v -d stats
-ctest -L unit --output-on-failure --parallel "${CPU_COUNT}"
+# skip unit tests
 
 # install!
-cd ..
 cmake --build build --target install

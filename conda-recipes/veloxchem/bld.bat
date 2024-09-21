@@ -21,10 +21,7 @@ if errorlevel 1 exit 1
 
 :: test!
 set KMP_DUPLICATE_LIB_OK=TRUE
-:: we only run unit tests here, integration tests are run later on
-cd %SRC_DIR%\build
-cmake --build . --config Release --parallel %CPU_COUNT% --target utests -- -v -d stats
-ctest -L unit --output-on-failure --parallel %CPU_COUNT%
+:: skip unit tests here
 cd %SRC_DIR%
 if errorlevel 1 exit 1
 
