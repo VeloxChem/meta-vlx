@@ -48,7 +48,8 @@ jobs:
           # For now, disable builds with openmpi due to the
           # "shmem: mmap: an error occurred while determining ..." error
           #echo '[ ["ubuntu-latest", "macos-14", "macos-12"], ["3.8", "3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          echo '[ ["ubuntu-latest", "macos-14", "macos-12"], ["3.8", "3.9", "3.10", "3.11"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          #echo '[ ["ubuntu-latest", "macos-14", "macos-12"], ["3.8", "3.9", "3.10", "3.11"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["ubuntu-latest"], ["3.11"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
@@ -62,7 +63,7 @@ jobs:
 
           cp matrix.json base.json
 
-          jq -sc 'add' base.json win.json > matrix.json
+          #jq -sc 'add' base.json win.json > matrix.json
 
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "MATRIX={\"include\": $(cat matrix.json)}"
