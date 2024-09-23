@@ -1,1 +1,2 @@
 $env:KMP_DUPLICATE_LIB_OK="FALSE"
+$env:BABEL_DATADIR=$null
