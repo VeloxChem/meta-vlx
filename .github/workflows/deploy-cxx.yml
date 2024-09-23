@@ -57,7 +57,7 @@ jobs:
           # - Python: 3.8, 3.9, 3.10, 3.11
           # - MPI: msmpi
           #echo '[ ["windows-2022"], ["3.8", "3.9", "3.10", "3.11"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          echo '[ ["windows-2022"], ["3.11"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["windows-2022"], ["3.8", "3.9", "3.10"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > win.json
 
