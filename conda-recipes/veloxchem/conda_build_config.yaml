@@ -42,7 +42,6 @@ mpi:
   - openmpi  # [not win]
 
 python:
-  - '3.8'   # EOL: 14 Oct 2024
   - '3.9'   # EOL: 05 Oct 2025
   - '3.10'  # EOL: 04 Oct 2026
   - '3.11'  # EOL: 24 Oct 2027

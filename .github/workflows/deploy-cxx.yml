@@ -43,20 +43,20 @@ jobs:
         run: |
           # create "base" build matrix as Cartesian product of:
           # - OS: ubunut-latest, macos-14 (arm64), macos-12 (x86_64)
-          # - Python: 3.8, 3.8, 3.10, 3.11
+          # - Python: 3.9, 3.10, 3.11
           # - MPI: openmpi, mpich
           # For now, disable builds with openmpi due to the
           # "shmem: mmap: an error occurred while determining ..." error
-          #echo '[ ["ubuntu-latest", "macos-14", "macos-12"], ["3.8", "3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          echo '[ ["ubuntu-latest", "macos-14", "macos-12"], ["3.8", "3.9", "3.10", "3.11"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          #echo '[ ["ubuntu-latest", "macos-14", "macos-12"], ["3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["ubuntu-latest", "macos-14", "macos-12"], ["3.9", "3.10", "3.11"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
           # append to the Cartesian products of:
           # - OS: windows-2022
-          # - Python: 3.8, 3.9, 3.10, 3.11
+          # - Python: 3.9, 3.10, 3.11
           # - MPI: msmpi
-          echo '[ ["windows-2022"], ["3.8", "3.9", "3.10", "3.11"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["windows-2022"], ["3.9", "3.10", "3.11"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > win.json
 
