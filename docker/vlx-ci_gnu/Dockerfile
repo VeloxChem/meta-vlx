@@ -14,20 +14,19 @@ RUN apt update --yes -qq \
        liblapacke \
        liblapacke-dev \
        libopenblas-openmp-dev \
-       libopenmpi-dev \
-       openmpi-bin \
-    && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.6.0.tar.gz | tar xz \
-    && cd xtb-6.6.0 \
+       mpich \
+    && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.6.1.tar.gz | tar xz \
+    && cd xtb-6.6.1 \
     && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLA_VENDOR=OpenBLAS > /dev/null 2>&1 \
     && cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
-    && rm -rf xtb-6.6.0 \
-    && curl -Ls https://gitlab.com/libxc/libxc/-/archive/6.1.0/libxc-6.1.0.tar.gz | tar xz \
-    && cd libxc-6.1.0 \
+    && rm -rf xtb-6.6.1 \
+    && curl -Ls https://gitlab.com/libxc/libxc/-/archive/6.2.2/libxc-6.2.2.tar.gz | tar xz \
+    && cd libxc-6.2.2 \
     && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF > /dev/null 2>&1 \
     && cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
-    && rm -rf libxc-6.1.0 \
+    && rm -rf libxc-6.2.2 \
     && apt autoremove --yes -qq \
     && apt clean --yes -qq \
     && update-ca-certificates \
