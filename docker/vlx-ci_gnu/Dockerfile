@@ -6,7 +6,10 @@ LABEL org.opencontainers.image.description "GNU-based VeloxChem CI container"
 ADD https://timeapi.io/api/Time/current/zone?timeZone=Europe/Stockholm /opt/docker/etc/timestamp
 
 # install software
-RUN apt update --yes -qq \
+RUN apt install -y gpg-agent wget \
+    && wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null \
+    && echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" |tee /etc/apt/sources.list.d/oneAPI.list \
+    && apt update --yes -qq \
     && DEBIAN_FRONTEND=noninteractive apt install --yes -qq \
        -o Dpkg::Options::="--force-confnew" \
        g++ \
