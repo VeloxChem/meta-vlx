@@ -56,7 +56,7 @@ test:
   requires:
     - pytest
     - libopenblas  # [unix]   
-    - mkl  # [win]
+    - mkl <=2024.1 # [win]
     - pip
     - scipy
     - openmm
