@@ -48,8 +48,7 @@ jobs:
           # For now, disable builds with openmpi due to the
           # "shmem: mmap: an error occurred while determining ..." error
           #echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          #echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.9", "3.10", "3.11", "3.12"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          echo '[ ["macos-13"], ["3.9", "3.10", "3.11", "3.12"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.9", "3.10", "3.11", "3.12"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
@@ -57,13 +56,13 @@ jobs:
           # - OS: windows-2022
           # - Python: 3.9, 3.10, 3.11, 3.12
           # - MPI: msmpi
-          #echo '[ ["windows-2022"], ["3.9", "3.10", "3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["windows-2022"], ["3.9", "3.10", "3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
-          #cat foo.json | jq -nc '[inputs]' > win.json
+          cat foo.json | jq -nc '[inputs]' > win.json
 
-          #cp matrix.json base.json
+          cp matrix.json base.json
 
-          #jq -sc 'add' base.json win.json > matrix.json
+          jq -sc 'add' base.json win.json > matrix.json
 
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "MATRIX={\"include\": $(cat matrix.json)}"
