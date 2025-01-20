@@ -1,2 +1,1 @@
 set KMP_DUPLICATE_LIB_OK=TRUE
-set BABEL_DATADIR=%CONDA_PREFIX%\share\openbabel
