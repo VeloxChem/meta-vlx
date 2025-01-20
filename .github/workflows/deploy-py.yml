@@ -64,6 +64,7 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
+          conda-remove-defaults: true
           auto-update-conda: true
           auto-activate-base: false
           activate-environment: deploy

@@ -130,6 +130,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         timeout-minutes: 30
         with:
+          conda-remove-defaults: true
           auto-update-conda: true
           auto-activate-base: false
           activate-environment: deploy
