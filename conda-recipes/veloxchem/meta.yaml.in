@@ -35,6 +35,7 @@ requirements:
     - mpi4py
     - libcblas
     - liblapacke
+    - eigen
     - numpy
     - xtb  # [unix]
     - gtest  # [osx]
