@@ -51,9 +51,7 @@ requirements:
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
   run_constrained:
-    - libopenblas =*openmp*  # [unix]
-    - libcblas !=*blis*  # [unix]
-    - liblapacke !=*blis*  # [unix]
+    - libopenblas * openmp*  # [unix]
 
 test:
   requires:
