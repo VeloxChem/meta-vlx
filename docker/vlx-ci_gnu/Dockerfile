@@ -18,12 +18,12 @@ RUN apt install -y gpg-agent wget \
        liblapacke-dev \
        libopenblas-openmp-dev \
        mpich \
-    && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.6.1.tar.gz | tar xz \
-    && cd xtb-6.6.1 \
-    && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLA_VENDOR=OpenBLAS > /dev/null 2>&1 \
+    && curl -Ls https://github.com/dftd4/dftd4/archive/refs/tags/v3.7.0.tar.gz | tar xz \
+    && cd dftd4-3.7.0 \
+    && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLA_VENDOR=OpenBLAS -DBUILD_SHARED_LIBS=ON > /dev/null 2>&1 \
     && cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
-    && rm -rf xtb-6.6.1 \
+    && rm -rf dftd4-3.7.0 \
     && curl -Ls https://gitlab.com/libxc/libxc/-/archive/6.2.2/libxc-6.2.2.tar.gz | tar xz \
     && cd libxc-6.2.2 \
     && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DBUILD_SHARED_LIBS=ON -DDISABLE_KXC=OFF -DDISABLE_LXC=OFF -DBUILD_TESTING=OFF > /dev/null 2>&1 \
