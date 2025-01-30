@@ -35,7 +35,7 @@ requirements:
     - liblapacke
     - eigen
     - numpy
-    - dftd4
+    - dftd4 <3.7
     - libxc-c
   run:
     - psutil
