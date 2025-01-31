@@ -1,5 +1,8 @@
 MACOSX_DEPLOYMENT_TARGET:
-  - '10.9'  # [osx]
+  - '11.0'  # [osx]
+
+cdt_name:
+  - cos6  # [linux]
 
 channel_sources:
   - conda-forge
@@ -11,7 +14,7 @@ cxx_compiler:
 
 cxx_compiler_version:
   - '12'  # [linux]
-  - '15'  # [osx]
+  - '18'  # [osx]
 
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
 # implementation as runtime, thus replicating the behavior of conda-forge
@@ -24,14 +27,16 @@ liblapacke:
   - 3.9 *netlib
 
 llvm_openmp:
-  - '15'  # [osx or win]
+  - '18'  # [osx or win]
 
 macos_machine:
-  - x86_64-apple-darwin13.4.0  # [osx]
+  - arm64-apple-darwin20.0.0   # [osx and arm64]
+  - x86_64-apple-darwin13.4.0  # [osx and x86_64]
 
 numpy:
-  - '1.21'  # [not py==311]
+  - '1.21'  # [not py==311 and not py==312]
   - '1.23'  # [py==311]
+  - '1.26'  # [py==312]
   
 mpi:
   - msmpi    # [win]
@@ -39,16 +44,17 @@ mpi:
   - openmpi  # [not win]
 
 python:
-  - 3.8      # EOL: 14 Oct 2024
-  - 3.9      # EOL: 05 Oct 2025
-  - '3.10'   # EOL: 04 Oct 2026
-  - '3.11'   # EOL: 24 Oct 2027
+  - '3.9'   # EOL: Oct 2025
+  - '3.10'  # EOL: Oct 2026
+  - '3.11'  # EOL: Oct 2027
+  - '3.12'  # EOL: Oct 2028
 
 target_platform:
   - linux-64  # [linux]
-  - osx-64    # [osx]
   - win-64    # [win]
+  - osx-arm64  # [osx and arm64]
+  - osx-64     # [osx and x86_64]
 
 CONDA_BUILD_SYSROOT:
-  - /Users/runner/MacOSX10.10.sdk  # [osx]
+  - /Users/runner/MacOSX11.0.sdk  # [osx]
 
