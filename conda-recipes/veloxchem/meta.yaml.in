@@ -43,7 +43,7 @@ requirements:
     - cppe  # [unix]
     - h5py
     - python
-    - impi  # [win]
+    - impi_rt  # [win]
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
   run_constrained:
