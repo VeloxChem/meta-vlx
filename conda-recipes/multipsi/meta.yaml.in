@@ -21,6 +21,7 @@ requirements:
     - {{ compiler('cxx') }}
     - libgomp  # [linux]
     - llvm-openmp  # [osx or win]
+    - vs2022_win-64  # [win]
     - ninja
   host:
     - pybind11
@@ -33,8 +34,9 @@ requirements:
     - numpy
     - scipy
   run:
-    - veloxchem >=1.0rc3*_96
+    - veloxchem >=1.0rc3*_180
     - python
+    - msmpi  # [win]
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('scipy') }}
@@ -45,8 +47,10 @@ test:
   requires:
     - pytest
     - libopenblas  # [unix]   
-    - mkl  # [win]
+    - mkl <=2024.1 # [win]
     - pip
+    - scipy
+    - m2w64-binutils  # [win]   # provides objdump.exe
   imports:
     - multipsi
   commands:
@@ -54,6 +58,7 @@ test:
     # Inspect linkage
     - ldd -v $SP_DIR/multipsi/multipsilib*.so  # [linux]
     - otool -L $SP_DIR/multipsi/multipsilib*.so  # [osx]
+    - objdump.exe -p %SP_DIR%\\multipsi\\multipsilib.*.pyd | findstr /i "dll"  # [win]
     # run integration tests
     - export OMPI_ALLOW_RUN_AS_ROOT=1  # [mpi == 'openmpi']
     - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1  # [mpi == 'openmpi']
