@@ -35,11 +35,11 @@ requirements:
     - liblapacke
     - eigen
     - numpy
-    - dftd4
     - libxc-c
   run:
     - psutil
     - geometric
+    - dftd4-python
     - cppe  # [unix]
     - h5py
     - python
