@@ -66,8 +66,6 @@ jobs:
 
           jq -sc 'add' base.json win.json > matrix.json
 
-          cp win.json matrix.json
-
           echo "Build matrix for ${{ github.event.inputs.recipe }}"
           echo "MATRIX={\"include\": $(cat matrix.json)}"
 
