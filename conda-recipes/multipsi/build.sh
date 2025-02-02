@@ -21,9 +21,12 @@ cmake \
     -DPYMOD_INSTALL_FULLDIR:PATH="${SP_DIR#$PREFIX/}/multipsi"
 
 # build!
-cmake --build build --parallel "${CPU_COUNT}" -- -v -d stats
+#cmake --build build --parallel "${CPU_COUNT}" -- -v -d stats
 
 # integration tests are run later on with pytest
 
 # install!
-cmake --build build --target install
+#cmake --build build --target install
+
+SKBUILD_CONFIGURE_OPTIONS="-DCMAKE_BUILD_TYPE:STRING=Release -DENABLE_ARCH_FLAGS:BOOL=OFF -DMTP_LA_VENDOR=Generic -DCMAKE_CXX_COMPILER=${CXX}" \
+    ${PYTHON} -m pip install --prefix=${PREFIX} --no-build-isolation -v .
