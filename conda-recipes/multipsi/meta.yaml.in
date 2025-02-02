@@ -69,10 +69,10 @@ test:
     - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
     - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --pyargs multipsi -m "parallel"  # [unix]
     - set OMP_NUM_THREADS=%CPU_COUNT%  # [win]
-    #- mpiexec -n 1 %PYTHON% -m pytest --pyargs multipsi  # [win]
+    - mpiexec -n 1 %PYTHON% -m pytest --pyargs multipsi  # [win]
     - set MPI_NUM_PROCS=2  # [win]
     - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%"  # [win]
-    #- mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs multipsi  # [win]
+    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --pyargs multipsi -m "parallel"  # [win]
 
 about:
   home: https://multipsi.org
