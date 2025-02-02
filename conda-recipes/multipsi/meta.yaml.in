@@ -24,6 +24,7 @@ requirements:
     - vs2022_win-64  # [win]
     - scikit-build
     - ninja
+    - veloxchem >=1.0rc3*_180
   host:
     - pybind11
     - python
@@ -37,6 +38,7 @@ requirements:
     - scikit-build
     - pip
     - setuptools
+    - veloxchem >=1.0rc3*_180
   run:
     - veloxchem >=1.0rc3*_180
     - python
