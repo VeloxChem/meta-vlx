@@ -24,7 +24,7 @@ requirements:
     - vs2022_win-64  # [win]
     - scikit-build
     - ninja
-    - veloxchem >=1.0rc3*_180
+    - libgcc  # [win]
   host:
     - pybind11
     - python
@@ -38,9 +38,9 @@ requirements:
     - scikit-build
     - pip
     - setuptools
-    - veloxchem >=1.0rc3*_180
+    - libgcc  # [win]
   run:
-    - veloxchem >=1.0rc3*_180
+    - veloxchem >=1.0rc3=*_187
     - python
     - impi_rt  # [win]
     - {{ pin_compatible('mpi4py') }}
