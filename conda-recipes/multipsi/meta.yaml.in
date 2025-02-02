@@ -22,9 +22,7 @@ requirements:
     - libgomp  # [linux]
     - llvm-openmp  # [osx or win]
     - vs2022_win-64  # [win]
-    - scikit-build
     - ninja
-    - libgcc  # [win]
   host:
     - pybind11
     - python
@@ -38,11 +36,10 @@ requirements:
     - scikit-build
     - pip
     - setuptools
-    - libgcc  # [win]
   run:
     - veloxchem >=1.0rc3=*_187
     - python
-    - impi_rt  # [win]
+    - msmpi  # [win]
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('scipy') }}

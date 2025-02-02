@@ -39,7 +39,7 @@ numpy:
   - '1.26'  # [py==312]
   
 mpi:
-  - impi_rt  # [win]
+  - msmpi  # [win]
   - mpich    # [not win]
   - openmpi  # [not win]
 

@@ -56,9 +56,9 @@ jobs:
           # append to the Cartesian products of:
           # - OS: windows-2022
           # - Python: 3.9, 3.10, 3.11, 3.12
-          # - MPI: impi_rt
-          #echo '[ ["windows-2022"], ["3.9", "3.10", "3.11", "3.12"], ["impi_rt"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          echo '[ ["windows-2022"], ["3.10", "3.11", "3.12"], ["impi_rt"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          # - MPI: msmpi
+          #echo '[ ["windows-2022"], ["3.9", "3.10", "3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["windows-2022"], ["3.10", "3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > win.json
 
