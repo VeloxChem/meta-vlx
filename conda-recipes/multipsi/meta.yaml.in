@@ -34,6 +34,9 @@ requirements:
     - liblapacke
     - numpy
     - scipy
+    - scikit-build
+    - pip
+    - setuptools
   run:
     - veloxchem >=1.0rc3*_180
     - python
