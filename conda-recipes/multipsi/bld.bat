@@ -25,6 +25,8 @@ if errorlevel 1 exit 1
 cmake --build build --config Release --target install
 if errorlevel 1 exit 1
 
+robocopy tests "%SP_DIR%\multipsi" /E /R:5 /W:5 /NFL /NDL /NJH /NJS
+
 :: Copy the [de]activate scripts to %PREFIX%\etc\conda\[de]activate.d.
 :: This will allow them to be run on environment activation.
 for %%F in (activate deactivate) DO (
