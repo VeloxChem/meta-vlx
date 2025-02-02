@@ -25,7 +25,10 @@ if errorlevel 1 exit 1
 cmake --build build --config Release --target install
 if errorlevel 1 exit 1
 
-robocopy src\python "%SP_DIR%\multipsi" *.py /R:5 /W:10 /NFL /NDL /NJH /NJS
+set "SKBUILD_CONFIGURE_OPTIONS=-DMTP_LA_VENDOR=Generic -DCMAKE_CXX_COMPILER=%CXX%"
+set "CMAKE_ARGS=-DCMAKE_BUILD_TYPE:STRING=Release -DENABLE_ARCH_FLAGS:BOOL=OFF"
+%PYTHON% -m pip install --prefix=%PREFIX% --no-build-isolation -v .
+
 robocopy tests "%SP_DIR%\multipsi" /E /R:5 /W:5 /NFL /NDL /NJH /NJS
 
 :: Copy the [de]activate scripts to %PREFIX%\etc\conda\[de]activate.d.
