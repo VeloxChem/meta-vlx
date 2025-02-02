@@ -25,10 +25,14 @@ if errorlevel 1 exit 1
 cmake --build build --config Release --target install
 if errorlevel 1 exit 1
 
-set "SKBUILD_CONFIGURE_OPTIONS=-DMTP_LA_VENDOR=Generic -DCMAKE_CXX_COMPILER=%CXX%"
-set "CMAKE_ARGS=-DCMAKE_BUILD_TYPE:STRING=Release -DENABLE_ARCH_FLAGS:BOOL=OFF"
-%PYTHON% -m pip install --prefix=%PREFIX% --no-build-isolation -v .
+:: ==== Error: scikit-build could not get a working generator for your system. ===
+:: set "SKBUILD_CONFIGURE_OPTIONS=-DMTP_LA_VENDOR=Generic -DCMAKE_CXX_COMPILER=%CXX%"
+:: set "CMAKE_ARGS=-DCMAKE_BUILD_TYPE:STRING=Release -DENABLE_ARCH_FLAGS:BOOL=OFF"
+:: %PYTHON% -m pip install --prefix=%PREFIX% --no-build-isolation -v .
 
+if not exist "%SP_DIR%\multipsi" mkdir "%SP_DIR%\multipsi"
+robocopy build "%SP_DIR%\multipsi" multipsilib.* /R:5 /W:5 /NFL /NDL /NJH /NJS
+robocopy src\python "%SP_DIR%\multipsi" *.py /R:5 /W:5 /NFL /NDL /NJH /NJS
 robocopy tests "%SP_DIR%\multipsi" /E /R:5 /W:5 /NFL /NDL /NJH /NJS
 
 :: Copy the [de]activate scripts to %PREFIX%\etc\conda\[de]activate.d.
