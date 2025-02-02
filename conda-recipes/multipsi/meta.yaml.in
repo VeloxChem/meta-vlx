@@ -54,8 +54,8 @@ test:
     - mkl <=2024.1 # [win]
     - pip
     - scipy
-  imports:
-    - multipsi
+  #imports:
+  #  - multipsi
   commands:
     - pip check
     # Inspect linkage

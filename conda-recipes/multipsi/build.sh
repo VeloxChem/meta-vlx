@@ -28,5 +28,6 @@ cmake \
 # install!
 #cmake --build build --target install
 
-SKBUILD_CONFIGURE_OPTIONS="-DCMAKE_BUILD_TYPE:STRING=Release -DENABLE_ARCH_FLAGS:BOOL=OFF -DMTP_LA_VENDOR=Generic -DCMAKE_CXX_COMPILER=${CXX}" \
+SKBUILD_CONFIGURE_OPTIONS="-DMTP_LA_VENDOR=Generic -DCMAKE_CXX_COMPILER=${CXX}" \
+    CMAKE_ARGS="-DCMAKE_BUILD_TYPE:STRING=Release -DENABLE_ARCH_FLAGS:BOOL=OFF" \
     ${PYTHON} -m pip install --prefix=${PREFIX} --no-build-isolation -v .
