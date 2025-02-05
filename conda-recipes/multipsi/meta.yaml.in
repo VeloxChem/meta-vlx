@@ -37,7 +37,7 @@ requirements:
     - pip
     - setuptools
   run:
-    - veloxchem >=1.0rc3=*_187
+    - veloxchem >=1.0rc3
     - python
     - msmpi  # [win]
     - {{ pin_compatible('mpi4py') }}
@@ -53,8 +53,8 @@ test:
     - mkl <=2024.1 # [win]
     - pip
     - scipy
-  #imports:
-  #  - multipsi
+  imports:
+    - multipsi
   commands:
     - pip check
     # Inspect linkage
