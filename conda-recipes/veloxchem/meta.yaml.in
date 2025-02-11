@@ -41,7 +41,6 @@ requirements:
     - psutil
     - geometric
     - dftd4-python
-    - cppe  # [unix]
     - h5py
     - python
     - {{ pin_compatible('mpi4py') }}
