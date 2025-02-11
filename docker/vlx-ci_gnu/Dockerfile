@@ -18,6 +18,10 @@ RUN apt install -y gpg-agent wget \
        liblapacke-dev \
        libopenblas-openmp-dev \
        mpich \
+    && curl -Ls https://github.com/grimme-lab/xtb/archive/refs/tags/v6.6.1.tar.gz | tar xz \
+    && cd xtb-6.6.1 \
+    && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLA_VENDOR=OpenBLAS > /dev/null 2>&1 \
+    && rm -rf xtb-6.6.1 \
     && curl -Ls https://github.com/dftd4/dftd4/archive/refs/tags/v3.7.0.tar.gz | tar xz \
     && cd dftd4-3.7.0 \
     && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLA_VENDOR=OpenBLAS -DBUILD_SHARED_LIBS=ON > /dev/null 2>&1 \
