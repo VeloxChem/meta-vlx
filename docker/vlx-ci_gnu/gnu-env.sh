@@ -11,3 +11,4 @@ export DFTD4_HOME="/usr/local"
 export LibXC_DIR="/usr/local/lib/cmake/Libxc"
 
 exec "$@"
+

@@ -73,4 +73,3 @@ which gets configured during execution of the
    ``` bash
    $ anaconda upload $HOME/miniforge3/conda-bld/linux-64/veloxchem-1.0rc3-py_0.tar.bz2 -u veloxchem -l test
    ```
-
