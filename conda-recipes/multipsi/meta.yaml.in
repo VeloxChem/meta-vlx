@@ -39,6 +39,7 @@ requirements:
   run:
     - veloxchem >=1.0rc3
     - python
+    - msmpi  # [win]
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
     - {{ pin_compatible('scipy') }}
