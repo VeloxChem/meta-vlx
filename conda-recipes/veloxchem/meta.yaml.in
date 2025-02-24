@@ -60,7 +60,7 @@ test:
     - rdkit
     - pymbar
     - k3d
-    # - mdanalysis  # [not aarch64 and not ppc64le]
+    - mdanalysis
   imports:
     - veloxchem
   commands:
