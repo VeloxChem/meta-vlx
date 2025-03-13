@@ -43,7 +43,6 @@ requirements:
     - dftd4-python
     - h5py
     - python
-    - msmpi  # [win]
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
   run_constrained:
