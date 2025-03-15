@@ -33,18 +33,12 @@ macos_machine:
   - arm64-apple-darwin20.0.0   # [osx and arm64]
   - x86_64-apple-darwin13.4.0  # [osx and x86_64]
 
-numpy:
-  - '1.21'  # [not py==311 and not py==312]
-  - '1.23'  # [py==311]
-  - '1.26'  # [py==312]
-  
 mpi:
-  - msmpi  # [win]
+  - msmpi    # [win]
   - mpich    # [not win]
   - openmpi  # [not win]
 
 python:
-  - '3.9'   # EOL: Oct 2025
   - '3.10'  # EOL: Oct 2026
   - '3.11'  # EOL: Oct 2027
   - '3.12'  # EOL: Oct 2028
