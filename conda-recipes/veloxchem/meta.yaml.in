@@ -35,7 +35,6 @@ requirements:
     - liblapacke
     - eigen
     - numpy
-    - xtb  # [unix]
     - libxc-c
   run:
     - psutil
