@@ -41,8 +41,8 @@ requirements:
     - geometric
     - h5py
     - python
-    - {{ pin_compatible('mpi4py') }}
-    - {{ pin_compatible('numpy') }}
+    - mpi4py
+    - numpy
   run_constrained:
     - libopenblas * openmp*  # [unix]
 
