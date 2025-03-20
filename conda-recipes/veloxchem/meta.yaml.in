@@ -39,7 +39,6 @@ requirements:
   run:
     - psutil
     - geometric
-    - dftd4-python
     - h5py
     - python
     - {{ pin_compatible('mpi4py') }}
@@ -52,6 +51,8 @@ test:
     - pytest
     - libopenblas  # [unix]   
     - mkl <=2024.1 # [win]
+    - dftd4-python
+    - xtb-python
     - pip
     - scipy
     - openmm
