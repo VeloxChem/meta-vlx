@@ -16,14 +16,11 @@ cmake ^
 if errorlevel 1 exit 1
 
 :: build!
-cmake --build build --config Release --parallel %CPU_COUNT% -- -v -d stats
+cmake --build build --config Release --parallel %CPU_COUNT% -- -d stats
 if errorlevel 1 exit 1
 
 :: test!
-set KMP_DUPLICATE_LIB_OK=TRUE
 :: skip unit tests here
-cd %SRC_DIR%
-if errorlevel 1 exit 1
 
 :: install!
 cmake --build build --config Release --target install
