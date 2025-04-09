@@ -29,8 +29,6 @@ requirements:
     - pybind11
     - python
     - pybind11-abi
-    - libcblas
-    - liblapacke
     - eigen
     - libxc-c
   run:
