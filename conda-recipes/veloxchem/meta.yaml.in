@@ -29,6 +29,7 @@ requirements:
     - pybind11
     - python
     - pybind11-abi
+    - msmpi  # [win]
     - eigen
     - libxc-c
   run:
@@ -46,7 +47,6 @@ test:
     - pytest
     - libopenblas  # [unix]   
     - mkl <=2024.1 # [win]
-    - {{ mpi }}
     - dftd4-python
     - xtb-python
     - pip

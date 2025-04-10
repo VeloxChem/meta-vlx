@@ -19,11 +19,12 @@ cxx_compiler_version:
 # implementation as runtime, thus replicating the behavior of conda-forge
 # packages documented here:
 # https://conda-forge.org/docs/maintainer/knowledge_base.html#how-it-works
-libcblas:
-  - 3.9 *netlib
 
-liblapacke:
-  - 3.9 *netlib
+#libcblas:
+#  - 3.9 *netlib
+
+#liblapacke:
+#  - 3.9 *netlib
 
 llvm_openmp:
   - '18'  # [osx or win]
@@ -32,10 +33,10 @@ macos_machine:
   - arm64-apple-darwin20.0.0   # [osx and arm64]
   - x86_64-apple-darwin13.4.0  # [osx and x86_64]
 
-mpi:
-  - msmpi    # [win]
-  - mpich    # [not win]
-  - openmpi  # [not win]
+#mpi:
+#  - msmpi    # [win]
+#  - mpich    # [not win]
+#  - openmpi  # [not win]
 
 python:
   - '3.10'  # EOL: Oct 2026
