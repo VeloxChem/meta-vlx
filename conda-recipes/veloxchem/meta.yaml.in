@@ -39,8 +39,6 @@ requirements:
     - python
     - mpi4py
     - numpy
-  run_constrained:
-    - libopenblas * openmp*  # [unix]
 
 test:
   requires:
@@ -78,15 +76,14 @@ test:
     - export MPI_NUM_PROCS=2  # [unix]
     - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
     - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO -m solvers  # [unix]
-    # remove __pycache__ on unix-like systems, using "${SP_DIR#$PREFIX/}/veloxchem" (see build.sh)
-    - find "${SP_DIR#$PREFIX/}/veloxchem" -type f -name "*.pyc" -delete -print  # [unix]
-    - find "${SP_DIR#$PREFIX/}/veloxchem" -type d -name "__pycache__" -delete -print  # [unix]
+    - rm -rf "$SP_DIR/veloxchem/__pycache__"  # [unix]
     # run integration tests on windows
     - set OMP_NUM_THREADS=%CPU_COUNT%  # [win]
     - mpiexec -n 1 %PYTHON% -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming" # [win]
     - set MPI_NUM_PROCS=2  # [win]
     - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%"  # [win]
     - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --capture=no --log-cli-level=INFO -m solvers  # [win]
+    - rd /s /q "%SP_DIR%\veloxchem\__pycache__"  # [win]
 
 about:
   home: https://veloxchem.org
