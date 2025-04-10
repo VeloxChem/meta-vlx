@@ -77,6 +77,9 @@ test:
     - export MPI_NUM_PROCS=2  # [unix]
     - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
     - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO -m solvers  # [unix]
+    - echo $PREFIX
+    - find $PREFIX -type f -name "*.pyc" -delete -print  # [unix]
+    - find $PREFIX -type d -name "__pycache__" -delete -print  # [unix]
     - set OMP_NUM_THREADS=%CPU_COUNT%  # [win]
     - mpiexec -n 1 %PYTHON% -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming" # [win]
     - set MPI_NUM_PROCS=2  # [win]
