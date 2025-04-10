@@ -39,6 +39,8 @@ requirements:
     - python
     - mpi4py
     - numpy
+  run_constrained:
+    - libopenblas * openmp*  # [unix]
 
 test:
   requires:
