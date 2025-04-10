@@ -66,20 +66,22 @@ test:
     # verify we can execute the CLI
     - vlx --version
     - vlx --help
-    # Inspect linkage
+    # inspect linkage
     - ldd -v $SP_DIR/veloxchem/veloxchemlib*.so  # [linux]
     - otool -L $SP_DIR/veloxchem/veloxchemlib*.so  # [osx]
-    # run integration tests
+    # prepare envvars
     - export OMPI_ALLOW_RUN_AS_ROOT=1  # [mpi == 'openmpi']
     - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1  # [mpi == 'openmpi']
+    # run integration tests on unix-like systems
     - export OMP_NUM_THREADS=$CPU_COUNT  # [unix]
     - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming"  # [unix]
     - export MPI_NUM_PROCS=2  # [unix]
     - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
     - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO -m solvers  # [unix]
-    - echo $PREFIX
-    - find $PREFIX -type f -name "*.pyc" -delete -print  # [unix]
-    - find $PREFIX -type d -name "__pycache__" -delete -print  # [unix]
+    # remove __pycache__ on unix-like systems, using "${SP_DIR#$PREFIX/}/veloxchem" (see build.sh)
+    - find "${SP_DIR#$PREFIX/}/veloxchem" -type f -name "*.pyc" -delete -print  # [unix]
+    - find "${SP_DIR#$PREFIX/}/veloxchem" -type d -name "__pycache__" -delete -print  # [unix]
+    # run integration tests on windows
     - set OMP_NUM_THREADS=%CPU_COUNT%  # [win]
     - mpiexec -n 1 %PYTHON% -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming" # [win]
     - set MPI_NUM_PROCS=2  # [win]
