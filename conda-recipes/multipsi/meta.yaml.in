@@ -49,6 +49,7 @@ test:
     - mkl <=2024.1 # [win]
     - pip
     - scipy
+    - dftd4-python
   source_files:
     - tests/
   imports:
