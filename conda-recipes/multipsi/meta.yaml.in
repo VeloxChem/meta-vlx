@@ -26,14 +26,14 @@ requirements:
   host:
     - pybind11
     - python
-    - pybind11-abi
+    - pybind11-abi =4
     - {{ mpi }}
     - mpi4py
     - libcblas
     - liblapacke
     - numpy
   run:
-    - veloxchem >=1.0rc3
+    - veloxchem >=1.0rc4
     - scipy
     - python
     - msmpi  # [win]
