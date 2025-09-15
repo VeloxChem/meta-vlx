@@ -55,7 +55,6 @@ test:
     - matplotlib
     - rdkit
     - pymbar
-    - k3d
     - mdanalysis
   source_files:
     - tests/
