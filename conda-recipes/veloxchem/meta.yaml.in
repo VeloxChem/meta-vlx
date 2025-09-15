@@ -28,7 +28,7 @@ requirements:
   host:
     - pybind11
     - python
-    - pybind11-abi
+    - pybind11-abi {{ pybind11_abi }}
     - msmpi  # [win]
     - eigen
     - libxc-c

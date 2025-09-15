@@ -49,7 +49,7 @@ jobs:
           # "shmem: mmap: an error occurred while determining ..." error
           #echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
           #echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.9", "3.10", "3.11", "3.12"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.10", "3.11", "3.12"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.11", "3.12"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
@@ -58,7 +58,7 @@ jobs:
           # - Python: 3.9, 3.10, 3.11, 3.12
           # - MPI: msmpi
           #echo '[ ["windows-2022"], ["3.9", "3.10", "3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          echo '[ ["windows-2022"], ["3.10", "3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["windows-2022"], ["3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > win.json
 
