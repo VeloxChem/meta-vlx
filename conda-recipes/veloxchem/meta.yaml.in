@@ -34,7 +34,9 @@ requirements:
     - libxc-c
   run:
     - python
-    - numpy >= {{ numpy_min[python] }}
+    - numpy >=1.22  # [py==310]
+    - numpy >=1.23  # [py==311]
+    - numpy >=1.26  # [py==312]
     - mpi4py
     - h5py
     - psutil
