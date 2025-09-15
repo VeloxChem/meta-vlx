@@ -19,26 +19,26 @@ build:
 
 requirements:
   build:
-    - cmake >=3.18
     - {{ compiler('cxx') }}
-    - libgomp  # [linux]
-    - llvm-openmp  # [osx or win]
-    - vs2022_win-64  # [win]
+    - cmake >=3.18
     - ninja
+    - vs2022_win-64  # [win]
   host:
-    - pybind11
     - python
+    - pybind11
     - pybind11-abi {{ pybind11_abi }}
+    - libgomp  # [linux]
+    - llvm-openmp  {{ llvm_openmp }}  # [osx or win]
     - msmpi  # [win]
     - eigen
     - libxc-c
   run:
+    - python
+    - numpy >= {{ numpy_min[python] }}
+    - mpi4py
+    - h5py
     - psutil
     - geometric
-    - h5py
-    - python
-    - mpi4py
-    - numpy
   run_constrained:
     - libopenblas * openmp*  # [unix]
 

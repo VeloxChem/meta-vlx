@@ -44,7 +44,12 @@ python:
   - '3.12'  # EOL: Oct 2028
 
 pybind11_abi:
-  - 4
+  - '4'
+
+numpy_min:
+  "3.10": "1.22"
+  "3.11": "1.23"
+  "3.12": "1.26"
 
 target_platform:
   - linux-64  # [linux]
