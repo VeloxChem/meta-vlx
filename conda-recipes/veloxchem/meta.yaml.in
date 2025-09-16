@@ -41,6 +41,7 @@ requirements:
     - numpy
   run_constrained:
     - libopenblas * openmp*  # [unix]
+    - xtb =6.7.1=*_3  # [win]
 
 test:
   requires:
@@ -49,7 +50,7 @@ test:
     - mkl <=2024.1  # [win]
     - dftd4-python
     - xtb-python
-    - xtb <=6.6  # [win]
+    - xtb =6.7.1=*_3  # [win]
     - pip
     - scipy
     - openmm
