@@ -25,9 +25,7 @@ requirements:
     - ninja
   host:
     - libgomp  # [linux]
-    - llvm-openmp  # [osx]
-    - intel-openmp  # [win]
-    - mkl <=2024.1  # [win]
+    - llvm-openmp  # [osx or win]
     - python
     - pybind11
     - pybind11-abi =4
@@ -43,14 +41,15 @@ requirements:
     - numpy
   run_constrained:
     - libopenblas * openmp*  # [unix]
-    - llvm-openmp <0  # [win]
 
 test:
   requires:
     - pytest
-    - libopenblas  # [unix]   
+    - libopenblas  # [unix]
+    - mkl <=2024.1  # [win]
     - dftd4-python
     - xtb-python
+    - xtb <=6.6  # [win]
     - pip
     - scipy
     - openmm
