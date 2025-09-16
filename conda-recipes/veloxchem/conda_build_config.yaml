@@ -43,9 +43,6 @@ python:
   - '3.11'  # EOL: Oct 2027
   - '3.12'  # EOL: Oct 2028
 
-pybind11_abi:
-  - 4
-
 target_platform:
   - linux-64  # [linux]
   - win-64    # [win]
