@@ -26,7 +26,8 @@ requirements:
   host:
     - libgomp  # [linux]
     - llvm-openmp  # [osx]
-    - llvm-openmp <=20.1.7 # [win]
+    - intel-openmp  # [win]
+    - mkl <=2024.1  # [win]
     - python
     - pybind11
     - pybind11-abi =4
@@ -42,12 +43,12 @@ requirements:
     - numpy
   run_constrained:
     - libopenblas * openmp*  # [unix]
+    - llvm-openmp <0  # [win]
 
 test:
   requires:
     - pytest
     - libopenblas  # [unix]   
-    - mkl <=2024.1 # [win]
     - dftd4-python
     - xtb-python
     - pip
