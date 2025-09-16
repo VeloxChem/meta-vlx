@@ -151,7 +151,7 @@ jobs:
 
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         id: condabuild
-        timeout-minutes: 150
+        timeout-minutes: 180
         continue-on-error: true
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
