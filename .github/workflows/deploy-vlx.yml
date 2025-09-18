@@ -1,19 +1,16 @@
-name: Deploy veloxchem
+name: Deploy VeloxChem
 
 on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'The branch or commit of veloxchem'
+        description: 'The branch or commit of VeloxChem'
         required: true
       version:
         description: 'Version of the conda package'
         required: true
       build:
         description: 'Build number of the conda package'
-        required: true
-      channel:
-        description: 'The anaconda.org channel'
         required: true
       label:
         description: 'Label of the conda package'
@@ -76,15 +73,19 @@ jobs:
 
           echo " > Recipe for package: veloxchem"
           echo " > Conda package version: ${{ github.event.inputs.version }}"
-          echo " > Conda package channel: ${{ github.event.inputs.channel }}"
+          echo " > Conda package channel: veloxchem"
           echo " > Conda package label: ${{ github.event.inputs.label }}"
           echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
 
-      - name: Clone veloxchem
+      - name: Clone veloxchem and get commit hash
         run: |
           echo ">>> Clone veloxchem ${{ github.event.inputs.branch }}"
           git config --global --add safe.directory $PWD
           git clone -b ${{ github.event.inputs.branch }} https://github.com/VeloxChem/VeloxChem.git veloxchem
+          VLXHASH=$(git -C veloxchem rev-parse HEAD)
+          echo "Commit hash is $VLXHASH"
+          echo "" >> veloxchem/src/pymodule/__init__.py
+          echo "__commit__ = '${VLXHASH}'" >> veloxchem/src/pymodule/__init__.py
 
       - name: Install macOS SDK
         if: startsWith(matrix.os, 'macos')
@@ -123,7 +124,7 @@ jobs:
           conda build \
                 --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
                 --token $ANACONDA_TOKEN \
-                --user ${{ github.event.inputs.channel }} \
+                --user veloxchem \
                 --label ${{ github.event.inputs.label }} \
                 --verify \
                 -c veloxchem/label/main \
