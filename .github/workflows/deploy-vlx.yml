@@ -1,0 +1,196 @@
+name: Deploy veloxchem
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch or commit of veloxchem'
+        required: true
+      version:
+        description: 'Version of the conda package'
+        required: true
+      build:
+        description: 'Build number of the conda package'
+        required: true
+      channel:
+        description: 'The anaconda.org channel'
+        required: true
+      label:
+        description: 'Label of the conda package'
+        required: true
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare-build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.MATRIX }}
+
+    steps:
+      - id: set-matrix
+        run: |
+          # create "base" build matrix as Cartesian product of:
+          # - OS: ubunut-latest, macos-14 (arm64), macos-13 (x86_64)
+          # - Python: 3.11, 3.12
+          # - MPI: mpich
+          echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.11", "3.12"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+
+          cat foo.json | jq -nc '[inputs]' > matrix.json
+
+          # append to the Cartesian products of:
+          # - OS: windows-2022
+          # - Python: 3.11, 3.12
+          # - MPI: msmpi
+          echo '[ ["windows-2022"], ["3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+
+          cat foo.json | jq -nc '[inputs]' > win.json
+
+          cp matrix.json base.json
+
+          jq -sc 'add' base.json win.json > matrix.json
+
+          echo "Build matrix for veloxchem"
+          echo "MATRIX={\"include\": $(cat matrix.json)}"
+
+          echo "MATRIX={\"include\": $(cat matrix.json)}" >> $GITHUB_OUTPUT
+
+  build:
+    name: Deploy to Anaconda.org
+    needs: prepare-build-matrix
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      matrix: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build summary
+        run: |
+          echo "Build triggered with the following parameters"
+
+          echo " > Recipe for package: veloxchem"
+          echo " > Conda package version: ${{ github.event.inputs.version }}"
+          echo " > Conda package channel: ${{ github.event.inputs.channel }}"
+          echo " > Conda package label: ${{ github.event.inputs.label }}"
+          echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
+
+      - name: Clone veloxchem
+        run: |
+          echo ">>> Clone veloxchem ${{ github.event.inputs.branch }}"
+          git config --global --add safe.directory $PWD
+          git clone -b ${{ github.event.inputs.branch }} https://github.com/VeloxChem/VeloxChem.git veloxchem
+
+      - name: Install macOS SDK
+        if: startsWith(matrix.os, 'macos')
+        working-directory: /Users/runner
+        run: |
+          curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX11.0.sdk.tar.xz | tar -xJ
+
+      - uses: conda-incubator/setup-miniconda@v3
+        timeout-minutes: 30
+        with:
+          conda-remove-defaults: true
+          auto-update-conda: true
+          auto-activate-base: false
+          activate-environment: deploy
+          environment-file: .github/deploy.yml
+          python-version: ${{ matrix.python }}
+          use-mamba: true
+
+      - name: Configure meta.yaml.in
+        run: |
+          python $GITHUB_WORKSPACE/.github/search-replace.py \
+                 --replace \
+                 "@_version_@=${{ github.event.inputs.version }}" \
+                 "@_build_@=${{ github.event.inputs.build }}" \
+                 --file \
+                 $GITHUB_WORKSPACE/conda-recipes/veloxchem/meta.yaml
+
+      - name: Build and upload veloxchem for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+        id: condabuild
+        timeout-minutes: 180
+        continue-on-error: true
+        env:
+          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+        run: |
+          cd $GITHUB_WORKSPACE/conda-recipes
+          conda build \
+                --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
+                --token $ANACONDA_TOKEN \
+                --user ${{ github.event.inputs.channel }} \
+                --label ${{ github.event.inputs.label }} \
+                --verify \
+                -c veloxchem/label/main \
+                -c conda-forge \
+                veloxchem
+
+      - name: Clean up source code
+        run: |
+          rm -rf veloxchem
+
+      - name: Write deployment summary of veloxchem for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+        run: |
+          echo '{ "os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" }' | jq -c '.' | tee summary.json
+
+      - name: Archive deployment summary of veloxchem for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: summary.json
+          name: build_summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}
+          retention-days: 1
+
+  summary-email:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    name: Summary of deployment to Anaconda.org for veloxchem
+    needs: build
+
+    steps:
+      - name: Download all build summaries
+        uses: actions/download-artifact@v4
+        with:
+          path: build_summaries
+
+      - name: Collate JSON files with build summaries
+        id: collate
+        working-directory: build_summaries
+        run: |
+
+          success_msg=""
+          failure_msg=""
+
+          for dir in "$PWD"/*/
+          do
+            echo "Reading JSON file: ${dir%*/}/summary.json"
+            part="$(cat "${dir}/summary.json")"
+            echo "Extract data from ${part}"
+
+            os="$(echo ${part} | jq -r '.os')"
+            echo "os ${os}"
+
+            python="$(echo ${part} | jq -r '.python')"
+            echo "python ${python}"
+
+            mpi="$(echo ${part} | jq -r '.mpi')"
+            echo "mpi ${mpi}"
+
+            outcome="$(echo ${part} | jq -r '.outcome')"
+            echo "outcome ${outcome}"
+
+            tmp="  - OS: ${os}, Python: ${python}, MPI: ${mpi}<br/>"
+
+            if [ "${outcome}" == "success" ]; then
+              success_msg+="${tmp}"
+            else
+              failure_msg+="${tmp}"
+            fi
+          done
+
+          echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
+          echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
