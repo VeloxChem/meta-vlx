@@ -71,7 +71,7 @@ jobs:
         run: |
           echo "Build triggered with the following parameters"
 
-          echo " > Recipe for package: veloxchem"
+          echo " > Recipe for package: veloxchem (${{ github.event.inputs.branch }})"
           echo " > Conda package version: ${{ github.event.inputs.version }}"
           echo " > Conda package channel: veloxchem"
           echo " > Conda package label: ${{ github.event.inputs.label }}"

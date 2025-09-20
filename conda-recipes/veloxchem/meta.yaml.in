@@ -7,8 +7,6 @@ package:
 
 source:
   path: ../../veloxchem
-  patches:
-    - patches/version.patch
 
 build:
   number: @_build_@
