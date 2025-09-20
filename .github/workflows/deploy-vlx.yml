@@ -6,9 +6,6 @@ on:
       branch:
         description: 'The branch or commit of VeloxChem'
         required: true
-      version:
-        description: 'Version of the conda package'
-        required: true
       build:
         description: 'Build number of the conda package'
         required: true
@@ -72,7 +69,6 @@ jobs:
           echo "Build triggered with the following parameters"
 
           echo " > Recipe for package: veloxchem (${{ github.event.inputs.branch }})"
-          echo " > Conda package version: ${{ github.event.inputs.version }}"
           echo " > Conda package channel: veloxchem"
           echo " > Conda package label: ${{ github.event.inputs.label }}"
           echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
@@ -106,9 +102,11 @@ jobs:
 
       - name: Configure meta.yaml.in
         run: |
+          VERSION_LINE=$(grep '__version__' veloxchem/src/pymodule/__init__.py)
+          VLX_VERSION=$(echo "$VERSION_LINE" | tr "'" '"' | cut -d '"' -f2)
           python $GITHUB_WORKSPACE/.github/search-replace.py \
                  --replace \
-                 "@_version_@=${{ github.event.inputs.version }}" \
+                 "@_version_@=$VLX_VERSION" \
                  "@_build_@=${{ github.event.inputs.build }}" \
                  --file \
                  $GITHUB_WORKSPACE/conda-recipes/veloxchem/meta.yaml
