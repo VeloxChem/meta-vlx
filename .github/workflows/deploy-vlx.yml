@@ -33,15 +33,15 @@ jobs:
       - id: set-matrix
         run: |
           if [ -z "${{ inputs.pyversions }}" ]; then
-            PY_VERSIONS = "3.11,3.12"
+            PY_VERSIONS="3.11,3.12"
           else
-            PY_VERSIONS = "${{ inputs.pyversions }}"
+            PY_VERSIONS="${{ inputs.pyversions }}"
           fi
 
           if [ -z "${{ inputs.ostypes }}" ]; then
-            OS_TYPES = "linux,osx-arm,osx,win"
+            OS_TYPES="linux,osx-arm,osx,win"
           else
-            OS_TYPES = "${{ inputs.ostypes }}"
+            OS_TYPES="${{ inputs.ostypes }}"
           fi
 
           python $GITHUB_WORKSPACE/.github/generate-matrix.py $PY_VERSIONS $OS_TYPES > matrix.json
