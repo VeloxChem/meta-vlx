@@ -32,8 +32,8 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          PY_VERSIONS = ${{ github.event.inputs.pyversions }}
-          OS_TYPES = ${{ github.event.inputs.ostypes }}
+          PY_VERSIONS = ${{ inputs.pyversions }}
+          OS_TYPES = ${{ inputs.ostypes }}
           python $GITHUB_WORKSPACE/.github/generate-matrix.py $PY_VERSIONS $OS_TYPES > matrix.json
 
           echo "Build matrix for veloxchem"
@@ -58,16 +58,16 @@ jobs:
         run: |
           echo "Build triggered with the following parameters"
 
-          echo " > Recipe for package: veloxchem (${{ github.event.inputs.branch }})"
+          echo " > Recipe for package: veloxchem (${{ inputs.branch }})"
           echo " > Conda package channel: veloxchem"
-          echo " > Conda package label: ${{ github.event.inputs.label }}"
+          echo " > Conda package label: ${{ inputs.label }}"
           echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
 
       - name: Clone veloxchem and get commit hash
         run: |
-          echo ">>> Clone veloxchem ${{ github.event.inputs.branch }}"
+          echo ">>> Clone veloxchem ${{ inputs.branch }}"
           git config --global --add safe.directory $PWD
-          git clone -b ${{ github.event.inputs.branch }} https://github.com/VeloxChem/VeloxChem.git veloxchem
+          git clone -b ${{ inputs.branch }} https://github.com/VeloxChem/VeloxChem.git veloxchem
           VLXHASH=$(git -C veloxchem rev-parse HEAD)
           echo "Commit hash is $VLXHASH"
           echo "" >> veloxchem/src/pymodule/__init__.py
@@ -97,7 +97,7 @@ jobs:
           python $GITHUB_WORKSPACE/.github/search-replace.py \
                  --replace \
                  "@_version_@=$VLX_VERSION" \
-                 "@_build_@=${{ github.event.inputs.build }}" \
+                 "@_build_@=${{ inputs.build }}" \
                  --file \
                  $GITHUB_WORKSPACE/conda-recipes/veloxchem/meta.yaml
 
@@ -113,7 +113,7 @@ jobs:
                 --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
                 --token $ANACONDA_TOKEN \
                 --user veloxchem \
-                --label ${{ github.event.inputs.label }} \
+                --label ${{ inputs.label }} \
                 --verify \
                 -c veloxchem/label/main \
                 -c conda-forge \
