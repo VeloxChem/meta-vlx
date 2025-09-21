@@ -115,6 +115,9 @@ jobs:
             BUILD_NUMBER="${{ inputs.build }}"
           fi
 
+          echo "VeloxChem version is $VLX_VERSION"
+          echo "Build number of the conda package is $BUILD_NUMBER"
+
           python $GITHUB_WORKSPACE/.github/search-replace.py \
                  --replace \
                  "@_version_@=$VLX_VERSION" \
