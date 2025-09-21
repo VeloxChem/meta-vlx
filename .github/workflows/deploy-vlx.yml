@@ -30,6 +30,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.MATRIX }}
 
     steps:
+      - uses: actions/checkout@v4
+
       - id: set-matrix
         run: |
           if [ -z "${{ inputs.pyversions }}" ]; then
