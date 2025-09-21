@@ -12,6 +12,12 @@ on:
       label:
         description: 'Label of the conda package'
         required: true
+      pyversions:
+        description: 'Python versions'
+        required: true
+      ostypes:
+        description: 'Operating systems'
+        required: true
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,25 +32,9 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          # create "base" build matrix as Cartesian product of:
-          # - OS: ubunut-latest, macos-14 (arm64), macos-13 (x86_64)
-          # - Python: 3.11, 3.12
-          # - MPI: mpich
-          echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.11", "3.12"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-
-          cat foo.json | jq -nc '[inputs]' > matrix.json
-
-          # append to the Cartesian products of:
-          # - OS: windows-2022
-          # - Python: 3.11, 3.12
-          # - MPI: msmpi
-          echo '[ ["windows-2022"], ["3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-
-          cat foo.json | jq -nc '[inputs]' > win.json
-
-          cp matrix.json base.json
-
-          jq -sc 'add' base.json win.json > matrix.json
+          PY_VERSIONS = ${{ github.event.inputs.pyversions }}
+          OS_TYPES = ${{ github.event.inputs.ostypes }}
+          python $GITHUB_WORKSPACE/.github/generate-matrix.py $PY_VERSIONS $OS_TYPES > matrix.json
 
           echo "Build matrix for veloxchem"
           echo "MATRIX={\"include\": $(cat matrix.json)}"
