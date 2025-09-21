@@ -6,18 +6,18 @@ on:
       branch:
         description: 'The branch or commit of VeloxChem'
         required: true
-      build:
-        description: 'Build number of the conda package'
-        required: true
       label:
         description: 'Label of the conda package'
         required: true
+      build:
+        description: 'Build number of the conda package (optional)'
+        required: false
       pyversions:
-        description: 'Python versions'
-        required: true
+        description: 'Python versions (optional)'
+        required: false
       ostypes:
-        description: 'Operating systems'
-        required: true
+        description: 'Operating systems (optional)'
+        required: false
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,8 +32,18 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          PY_VERSIONS = ${{ inputs.pyversions }}
-          OS_TYPES = ${{ inputs.ostypes }}
+          if [ -z "${{ inputs.pyversions }}" ]; then
+            PY_VERSIONS = "3.11,3.12"
+          else
+            PY_VERSIONS = "${{ inputs.pyversions }}"
+          fi
+
+          if [ -z "${{ inputs.ostypes }}" ]; then
+            OS_TYPES = "linux,osx-arm,osx,win"
+          else
+            OS_TYPES = "${{ inputs.ostypes }}"
+          fi
+
           python $GITHUB_WORKSPACE/.github/generate-matrix.py $PY_VERSIONS $OS_TYPES > matrix.json
 
           echo "Build matrix for veloxchem"
@@ -65,7 +75,7 @@ jobs:
 
       - name: Clone veloxchem and get commit hash
         run: |
-          echo ">>> Clone veloxchem ${{ inputs.branch }}"
+          echo ">>> Clone veloxchem (${{ inputs.branch }})"
           git config --global --add safe.directory $PWD
           git clone -b ${{ inputs.branch }} https://github.com/VeloxChem/VeloxChem.git veloxchem
           VLXHASH=$(git -C veloxchem rev-parse HEAD)
@@ -94,10 +104,19 @@ jobs:
         run: |
           VERSION_LINE=$(grep '__version__' veloxchem/src/pymodule/__init__.py)
           VLX_VERSION=$(echo "$VERSION_LINE" | tr "'" '"' | cut -d '"' -f2)
+
+          if [ -z "${{ inputs.build }}" ]; then
+            YEAR=$(date +"%Y")
+            WEEK=$(date +"%V")
+            BUILD_NUMBER=$((($YEAR - 2022)*53 + 22 + 10#$WEEK))
+          else
+            BUILD_NUMBER="${{ inputs.build }}"
+          fi
+
           python $GITHUB_WORKSPACE/.github/search-replace.py \
                  --replace \
                  "@_version_@=$VLX_VERSION" \
-                 "@_build_@=${{ inputs.build }}" \
+                 "@_build_@=$BUILD_NUMBER" \
                  --file \
                  $GITHUB_WORKSPACE/conda-recipes/veloxchem/meta.yaml
 
