@@ -127,7 +127,7 @@ jobs:
 
       - name: Build and upload veloxchem for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         id: condabuild
-        timeout-minutes: 180
+        timeout-minutes: 300
         continue-on-error: true
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
