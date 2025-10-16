@@ -72,11 +72,15 @@ test:
     - export OMPI_ALLOW_RUN_AS_ROOT=1  # [mpi == 'openmpi']
     - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1  # [mpi == 'openmpi']
     # run integration tests on unix-like systems
+    # for now we only run limited tests on osx-64 due to time and resources
     - export OMP_NUM_THREADS=$CPU_COUNT  # [unix]
-    - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming"  # [unix]
+    - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming"  # [linux]
+    - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming"  # [osx and arm64]
+    - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming and not solvers"  # [osx and x86_64]
     - export MPI_NUM_PROCS=2  # [unix]
     - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
-    - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO -m solvers  # [unix]
+    - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO -m solvers  # [linux]
+    - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO -m solvers  # [osx and arm64]
     # run integration tests on windows
     - set OMP_NUM_THREADS=%CPU_COUNT%  # [win]
     - mpiexec -n 1 %PYTHON% -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming" # [win]
