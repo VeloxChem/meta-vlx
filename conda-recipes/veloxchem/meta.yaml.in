@@ -40,6 +40,7 @@ requirements:
   run_constrained:
     - libopenblas * openmp*  # [unix]
     - xtb =6.7.1=*_3  # [win]
+    - libxc-c =7.0.0=*_3  # [win]
 
 test:
   requires:
