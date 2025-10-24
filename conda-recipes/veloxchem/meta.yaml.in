@@ -29,7 +29,8 @@ requirements:
     - pybind11-abi =4
     - msmpi  # [win]
     - eigen
-    - libxc-c
+    - libxc-c  # [unix]
+    - libxc-c =7.0.0=*_3  # [win]
   run:
     - psutil
     - geometric
@@ -40,7 +41,6 @@ requirements:
   run_constrained:
     - libopenblas * openmp*  # [unix]
     - xtb =6.7.1=*_3  # [win]
-    - libxc-c =7.0.0=*_3  # [win]
 
 test:
   requires:
