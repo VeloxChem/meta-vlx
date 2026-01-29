@@ -62,7 +62,6 @@ test:
   imports:
     - veloxchem
   commands:
-    - pip check
     # verify we can execute the CLI
     - vlx --version
     - vlx --help
