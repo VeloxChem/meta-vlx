@@ -35,12 +35,11 @@ which gets configured during execution of the
      such that `CONDA_BUILD_SYSROOT` points to the location of the SDK.
 
 4. Install `conda-build`:
-   <https://docs.conda.io/projects/conda-build/en/latest/> We also
-   install `conda-verify`
+   <https://docs.conda.io/projects/conda-build/en/latest/>
 
    ``` bash
    $ conda activate base
-   $ conda install conda-build conda-verify python=3.11
+   $ conda install conda-build python=3.11
    ```
 5. Clone the veloxchem repository. Note that the `veloxchem` folder
    **must be** at the same level as the `conda-recipes` folder of
