@@ -45,8 +45,7 @@ requirements:
 test:
   requires:
     - pytest
-    - libopenblas  # [unix]
-    - mkl <=2024.1  # [win]
+    - libopenblas
     - dftd4-python
     - xtb-python
     - xtb =6.7.1=*_3  # [win]
