@@ -19,8 +19,7 @@ requirements:
   build:
     - cmake >=3.18
     - {{ compiler('cxx') }}
-    - libgomp  # [linux]
-    - llvm-openmp  # [osx or win]
+    - llvm-openmp
     - vs2022_win-64  # [win]
     - ninja
   host:
@@ -31,7 +30,6 @@ requirements:
     - eigen
     - libxc-c  # [unix]
     - libxc-c =7.0.0=*_3  # [win]
-    - libblas
   run:
     - psutil
     - geometric
