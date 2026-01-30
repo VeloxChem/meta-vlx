@@ -82,8 +82,6 @@ jobs:
           git clone -b ${{ inputs.branch }} https://github.com/VeloxChem/VeloxChem.git veloxchem
           VLXHASH=$(git -C veloxchem rev-parse HEAD)
           echo "Commit hash is $VLXHASH"
-          echo "" >> veloxchem/src/pymodule/__init__.py
-          echo "__commit__ = '${VLXHASH}'" >> veloxchem/src/pymodule/__init__.py
 
       - name: Install macOS SDK
         if: startsWith(matrix.os, 'macos')

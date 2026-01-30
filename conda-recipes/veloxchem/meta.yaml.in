@@ -31,6 +31,7 @@ requirements:
     - eigen
     - libxc-c  # [unix]
     - libxc-c =7.0.0=*_3  # [win]
+    - libblas
   run:
     - psutil
     - geometric
