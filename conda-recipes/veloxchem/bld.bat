@@ -10,6 +10,7 @@ cmake ^
     -DCMAKE_CXX_COMPILER:STRING=clang-cl ^
     -DCMAKE_C_COMPILER:STRING=clang-cl ^
     -DENABLE_ARCH_FLAGS:BOOL=OFF ^
+    -DENABLE_COMMIT_HASH:BOOL=ON ^
     -DPython_EXECUTABLE:STRING="%PYTHON%" ^
     -DPYMOD_INSTALL_FULLDIR:PATH="Lib\site-packages\veloxchem"
 if errorlevel 1 exit 1
