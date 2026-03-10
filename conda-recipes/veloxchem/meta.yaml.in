@@ -28,6 +28,7 @@ requirements:
     - pybind11-abi =4
     - msmpi  # [win]
     - eigen
+    - libboost-headers
     - libxc-c  # [unix]
     - libxc-c =7.0.0=*_3  # [win]
   run:
