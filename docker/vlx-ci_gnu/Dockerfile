@@ -30,12 +30,12 @@ RUN apt install -y gpg-agent wget \
     && cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
     && rm -rf dftd4-3.7.0 \
-    && curl -Ls https://gitlab.com/libxc/libxc/-/archive/6.2.2/libxc-6.2.2.tar.gz | tar xz \
-    && cd libxc-6.2.2 \
+    && curl -Ls https://gitlab.com/libxc/libxc/-/archive/7.0.0/libxc-7.0.0.tar.gz | tar xz \
+    && cd libxc-7.0.0 \
     && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DBUILD_SHARED_LIBS=ON -DDISABLE_KXC=OFF -DDISABLE_LXC=OFF -DBUILD_TESTING=OFF > /dev/null 2>&1 \
     && cmake --build build --target install > /dev/null 2>&1 \
     && cd .. \
-    && rm -rf libxc-6.2.2 \
+    && rm -rf libxc-7.0.0 \
     && apt autoremove --yes -qq \
     && apt clean --yes -qq \
     && update-ca-certificates \
