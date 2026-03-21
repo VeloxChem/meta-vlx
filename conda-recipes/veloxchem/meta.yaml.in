@@ -29,7 +29,7 @@ requirements:
     - msmpi  # [win]
     - eigen
     - libboost-headers
-    - libxc-c  # [unix]
+    - libxc-c >=7.0.0     # [unix]
     - libxc-c =7.0.0=*_3  # [win]
   run:
     - psutil
