@@ -19,18 +19,55 @@ on:
         description: 'Operating systems (optional)'
         required: false
 
-concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+concurrency:
+  group: deploy-vlx-publish
+  cancel-in-progress: false
 
 jobs:
   prepare-build-matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.MATRIX }}
+      vlx_version: ${{ steps.set-version.outputs.vlx_version }}
+      build_number: ${{ steps.set-build-number.outputs.build_number }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - id: set-version
+        run: |
+          echo ">>> Clone veloxchem (${{ inputs.branch }}) for version discovery"
+          git config --global --add safe.directory $PWD
+          git clone -b ${{ inputs.branch }} https://github.com/VeloxChem/VeloxChem.git veloxchem
+
+          VERSION_LINE=$(grep '__version__' veloxchem/src/pymodule/__init__.py)
+          VLX_VERSION=$(echo "$VERSION_LINE" | tr "'" '"' | cut -d '"' -f2)
+
+          if [ -z "$VLX_VERSION" ]; then
+            echo "Unable to determine VeloxChem version" >&2
+            exit 1
+          fi
+
+          echo "VeloxChem version is $VLX_VERSION"
+          echo "vlx_version=$VLX_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Clean up version discovery source tree
+        run: |
+          rm -rf veloxchem
+
+      - id: set-build-number
+        run: |
+          if [ -n "${{ inputs.build }}" ]; then
+            BUILD_NUMBER="${{ inputs.build }}"
+          else
+            BUILD_NUMBER=$(python3 $GITHUB_WORKSPACE/.github/get-next-build-number.py \
+              --namespace veloxchem \
+              --package veloxchem \
+              --version "${{ steps.set-version.outputs.vlx_version }}")
+          fi
+
+          echo "Build number for veloxchem: $BUILD_NUMBER"
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
 
       - id: set-matrix
         run: |
@@ -46,7 +83,7 @@ jobs:
             OS_TYPES="${{ inputs.ostypes }}"
           fi
 
-          python $GITHUB_WORKSPACE/.github/generate-matrix.py $PY_VERSIONS $OS_TYPES > matrix.json
+          python3 $GITHUB_WORKSPACE/.github/generate-matrix.py $PY_VERSIONS $OS_TYPES > matrix.json
 
           echo "Build matrix for veloxchem"
           echo "MATRIX={\"include\": $(cat matrix.json)}"
@@ -71,8 +108,10 @@ jobs:
           echo "Build triggered with the following parameters"
 
           echo " > Recipe for package: veloxchem (${{ inputs.branch }})"
+          echo " > Conda package version: ${{ needs.prepare-build-matrix.outputs.vlx_version }}"
           echo " > Conda package channel: veloxchem"
           echo " > Conda package label: ${{ inputs.label }}"
+          echo " > Conda package build number: ${{ needs.prepare-build-matrix.outputs.build_number }}"
           echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
 
       - name: Clone veloxchem and get commit hash
@@ -102,16 +141,8 @@ jobs:
 
       - name: Configure meta.yaml.in
         run: |
-          VERSION_LINE=$(grep '__version__' veloxchem/src/pymodule/__init__.py)
-          VLX_VERSION=$(echo "$VERSION_LINE" | tr "'" '"' | cut -d '"' -f2)
-
-          if [ -z "${{ inputs.build }}" ]; then
-            YEAR=$(date +"%Y")
-            WEEK=$(date +"%V")
-            BUILD_NUMBER=$((($YEAR - 2022)*53 + 22 + 10#$WEEK))
-          else
-            BUILD_NUMBER="${{ inputs.build }}"
-          fi
+          VLX_VERSION="${{ needs.prepare-build-matrix.outputs.vlx_version }}"
+          BUILD_NUMBER="${{ needs.prepare-build-matrix.outputs.build_number }}"
 
           echo "VeloxChem version is $VLX_VERSION"
           echo "Build number of the conda package is $BUILD_NUMBER"
@@ -205,3 +236,31 @@ jobs:
 
           echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
           echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
+
+  query-old-builds:
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.build.result == 'success' }}
+    name: Dry run for old VeloxChem package files
+    needs:
+      - build
+      - prepare-build-matrix
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: List old VeloxChem package files
+        id: old-builds
+        run: |
+          python3 .github/query-old-vlx-builds.py \
+            --namespace veloxchem \
+            --package veloxchem \
+            --version "${{ needs.prepare-build-matrix.outputs.vlx_version }}" \
+            --keep-builds 10
+
+      - name: Print dry-run result
+        run: |
+          echo "Old package files found: ${{ steps.old-builds.outputs.old_file_count }}"
