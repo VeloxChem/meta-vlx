@@ -187,6 +187,12 @@ jobs:
           name: build_summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}
           retention-days: 1
 
+      - name: Fail job if build or upload failed
+        if: ${{ steps.condabuild.outcome != 'success' }}
+        run: |
+          echo "Build or upload failed for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}" >&2
+          exit 1
+
   summary-email:
     runs-on: ubuntu-latest
     if: ${{ always() }}
