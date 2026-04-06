@@ -178,70 +178,15 @@ jobs:
 
       - name: Write deployment summary of veloxchem for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         run: |
-          echo '{ "os": "${{ matrix.os }}", "python": "${{ matrix.python }}", "mpi": "${{ matrix.mpi }}", "outcome": "${{ steps.condabuild.outcome }}" }' | jq -c '.' | tee summary.json
-
-      - name: Archive deployment summary of veloxchem for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
-        uses: actions/upload-artifact@v4
-        with:
-          path: summary.json
-          name: build_summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}
-          retention-days: 1
+          line="OS=${{ matrix.os }}, Python=${{ matrix.python }}, MPI=${{ matrix.mpi }}, Outcome=${{ steps.condabuild.outcome }}"
+          echo "$line"
+          echo "- $line" >> $GITHUB_STEP_SUMMARY
 
       - name: Fail job if build or upload failed
         if: ${{ steps.condabuild.outcome != 'success' }}
         run: |
           echo "Build or upload failed for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}" >&2
           exit 1
-
-  summary-email:
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    name: Summary of deployment to Anaconda.org for veloxchem
-    needs: build
-
-    steps:
-      - name: Download all build summaries
-        uses: actions/download-artifact@v4
-        with:
-          path: build_summaries
-
-      - name: Collate JSON files with build summaries
-        id: collate
-        working-directory: build_summaries
-        run: |
-
-          success_msg=""
-          failure_msg=""
-
-          for dir in "$PWD"/*/
-          do
-            echo "Reading JSON file: ${dir%*/}/summary.json"
-            part="$(cat "${dir}/summary.json")"
-            echo "Extract data from ${part}"
-
-            os="$(echo ${part} | jq -r '.os')"
-            echo "os ${os}"
-
-            python="$(echo ${part} | jq -r '.python')"
-            echo "python ${python}"
-
-            mpi="$(echo ${part} | jq -r '.mpi')"
-            echo "mpi ${mpi}"
-
-            outcome="$(echo ${part} | jq -r '.outcome')"
-            echo "outcome ${outcome}"
-
-            tmp="  - OS: ${os}, Python: ${python}, MPI: ${mpi}<br/>"
-
-            if [ "${outcome}" == "success" ]; then
-              success_msg+="${tmp}"
-            else
-              failure_msg+="${tmp}"
-            fi
-          done
-
-          echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
-          echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
 
   query-old-builds:
     runs-on: ubuntu-latest
