@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - conda-recipes/geometric/meta.yaml
   workflow_dispatch:
 
 concurrency:
@@ -11,31 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  changes:
-    name: Changed Conda recipes
-    runs-on: ubuntu-latest
-
-    outputs:
-      changed_files: ${{ steps.combine.outputs.changed_files }}
-
-    steps:
-      - id: files
-        uses: Ana06/get-changed-files@v2.3.0
-        with:
-          format: 'json'
-
-      - id: combine
-        run: |
-          echo '${{ steps.files.outputs.added_modified }}' | tee added_modified.json
-          echo '${{ steps.files.outputs.renamed }}' | tee renamed.json
-          changes="$(cat added_modified.json renamed.json | jq -r -s 'add | unique | sort')"
-          echo "Added, modified, renamed files: $changes"
-          echo ::set-output name=changed_files::$(echo $changes | jq -c .)
-
   build:
     name: Deploy to Anaconda.org
-    needs:
-      - changes
     runs-on: ubuntu-latest
     timeout-minutes: 90
     defaults:
@@ -49,18 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Continue if the Conda recipe was changed
+      - name: Build summary
         run: |
-          apk add jq
-          echo "Added, modified, removed files:"
-          echo '${{ needs.changes.outputs.changed_files }}' | tee changed_files.json
-          changed="$(cat changed_files.json | jq 'any(.[]; . == "conda-recipes/${{ matrix.recipe }}/meta.yaml")')"
-          if [[ "$changed" == "true" ]]; then
-             echo "Recipe to build: conda-recipes/${{ matrix.recipe }}/meta.yaml"
-             echo "keepgoing=true" >> $GITHUB_ENV
-          else
-             echo "Nothing to build!"
-          fi
+          echo "Workflow triggered for recipe: conda-recipes/${{ matrix.recipe }}/meta.yaml"
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -73,7 +43,6 @@ jobs:
 
       - name: Build and upload ${{ matrix.recipe }} Python package
         id: condabuild
-        if: ${{ env.keepgoing == 'true' }}
         continue-on-error: true
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
