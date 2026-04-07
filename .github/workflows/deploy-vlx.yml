@@ -189,22 +189,31 @@ jobs:
           echo "Build or upload failed for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}" >&2
           exit 1
 
-  query-old-builds:
+  delete-old-builds:
     runs-on: ubuntu-latest
     if: ${{ always() && needs.build.result == 'success' }}
-    name: Dry run for old VeloxChem package files
+    name: Delete old VeloxChem package files
     needs:
       - build
       - prepare-build-matrix
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: conda-incubator/setup-miniconda@v3
         with:
+          conda-remove-defaults: true
+          auto-update-conda: true
+          auto-activate-base: false
+          activate-environment: deploy
+          environment-file: .github/deploy.yml
           python-version: "3.12"
+          use-mamba: true
 
-      - name: List old VeloxChem package files
+      - name: Select old VeloxChem package files
         id: old-builds
         run: |
           python3 .github/query-old-vlx-builds.py \
@@ -213,6 +222,26 @@ jobs:
             --version "${{ needs.prepare-build-matrix.outputs.vlx_version }}" \
             --keep-builds 10
 
-      - name: Print dry-run result
+      - name: Delete old VeloxChem package files
+        id: delete-old-builds
+        env:
+          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
-          echo "Old package files found: ${{ steps.old-builds.outputs.old_file_count }}"
+          mapfile -t package_refs < <(
+            python3 -c 'import json, sys; [print(item) for item in json.loads(sys.argv[1])]' \
+              '${{ steps.old-builds.outputs.package_refs }}'
+          )
+
+          deleted_count=0
+          for package_ref in "${package_refs[@]}"; do
+            echo "Deleting ${package_ref}"
+            echo anaconda -t "$ANACONDA_TOKEN" remove -f "$package_ref"
+            deleted_count=$((deleted_count + 1))
+          done
+
+          echo "deleted_file_count=${deleted_count}" >> "$GITHUB_OUTPUT"
+
+      - name: Print cleanup result
+        run: |
+          echo "Old package files selected: ${{ steps.old-builds.outputs.old_file_count }}"
+          echo "Old package files deleted: ${{ steps.delete-old-builds.outputs.deleted_file_count }}"

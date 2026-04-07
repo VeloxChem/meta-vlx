@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -64,7 +65,12 @@ def get_display_name(file_record):
     return "<unknown>"
 
 
-def build_summary_lines(total_files, total_build_numbers, recent_build_numbers, selected):
+def build_summary_lines(
+    total_files,
+    total_build_numbers,
+    recent_build_numbers,
+    selected,
+):
     lines = [
         f"Total uploaded files inspected: {total_files}",
         f"Distinct build numbers found: {total_build_numbers}",
@@ -74,18 +80,19 @@ def build_summary_lines(total_files, total_build_numbers, recent_build_numbers, 
 
     if selected:
         lines.append("")
-        lines.append("Old files:")
+        lines.append("Old files selected:")
         for item in selected:
             lines.append(f"- {item['name']} | build {item['build_number']}")
 
     return lines
 
 
-def write_outputs(match_count):
+def write_outputs(match_count, package_refs):
     github_output = os.environ.get("GITHUB_OUTPUT")
     if github_output:
         with open(github_output, "a", encoding="utf-8") as handle:
             handle.write(f"old_file_count={match_count}\n")
+            handle.write(f"package_refs={json.dumps(package_refs)}\n")
 
 
 def write_step_summary(lines):
@@ -116,6 +123,7 @@ def main():
         files_with_build_numbers.append(
             {
                 "name": get_display_name(file_record),
+                "package_ref": f"{args.namespace}/{args.package}/{args.version}/{get_display_name(file_record)}",
                 "build_number": build_number,
             }
         )
@@ -136,6 +144,7 @@ def main():
         item for item in files_with_build_numbers if item["build_number"] not in recent_build_number_set
     ]
     selected.sort(key=lambda item: (item["build_number"], item["name"]), reverse=True)
+    package_refs = [item["package_ref"] for item in selected]
 
     summary_lines = build_summary_lines(
         total_files=len(files_with_build_numbers),
@@ -151,7 +160,7 @@ def main():
     for line in summary_lines:
         print(line)
 
-    write_outputs(len(selected))
+    write_outputs(len(selected), package_refs)
     write_step_summary(summary_lines)
 
 
