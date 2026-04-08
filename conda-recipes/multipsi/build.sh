@@ -28,4 +28,4 @@ cmake --build build --target install
 
 mkdir -p "${SP_DIR}/multipsi"
 cp -r build/multipsilib.* "${SP_DIR}/multipsi"
-cp -r src/python/*.py "${SP_DIR}/multipsi"
+cp -r src/multipsi/*.py "${SP_DIR}/multipsi"
