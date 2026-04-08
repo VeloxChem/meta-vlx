@@ -29,8 +29,8 @@ requirements:
     - pybind11-abi =4
     - {{ mpi }}
     - mpi4py
-    - libcblas
-    - liblapacke
+    - libblas=*=*_openblas
+    - openblas=*=openmp*    # [unix]
     - numpy
   run:
     - veloxchem >=1.0rc4
@@ -39,8 +39,6 @@ requirements:
     - msmpi  # [win]
     - {{ pin_compatible('mpi4py') }}
     - {{ pin_compatible('numpy') }}
-  run_constrained:
-    - libopenblas * openmp*  # [unix]
 
 test:
   requires:
