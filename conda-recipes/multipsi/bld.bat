@@ -25,7 +25,7 @@ if errorlevel 1 exit 1
 
 if not exist "%SP_DIR%\multipsi" mkdir "%SP_DIR%\multipsi"
 robocopy build "%SP_DIR%\multipsi" multipsilib.* /R:5 /W:5 /NFL /NDL /NJH /NJS
-robocopy src\python "%SP_DIR%\multipsi" *.py /R:5 /W:5 /NFL /NDL /NJH /NJS
+robocopy src\multipsi "%SP_DIR%\multipsi" *.py /R:5 /W:5 /NFL /NDL /NJH /NJS
 
 :: Copy the [de]activate scripts to %PREFIX%\etc\conda\[de]activate.d.
 :: This will allow them to be run on environment activation.
