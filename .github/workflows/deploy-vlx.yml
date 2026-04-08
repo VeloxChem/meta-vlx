@@ -72,13 +72,13 @@ jobs:
       - id: set-matrix
         run: |
           if [ -z "${{ inputs.pyversions }}" ]; then
-            PY_VERSIONS="3.11,3.12"
+            PY_VERSIONS="3.12,3.13"
           else
             PY_VERSIONS="${{ inputs.pyversions }}"
           fi
 
           if [ -z "${{ inputs.ostypes }}" ]; then
-            OS_TYPES="linux,osx-arm,osx,win"
+            OS_TYPES="linux,osx-arm,win"
           else
             OS_TYPES="${{ inputs.ostypes }}"
           fi
