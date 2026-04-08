@@ -45,7 +45,7 @@ test:
   requires:
     - pytest
     - libopenblas  # [unix]   
-    - mkl <=2024.1 # [win]
+    - mkl          # [win]
     - pip
     - scipy
   source_files:
