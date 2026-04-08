@@ -19,7 +19,7 @@ requirements:
   build:
     - cmake >=3.18
     - {{ compiler('cxx') }}
-    - llvm-openmp
+    - llvm-openmp # [unix]
     - vs2022_win-64  # [win]
     - ninja
   host:
