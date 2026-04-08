@@ -28,8 +28,10 @@ requirements:
     - pybind11-abi =4
     - {{ mpi }}
     - mpi4py
-    - libblas=*=*_openblas
+    - libblas=*=*_openblas  # [unix]
     - openblas=*=openmp*    # [unix]
+    - libblas=*=*_mkl       # [win]
+    - mkl-devel             # [win]
     - numpy
   run:
     - veloxchem >=1.0rc4
