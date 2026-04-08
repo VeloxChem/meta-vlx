@@ -37,7 +37,7 @@ requirements:
     - python
     - msmpi  # [win]
     - {{ pin_compatible('mpi4py') }}
-    - {{ pin_compatible('numpy') }}
+    - numpy
 
 test:
   requires:
