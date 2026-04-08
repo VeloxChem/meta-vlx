@@ -65,6 +65,19 @@ def get_display_name(file_record):
     return "<unknown>"
 
 
+def get_package_ref(file_record):
+    package_ref = get_display_name(file_record)
+    if package_ref == "<unknown>":
+        raise RuntimeError("Unable to determine exact package reference from file record.")
+
+    if package_ref.count("/") < 3:
+        raise RuntimeError(
+            f"Package reference does not look like a full Anaconda package path: {package_ref}"
+        )
+
+    return package_ref
+
+
 def build_summary_lines(
     total_files,
     total_build_numbers,
@@ -123,7 +136,7 @@ def main():
         files_with_build_numbers.append(
             {
                 "name": get_display_name(file_record),
-                "package_ref": f"{args.namespace}/{args.package}/{args.version}/{get_display_name(file_record)}",
+                "package_ref": get_package_ref(file_record),
                 "build_number": build_number,
             }
         )
