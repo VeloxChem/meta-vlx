@@ -9,8 +9,7 @@ channel_sources:
   - veloxchem
 
 cxx_compiler:
-  - gxx      # [linux]
-  - clangxx  # [osx]
+  - clangxx  # [unix]
 
 cxx_compiler_version:
   - '12'  # [linux]
