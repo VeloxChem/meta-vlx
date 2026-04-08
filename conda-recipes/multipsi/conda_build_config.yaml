@@ -12,8 +12,7 @@ cxx_compiler:
   - clangxx  # [unix]
 
 cxx_compiler_version:
-  - '12'  # [linux]
-  - '18'  # [osx]
+  - '18'  # [unix]
 
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
 # implementation as runtime, thus replicating the behavior of conda-forge
