@@ -38,7 +38,11 @@ jobs:
         run: |
           echo ">>> Clone veloxchem (${{ inputs.commit }}) for version discovery"
           git config --global --add safe.directory $PWD
-          git clone -b ${{ inputs.commit }} https://github.com/VeloxChem/VeloxChem.git veloxchem
+          git clone https://github.com/VeloxChem/VeloxChem.git veloxchem
+          cd veloxchem
+          git fetch origin "${{ inputs.commit }}"
+          git checkout "${{ inputs.commit }}"
+          cd ..
 
           VERSION_LINE=$(grep '__version__' veloxchem/src/pymodule/__init__.py)
           VLX_VERSION=$(echo "$VERSION_LINE" | tr "'" '"' | cut -d '"' -f2)
@@ -119,7 +123,11 @@ jobs:
         run: |
           echo ">>> Clone veloxchem (${{ inputs.commit }})"
           git config --global --add safe.directory $PWD
-          git clone -b ${{ inputs.commit }} https://github.com/VeloxChem/VeloxChem.git veloxchem
+          git clone https://github.com/VeloxChem/VeloxChem.git veloxchem
+          cd veloxchem
+          git fetch origin "${{ inputs.commit }}"
+          git checkout "${{ inputs.commit }}"
+          cd ..
           VLXHASH=$(git -C veloxchem rev-parse HEAD)
           echo "Commit hash is $VLXHASH"
 
