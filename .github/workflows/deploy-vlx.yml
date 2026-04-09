@@ -3,8 +3,8 @@ name: Deploy VeloxChem
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'The branch or commit of VeloxChem'
+      commit:
+        description: 'The commit of VeloxChem'
         required: true
       label:
         description: 'Label of the conda package'
@@ -36,9 +36,9 @@ jobs:
 
       - id: set-version
         run: |
-          echo ">>> Clone veloxchem (${{ inputs.branch }}) for version discovery"
+          echo ">>> Clone veloxchem (${{ inputs.commit }}) for version discovery"
           git config --global --add safe.directory $PWD
-          git clone -b ${{ inputs.branch }} https://github.com/VeloxChem/VeloxChem.git veloxchem
+          git clone -b ${{ inputs.commit }} https://github.com/VeloxChem/VeloxChem.git veloxchem
 
           VERSION_LINE=$(grep '__version__' veloxchem/src/pymodule/__init__.py)
           VLX_VERSION=$(echo "$VERSION_LINE" | tr "'" '"' | cut -d '"' -f2)
@@ -108,7 +108,7 @@ jobs:
         run: |
           echo "Build triggered with the following parameters"
 
-          echo " > Recipe for package: veloxchem (${{ inputs.branch }})"
+          echo " > Recipe for package: veloxchem (${{ inputs.commit }})"
           echo " > Conda package version: ${{ needs.prepare-build-matrix.outputs.vlx_version }}"
           echo " > Conda package channel: veloxchem"
           echo " > Conda package label: ${{ inputs.label }}"
@@ -117,9 +117,9 @@ jobs:
 
       - name: Clone veloxchem and get commit hash
         run: |
-          echo ">>> Clone veloxchem (${{ inputs.branch }})"
+          echo ">>> Clone veloxchem (${{ inputs.commit }})"
           git config --global --add safe.directory $PWD
-          git clone -b ${{ inputs.branch }} https://github.com/VeloxChem/VeloxChem.git veloxchem
+          git clone -b ${{ inputs.commit }} https://github.com/VeloxChem/VeloxChem.git veloxchem
           VLXHASH=$(git -C veloxchem rev-parse HEAD)
           echo "Commit hash is $VLXHASH"
 
