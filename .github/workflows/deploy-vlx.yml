@@ -171,7 +171,11 @@ jobs:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
-          conda build \
+          conda info --envs
+          conda activate deploy
+          conda info --envs
+          which conda-build
+          conda-build \
                 --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
                 --token $ANACONDA_TOKEN \
                 --user veloxchem \
