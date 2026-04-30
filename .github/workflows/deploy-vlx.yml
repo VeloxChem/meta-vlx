@@ -151,7 +151,7 @@ jobs:
 
       - name: Install upload client
         run: |
-          conda install -n base -c conda-forge anaconda-client conda-verify -y
+          conda install -n base -c conda-forge anaconda-client -y
           conda list -n base conda-build
           conda list -n base anaconda-client
 
