@@ -143,20 +143,10 @@ jobs:
           conda-remove-defaults: true
           auto-update-conda: true
           auto-activate-base: false
-          activate-environment: base
+          activate-environment: deploy
+          environment-file: .github/deploy.yml
           python-version: ${{ matrix.python }}
           use-mamba: true
-          channels: conda-forge
-          channel-priority: strict
-          conda-build-version: "*"
-
-      - name: Install upload client
-        run: |
-          conda info --envs
-          conda install -c conda-forge anaconda-client -y
-          conda list conda-build
-          conda list anaconda-client
-          which conda-build
 
       - name: Configure meta.yaml.in
         run: |
@@ -181,9 +171,7 @@ jobs:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
-          conda info --envs
-          which conda-build
-          conda-build \
+          conda build \
                 --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
                 --token $ANACONDA_TOKEN \
                 --user veloxchem \
