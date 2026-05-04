@@ -1,0 +1,260 @@
+name: Deploy MultiPsi
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'The commit of MultiPsi'
+        required: true
+      label:
+        description: 'Label of the conda package'
+        required: true
+      build:
+        description: 'Build number of the conda package (optional)'
+        required: false
+      pyversions:
+        description: 'Python versions (optional)'
+        required: false
+      ostypes:
+        description: 'Operating systems (optional)'
+        required: false
+
+concurrency:
+  group: deploy-mtp-publish
+  cancel-in-progress: false
+
+jobs:
+  prepare-build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.MATRIX }}
+      mtp_version: ${{ steps.set-version.outputs.mtp_version }}
+      build_number: ${{ steps.set-build-number.outputs.build_number }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: set-version
+        run: |
+          echo ">>> Clone multipsi (${{ inputs.commit }}) for version discovery"
+          git config --global --add safe.directory $PWD
+          git clone https://gitlab.com/MGDelcey/multipsi.git multipsi
+          cd multipsi
+          git fetch origin "${{ inputs.commit }}"
+          git checkout "${{ inputs.commit }}"
+          cd ..
+
+          VERSION_LINE=$(grep '__version__' multipsi/src/multipsi/__init__.py)
+          MTP_VERSION=$(echo "$VERSION_LINE" | tr "'" '"' | cut -d '"' -f2)
+
+          if [ -z "$MTP_VERSION" ]; then
+            echo "Unable to determine MultiPsi version" >&2
+            exit 1
+          fi
+
+          echo "MultiPsi version is $MTP_VERSION"
+          echo "mtp_version=$MTP_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Clean up version discovery source tree
+        run: |
+          rm -rf multipsi
+
+      - id: set-build-number
+        run: |
+          if [ -n "${{ inputs.build }}" ]; then
+            BUILD_NUMBER="${{ inputs.build }}"
+          else
+            BUILD_NUMBER=$(python3 $GITHUB_WORKSPACE/.github/get-next-build-number.py \
+              --namespace veloxchem \
+              --package multipsi \
+              --version "${{ steps.set-version.outputs.mtp_version }}")
+          fi
+
+          echo "Build number for multipsi: $BUILD_NUMBER"
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+
+      - id: set-matrix
+        run: |
+          if [ -z "${{ inputs.pyversions }}" ]; then
+            PY_VERSIONS="3.12,3.13"
+          else
+            PY_VERSIONS="${{ inputs.pyversions }}"
+          fi
+
+          if [ -z "${{ inputs.ostypes }}" ]; then
+            OS_TYPES="linux,osx-arm,win"
+          else
+            OS_TYPES="${{ inputs.ostypes }}"
+          fi
+
+          python3 $GITHUB_WORKSPACE/.github/generate-matrix.py $PY_VERSIONS $OS_TYPES > matrix.json
+
+          echo "Build matrix for multipsi"
+          echo "MATRIX={\"include\": $(cat matrix.json)}"
+
+          echo "MATRIX={\"include\": $(cat matrix.json)}" >> $GITHUB_OUTPUT
+
+  build:
+    name: Deploy to Anaconda.org
+    needs: prepare-build-matrix
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build summary
+        run: |
+          echo "Build triggered with the following parameters"
+
+          echo " > Recipe for package: multipsi (${{ inputs.commit }})"
+          echo " > Conda package version: ${{ needs.prepare-build-matrix.outputs.mtp_version }}"
+          echo " > Conda package channel: veloxchem"
+          echo " > Conda package label: ${{ inputs.label }}"
+          echo " > Conda package build number: ${{ needs.prepare-build-matrix.outputs.build_number }}"
+          echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
+
+      - name: Clone multipsi and get commit hash
+        run: |
+          echo ">>> Clone multipsi (${{ inputs.commit }})"
+          git config --global --add safe.directory $PWD
+          git clone https://gitlab.com/MGDelcey/multipsi.git multipsi
+          cd multipsi
+          git fetch origin "${{ inputs.commit }}"
+          git checkout "${{ inputs.commit }}"
+          cd ..
+          MTPHASH=$(git -C multipsi rev-parse HEAD)
+          echo "Commit hash is $MTPHASH"
+
+      - name: Install macOS SDK
+        if: startsWith(matrix.os, 'macos')
+        working-directory: /Users/runner
+        run: |
+          curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX11.0.sdk.tar.xz | tar -xJ
+
+      - uses: conda-incubator/setup-miniconda@v3
+        timeout-minutes: 30
+        with:
+          conda-remove-defaults: true
+          auto-update-conda: true
+          auto-activate-base: false
+          activate-environment: deploy
+          environment-file: .github/deploy.yml
+          python-version: ${{ matrix.python }}
+          use-mamba: true
+
+      - name: Configure meta.yaml.in
+        run: |
+          MTP_VERSION="${{ needs.prepare-build-matrix.outputs.mtp_version }}"
+          BUILD_NUMBER="${{ needs.prepare-build-matrix.outputs.build_number }}"
+
+          echo "MultiPsi version is $MTP_VERSION"
+          echo "Build number of the conda package is $BUILD_NUMBER"
+
+          python $GITHUB_WORKSPACE/.github/search-replace.py \
+                 --replace \
+                 "@_version_@=$MTP_VERSION" \
+                 "@_build_@=$BUILD_NUMBER" \
+                 --file \
+                 $GITHUB_WORKSPACE/conda-recipes/multipsi/meta.yaml
+
+      - name: Build and upload multipsi for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+        id: condabuild
+        timeout-minutes: 350
+        continue-on-error: true
+        env:
+          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+        run: |
+          cd $GITHUB_WORKSPACE/conda-recipes
+          conda info --envs
+          which conda-build
+          conda-build \
+                --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
+                --token $ANACONDA_TOKEN \
+                --user veloxchem \
+                --label ${{ inputs.label }} \
+                --verify \
+                -c veloxchem/label/main \
+                -c conda-forge \
+                multipsi
+
+      - name: Clean up source code
+        run: |
+          rm -rf multipsi
+
+      - name: Write deployment summary of multipsi for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+        run: |
+          line="OS=${{ matrix.os }}, Python=${{ matrix.python }}, MPI=${{ matrix.mpi }}, Outcome=${{ steps.condabuild.outcome }}"
+          echo "$line"
+          echo "- $line" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail job if build or upload failed
+        if: ${{ steps.condabuild.outcome != 'success' }}
+        run: |
+          echo "Build or upload failed for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}" >&2
+          exit 1
+
+  delete-old-builds:
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.build.result == 'success' }}
+    name: Delete old MultiPsi package files
+    needs:
+      - build
+      - prepare-build-matrix
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          conda-remove-defaults: true
+          auto-update-conda: true
+          auto-activate-base: false
+          activate-environment: deploy
+          environment-file: .github/deploy.yml
+          python-version: "3.12"
+          use-mamba: true
+
+      - name: Select old MultiPsi package files
+        id: old-builds
+        run: |
+          python3 .github/query-old-vlx-builds.py \
+            --namespace veloxchem \
+            --package multipsi \
+            --version "${{ needs.prepare-build-matrix.outputs.mtp_version }}" \
+            --keep-builds 10
+
+      - name: Delete old MultiPsi package files
+        id: delete-old-builds
+        env:
+          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+        run: |
+          conda info --envs
+          which anaconda
+
+          mapfile -t package_refs < <(
+            python3 -c 'import json, sys; [print(item) for item in json.loads(sys.argv[1])]' \
+              '${{ steps.old-builds.outputs.package_refs }}'
+          )
+
+          deleted_count=0
+          for package_ref in "${package_refs[@]}"; do
+            echo "Deleting ${package_ref}"
+            #anaconda -t "$ANACONDA_TOKEN" remove -f "$package_ref"
+            deleted_count=$((deleted_count + 1))
+          done
+
+          echo "deleted_file_count=${deleted_count}" >> "$GITHUB_OUTPUT"
+
+      - name: Print cleanup result
+        run: |
+          echo "Old package files selected: ${{ steps.old-builds.outputs.old_file_count }}"
+          echo "Old package files deleted: ${{ steps.delete-old-builds.outputs.deleted_file_count }}"
