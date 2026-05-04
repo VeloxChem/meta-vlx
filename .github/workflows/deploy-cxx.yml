@@ -42,22 +42,19 @@ jobs:
       - id: set-matrix
         run: |
           # create "base" build matrix as Cartesian product of:
-          # - OS: ubunut-latest, macos-14 (arm64), macos-13 (x86_64)
-          # - Python: 3.9, 3.10, 3.11, 3.12
+          # - OS: ubunut-latest, macos-14 (arm64)
+          # - Python: 3.12, 3.13
           # - MPI: openmpi, mpich
           # For now, disable builds with openmpi due to the
           # "shmem: mmap: an error occurred while determining ..." error
-          #echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.9", "3.10", "3.11"], ["openmpi", "mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
-          #echo '[ ["ubuntu-latest", "macos-14", "macos-13"], ["3.9", "3.10", "3.11", "3.12"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
           echo '[ ["ubuntu-latest", "macos-14"], ["3.12", "3.13"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
           # append to the Cartesian products of:
           # - OS: windows-2022
-          # - Python: 3.9, 3.10, 3.11, 3.12
+          # - Python: 3.12, 3.13
           # - MPI: msmpi
-          #echo '[ ["windows-2022"], ["3.9", "3.10", "3.11", "3.12"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
           echo '[ ["windows-2022"], ["3.12", "3.13"], ["msmpi"] ]' | jq '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > win.json
@@ -146,8 +143,8 @@ jobs:
                  --replace \
                  "@_version_@=${{ github.event.inputs.version }}" \
                  "@_build_@=${{ github.event.inputs.build }}" \
-                --file \
-                $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/meta.yaml
+                 --file \
+                 $GITHUB_WORKSPACE/conda-recipes/${{ github.event.inputs.recipe }}/meta.yaml
 
       - name: Build and upload ${{ github.event.inputs.recipe }} for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
         id: condabuild
@@ -157,7 +154,9 @@ jobs:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
-          conda build \
+          conda info --envs
+          which conda-build
+          conda-build \
                 --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
                 --token $ANACONDA_TOKEN \
                 --user ${{ github.event.inputs.channel }} \
@@ -184,34 +183,7 @@ jobs:
           name: build_summary-${{ matrix.os }}_${{ matrix.python }}_${{ matrix.mpi }}
           retention-days: 1
 
-      - name: Send notification for failure
-        if: steps.condabuild.outcome != 'success'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{secrets.MAIL_USERNAME}}
-          password: ${{secrets.MAIL_PASSWORD}}
-          subject: "${{ github.event.inputs.recipe }}: UNSUCCESSFUL Conda deployment for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}"
-          to: roberto@algorithmiq.fi
-          from: MinazoBot
-          body: |
-            Greetings!
-            The deployment DID NOT succeed for a Conda package with the following build parameters:
-              > Recipe for package: ${{ github.event.inputs.recipe }}
-              > Conda package version: ${{ github.event.inputs.version }}
-              > Conda package build number: ${{ github.event.inputs.build }}
-              > Conda package channel: ${{ github.event.inputs.channel }}
-              > Conda package label: ${{ github.event.inputs.label }}
-              > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}
-
-            Find the build logs here:
-              > ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-            Best regards,
-              MinazoBot
-
-  summary-email:
+  summary:
     runs-on: ubuntu-latest
     if: ${{ always() }}
     name: Summary of deployment to Anaconda.org for ${{ github.event.inputs.recipe }}
@@ -260,31 +232,3 @@ jobs:
 
           echo "SUCCESS=${success_msg}" >> $GITHUB_OUTPUT
           echo "FAILURE=${failure_msg}" >> $GITHUB_OUTPUT
-
-      - name: Send notification
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{secrets.MAIL_USERNAME}}
-          password: ${{secrets.MAIL_PASSWORD}}
-          subject: "${{ github.event.inputs.recipe }}: summary of deployments to Anaconda.org"
-          to: roberto@algorithmiq.fi,lxin@kth.se
-          from: MinazoBot
-          html_body: |
-            Greetings!<br/><br/>
-
-            Deployments to Anaconda.org succeeded for:<br/><br/>
-
-            ${{ steps.collate.outputs.SUCCESS }}<br/>
-
-            You can install with:<br/><br/>
-
-              $ conda install ${{ github.event.inputs.recipe }}=${{ github.event.inputs.version }}=*_${{ github.event.inputs.build }} -c ${{ github.event.inputs.channel }}/label/${{ github.event.inputs.label }} -c conda-forge<br/><br/>
-
-            Deployments to Anaconda.org failed for:<br/><br/>
-
-            ${{ steps.collate.outputs.FAILURE }}<br/>
-
-            Best regards,<br/>
-              MinazoBot
