@@ -19,7 +19,8 @@ requirements:
   build:
     - cmake >=3.18
     - {{ compiler('cxx') }}
-    - llvm-openmp
+    - libgomp  # [linux]
+    - llvm-openmp  # [osx or win]
     - vs2022_win-64  # [win]
     - ninja
   host:
@@ -39,7 +40,6 @@ requirements:
     - mpi4py
     - numpy
   run_constrained:
-    - libopenblas * openmp*  # [unix]
     - xtb =6.7.1=*_3  # [win]
 
 test:

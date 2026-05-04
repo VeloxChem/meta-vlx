@@ -8,10 +8,12 @@ channel_sources:
   - conda-forge
 
 cxx_compiler:
-  - clangxx  # [unix]
+  - gxx      # [linux]
+  - clangxx  # [osx]
 
 cxx_compiler_version:
-  - '18'  # [unix]
+  - '12'  # [linux]
+  - '18'  # [osx]
 
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
 # implementation as runtime, thus replicating the behavior of conda-forge
@@ -25,7 +27,7 @@ cxx_compiler_version:
 #  - 3.9 *netlib
 
 llvm_openmp:
-  - '18'
+  - '18'  # [osx or win]
 
 macos_machine:
   - arm64-apple-darwin20.0.0   # [osx and arm64]
