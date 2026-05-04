@@ -65,7 +65,7 @@ test:
     - mpiexec -n 1 %PYTHON% -m pytest --capture=no --log-cli-level=INFO  # [win]
     - set MPI_NUM_PROCS=2  # [win]
     - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%"  # [win]
-    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --capture=no --log-cli-level=INFO -m "parallel" -k "test_ci_gradient_water_65_nodis or not test_ci_gradient_water_65"  # [win]
+    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --capture=no --log-cli-level=INFO -m "parallel" -k "not test_mcscfdriver"  # [win]
 
 about:
   home: https://multipsi.org
