@@ -248,7 +248,7 @@ jobs:
           deleted_count=0
           for package_ref in "${package_refs[@]}"; do
             echo "Deleting ${package_ref}"
-            #anaconda -t "$ANACONDA_TOKEN" remove -f "$package_ref"
+            anaconda -t "$ANACONDA_TOKEN" remove -f "$package_ref"
             deleted_count=$((deleted_count + 1))
           done
 
