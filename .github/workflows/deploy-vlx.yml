@@ -172,8 +172,6 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/conda-recipes
           conda info --envs
-          conda activate deploy
-          conda info --envs
           which conda-build
           conda-build \
                 --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
@@ -239,6 +237,9 @@ jobs:
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
+          conda info --envs
+          which anaconda
+
           mapfile -t package_refs < <(
             python3 -c 'import json, sys; [print(item) for item in json.loads(sys.argv[1])]' \
               '${{ steps.old-builds.outputs.package_refs }}'
