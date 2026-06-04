@@ -74,7 +74,7 @@ test:
     # for now we only run selected tests on osx-64 and osx-arm64 due to time and resources
     - export OMP_NUM_THREADS=$CPU_COUNT  # [unix]
     - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming"  # [linux]
-    - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming" -k "not test_symmetrize_pointgroup_d6h_from_loose_geometry" # [osx and arm64]
+    - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming"  # [osx and arm64]
     - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO -m "not timeconsuming and not solvers"  # [osx and x86_64]
     - export MPI_NUM_PROCS=2  # [unix]
     - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
