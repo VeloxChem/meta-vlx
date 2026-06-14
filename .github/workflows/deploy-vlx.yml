@@ -46,7 +46,11 @@ jobs:
           git checkout "${{ inputs.commit }}"
           cd ..
 
-          VERSION_LINE=$(grep '__version__' veloxchem/src/pymodule/__init__.py)
+          if [ -f veloxchem/src/pymodule/_version.py ] && grep -q '__version__' veloxchem/src/pymodule/_version.py; then
+            VERSION_LINE=$(grep '__version__' veloxchem/src/pymodule/_version.py)
+          else
+            VERSION_LINE=$(grep '__version__' veloxchem/src/pymodule/__init__.py)
+          fi
           VLX_VERSION=$(echo "$VERSION_LINE" | tr "'" '"' | cut -d '"' -f2)
 
           if [ -z "$VLX_VERSION" ]; then
