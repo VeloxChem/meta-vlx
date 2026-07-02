@@ -29,3 +29,8 @@ cmake --build build --parallel "${CPU_COUNT}" -- -d stats
 
 # install!
 cmake --build build --target install
+
+# Copy license files
+LICENSE_DIR="${PREFIX}/share/licenses/veloxchem"
+mkdir -p "${LICENSE_DIR}"
+cp "${SRC_DIR}"/LICENSE* "${LICENSE_DIR}/"
