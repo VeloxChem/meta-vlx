@@ -70,5 +70,5 @@ which gets configured during execution of the
    And upload with:
 
    ``` bash
-   $ anaconda upload $HOME/miniforge3/conda-bld/linux-64/veloxchem-1.0rc3-py_0.tar.bz2 -u veloxchem -l test
+   $ anaconda upload $HOME/miniforge3/conda-bld/linux-64/veloxchem-1.0rc4-py_0.tar.bz2 -u veloxchem -l test
    ```
