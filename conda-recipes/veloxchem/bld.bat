@@ -35,7 +35,7 @@ for %%F in (activate deactivate) DO (
 )
 
 :: Copy license files
-set "LICENSE_DIR=%PREFIX%\share\licenses\veloxchem"
+set "LICENSE_DIR=%LIBRARY_PREFIX%\share\licenses\veloxchem"
 if not exist "%LICENSE_DIR%" (
     mkdir "%LICENSE_DIR%"
     if errorlevel 1 exit /b 1
