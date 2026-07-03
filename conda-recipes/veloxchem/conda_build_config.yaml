@@ -39,9 +39,8 @@ macos_machine:
 #  - openmpi  # [not win]
 
 python:
-  - '3.10'  # EOL: Oct 2026
-  - '3.11'  # EOL: Oct 2027
   - '3.12'  # EOL: Oct 2028
+  - '3.13'  # EOL: Oct 2029
 
 target_platform:
   - linux-64  # [linux]
@@ -51,4 +50,3 @@ target_platform:
 
 CONDA_BUILD_SYSROOT:
   - /Users/runner/MacOSX11.0.sdk  # [osx]
-
