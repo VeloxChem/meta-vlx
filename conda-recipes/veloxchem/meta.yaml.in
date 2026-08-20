@@ -45,6 +45,7 @@ requirements:
 test:
   requires:
     - pytest
+    - openmpi  # [linux]
     - libblas
     - dftd4-python
     - xtb-python
