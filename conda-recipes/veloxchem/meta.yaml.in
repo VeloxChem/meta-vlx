@@ -38,6 +38,7 @@ requirements:
     - python
     - mpi4py
     - numpy
+    - networkx <3.7
   run_constrained:
     - libxc-c =7.*=cpu_*
     - xtb =6.7.1=*_3  # [win]
