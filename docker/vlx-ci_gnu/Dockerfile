@@ -1,4 +1,4 @@
-FROM ghcr.io/veloxchem/meta-vlx/vlx-ci_ubuntu-22.04:sha-56644e9
+FROM ubuntu:24.04
 
 LABEL org.opencontainers.image.description "GNU-based VeloxChem CI container"
 
@@ -6,18 +6,36 @@ LABEL org.opencontainers.image.description "GNU-based VeloxChem CI container"
 ADD https://timeapi.io/api/Time/current/zone?timeZone=Europe/Stockholm /opt/docker/etc/timestamp
 
 # install software
-RUN apt install -y gpg-agent wget \
-    && wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null \
-    && echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" |tee /etc/apt/sources.list.d/oneAPI.list \
-    && apt update --yes -qq \
-    && DEBIAN_FRONTEND=noninteractive apt install --yes -qq \
-       -o Dpkg::Options::="--force-confnew" \
+RUN apt update --yes -qq \
+    && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
+       ca-certificates \
+       curl \
+       bzip2 \
+    && curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba \
+    && apt purge --yes -qq bzip2 \
+    && apt upgrade --yes -qq \
+    && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
+       build-essential \
+       cmake \
        g++ \
        gcc \
+       git \
+       googletest \
+       libgtest-dev \
+       libhdf5-dev \
        liblapacke \
        liblapacke-dev \
        libopenblas-openmp-dev \
+       libpython3-dev \
        mpich \
+       ninja-build \
+       pkg-config \
+       python-is-python3 \
+       python3 \
+       python3-pip \
+       python3-requests \
+       python3-venv \
+       rsync \
     && curl -Ls https://gitlab.com/libxc/libxc/-/archive/7.0.0/libxc-7.0.0.tar.gz | tar xz \
     && cd libxc-7.0.0 \
     && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DBUILD_SHARED_LIBS=ON -DDISABLE_KXC=OFF -DDISABLE_LXC=OFF -DBUILD_TESTING=OFF > /dev/null 2>&1 \
@@ -27,7 +45,8 @@ RUN apt install -y gpg-agent wget \
     && apt autoremove --yes -qq \
     && apt clean --yes -qq \
     && update-ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && micromamba shell init --shell=bash --root-prefix=~/micromamba
 
 COPY gnu-env.sh /opt/docker/etc
 
