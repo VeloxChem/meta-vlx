@@ -26,9 +26,10 @@ RUN apt update --yes -qq \
        liblapacke \
        liblapacke-dev \
        libopenblas-openmp-dev \
+       libopenmpi-dev \
        libpython3-dev \
-       mpich \
        ninja-build \
+       openmpi-bin \
        pkg-config \
        python-is-python3 \
        python3 \
@@ -47,6 +48,9 @@ RUN apt update --yes -qq \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && micromamba shell init --shell=bash --root-prefix=~/micromamba
+
+ENV OMPI_ALLOW_RUN_AS_ROOT=1 \
+    OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
 COPY gnu-env.sh /opt/docker/etc
 
