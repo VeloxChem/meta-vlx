@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.description "GNU-based VeloxChem CI container"
 # add a timestamp for the build. Also, bust the cache.
 ADD https://timeapi.io/api/Time/current/zone?timeZone=Europe/Stockholm /opt/docker/etc/timestamp
 
-# install software
+# install system software and Libxc
 RUN apt update --yes -qq \
     && DEBIAN_FRONTEND=noninteractive apt install --yes -o Dpkg::Options::="--force-confnew" -qq \
        ca-certificates \
@@ -22,9 +22,6 @@ RUN apt update --yes -qq \
        git \
        googletest \
        libgtest-dev \
-       libhdf5-dev \
-       liblapacke \
-       liblapacke-dev \
        libopenblas-openmp-dev \
        libopenmpi-dev \
        libpython3-dev \
@@ -37,17 +34,21 @@ RUN apt update --yes -qq \
        python3-requests \
        python3-venv \
        rsync \
-    && curl -Ls https://gitlab.com/libxc/libxc/-/archive/7.1.2/libxc-7.1.2.tar.gz | tar xz \
-    && cd libxc-7.1.2 \
-    && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DBUILD_SHARED_LIBS=ON -DMAXORDER=4 -DBUILD_TESTING=OFF > /dev/null 2>&1 \
-    && cmake --build build --target install > /dev/null 2>&1 \
-    && cd .. \
-    && rm -rf libxc-7.1.2 \
     && apt autoremove --yes -qq \
     && apt clean --yes -qq \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && micromamba shell init --shell=bash --root-prefix=~/micromamba
+    && micromamba shell init --shell=bash --root-prefix=~/micromamba \
+    && echo "=== Downloading Libxc 7.1.2 ===" \
+    && curl -Ls https://gitlab.com/libxc/libxc/-/archive/7.1.2/libxc-7.1.2.tar.gz | tar xz \
+    && cd libxc-7.1.2 \
+    && echo "=== Configuring Libxc 7.1.2 ===" \
+    && cmake -S. -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DBUILD_SHARED_LIBS=ON -DMAXORDER=4 -DBUILD_TESTING=OFF \
+    && echo "=== Building and installing Libxc 7.1.2 ===" \
+    && cmake --build build --target install \
+    && echo "=== Libxc 7.1.2 installed successfully ===" \
+    && cd .. \
+    && rm -rf libxc-7.1.2
 
 ENV OMPI_ALLOW_RUN_AS_ROOT=1 \
     OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
