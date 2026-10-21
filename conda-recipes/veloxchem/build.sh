@@ -7,6 +7,14 @@ CXXFLAGS="${CXXFLAGS//-mtune=haswell}"
 CXXFLAGS="${CXXFLAGS//-march=core2}"
 CXXFLAGS="${CXXFLAGS//-mssse3}"
 
+# conda-forge's libc++ headers mark newer C++ features as unavailable for the
+# deployment target, although conda-forge ships its own modern libcxx runtime
+# that provides them. Needed for std::from_chars(double). See
+# https://conda-forge.org/docs/maintainer/knowledge_base/#newer-c-features-with-old-sdk
+if [[ "${target_platform}" == osx-* ]]; then
+  CXXFLAGS="${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY"
+fi
+
 # configure!
 cmake \
     --log-level=DEBUG \
