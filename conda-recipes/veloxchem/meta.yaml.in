@@ -81,12 +81,9 @@ test:
     - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "not timeconsuming"  # [linux]
     - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "not timeconsuming"  # [osx and arm64]
     - export MPI_NUM_PROCS=2  # [unix]
-    # macOS arm64 runners have 3 cores; use one MPI rank per core instead of
-    # leaving one core idle with 2 MPI ranks x 1 OpenMP thread.
-    - export MPI_NUM_PROCS=$CPU_COUNT  # [osx and arm64]
     - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
-    - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming"  # [linux]
-    - mpiexec -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming" -k "TestScf or TestGrad or TestRI or TestCPP or TestRPA"  # [osx and arm64]
+    - mpiexec --bind-to none -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming"  # [linux]
+    - mpiexec --bind-to none -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming" -k "TestScf or TestGrad or TestRI or TestCPP or TestRPA"  # [osx and arm64]
     # run integration tests on windows
     # Fast solver tests receive the same serial/parallel double coverage here.
     - set OMP_NUM_THREADS=%CPU_COUNT%  # [win]
