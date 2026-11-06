@@ -10,13 +10,12 @@ channel_sources:
 cxx_compiler:
   - gxx      # [linux]
   - clangxx  # [osx]
-  - clang-cl # [win]
 
 cxx_compiler_version:
   - '12'  # [linux]
   # libc++ >= 20 provides std::from_chars for floating-point types (osx);
   # 21 is the current conda-forge default compiler stack
-  - '21'  # [osx or win]
+  - '21'  # [osx]
 
 # the following pinnings are necessary to allow switching the BLAS/LAPACK
 # implementation as runtime, thus replicating the behavior of conda-forge

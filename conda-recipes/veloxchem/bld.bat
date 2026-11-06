@@ -1,6 +1,6 @@
 setlocal EnableDelayedExpansion
 
-:: verify that the conda-forge clang-cl is the one on PATH
+:: log the resolved clang-cl and its version
 where clang-cl
 if errorlevel 1 exit /b 1
 clang-cl --version
