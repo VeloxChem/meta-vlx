@@ -1,5 +1,11 @@
 setlocal EnableDelayedExpansion
 
+:: verify that the conda-forge clang-cl is the one on PATH
+where clang-cl
+if errorlevel 1 exit /b 1
+clang-cl --version
+if errorlevel 1 exit /b 1
+
 :: configure!
 cmake ^
     -S"%SRC_DIR%" ^

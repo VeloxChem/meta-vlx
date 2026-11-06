@@ -24,6 +24,7 @@ requirements:
     - vs2022_win-64  # [win]
     - ninja
   host:
+    - llvm-openmp  # [osx or win]
     - pybind11
     - python
     - pybind11-abi =4
