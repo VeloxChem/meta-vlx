@@ -14,17 +14,14 @@ def main():
         if os_t.startswith('linux'):
             os_images.add('ubuntu-latest')
         elif os_t.startswith('osx-arm'):
-            os_images.add('macos-14')
-        elif os_t.startswith('osx'):
-            os_images.add('macos-13')
+            os_images.add('macos-15')
         elif os_t.startswith('win'):
             os_images.add('windows-2022')
     os_images = list(os_images)
 
     mpi_mapping = {
         "ubuntu-latest": "mpich",
-        "macos-14": "mpich",
-        "macos-13": "mpich",
+        "macos-15": "mpich",
         "windows-2022": "msmpi",
     }
 

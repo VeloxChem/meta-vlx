@@ -42,12 +42,12 @@ jobs:
       - id: set-matrix
         run: |
           # create "base" build matrix as Cartesian product of:
-          # - OS: ubunut-latest, macos-14 (arm64)
+          # - OS: ubuntu-latest, macos-15 (arm64)
           # - Python: 3.12, 3.13
           # - MPI: openmpi, mpich
           # For now, disable builds with openmpi due to the
           # "shmem: mmap: an error occurred while determining ..." error
-          echo '[ ["ubuntu-latest", "macos-14"], ["3.12", "3.13"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
+          echo '[ ["ubuntu-latest", "macos-15"], ["3.12", "3.13"], ["mpich"] ]' | jq -c '.[0][] as $os | .[1][] as $python | .[2][] as $mpi | {$os,$python,$mpi}' > foo.json
 
           cat foo.json | jq -nc '[inputs]' > matrix.json
 
