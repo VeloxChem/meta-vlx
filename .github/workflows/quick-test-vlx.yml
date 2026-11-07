@@ -47,7 +47,7 @@ on:
         default: ''
         type: string
       math_backends:
-        description: 'Math backends, comma-separated (optional; defaults: linux=mkl,openblas; osx-arm=openblas; win=mkl,openblas)'
+        description: 'Math backends, comma-separated (optional; defaults: linux=mkl,openblas; osx-arm=openblas; win=mkl,openblas,openblas-0.3.33)'
         required: false
         default: ''
         type: string
@@ -92,7 +92,9 @@ jobs:
           default_math = {
               "linux": ["mkl", "openblas"],
               "osx-arm": ["openblas"],
-              "win": ["mkl", "openblas"],
+              # Test both the current OpenBLAS (0.3.34) and the older
+              # 0.3.33 release, which is known to work on Windows.
+              "win": ["mkl", "openblas", "openblas-0.3.33"],
           }
 
           def split_csv(value):
@@ -113,12 +115,29 @@ jobs:
           for os_name in selected_os:
               for mpi in mpi_override or default_mpi[os_name]:
                   for math in math_override or default_math[os_name]:
+                      # GitHub's Linux runners expose an unusable verbs device
+                      # (ud_verbs/mana_0). Restrict UCX to local/TCP transports
+                      # for the Linux MPI backends that use UCX.
+                      ucx_tls = (
+                          "self,tcp"
+                          if os_name == "linux" and mpi in ("mpich", "openmpi")
+                          else "all"
+                      )
+                      # MPICH on macOS uses libfabric. Force its TCP provider
+                      # instead of relying on the platform default.
+                      fi_provider = (
+                          "tcp"
+                          if os_name == "osx-arm" and mpi == "mpich"
+                          else ""
+                      )
                       include.append({
                           "os": os_name,
                           "runner": runners[os_name]["runner"],
                           "platform": runners[os_name]["platform"],
                           "mpi": mpi,
                           "math": math,
+                          "ucx_tls": ucx_tls,
+                          "fi_provider": fi_provider,
                       })
 
           if not include:
@@ -153,6 +172,8 @@ jobs:
       VLX_PLATFORM: ${{ matrix.platform }}
       VLX_MPI: ${{ matrix.mpi }}
       VLX_MATH: ${{ matrix.math }}
+      VLX_FI_PROVIDER: ${{ matrix.fi_provider }}
+      UCX_TLS: ${{ matrix.ucx_tls }}
       TEST_TIMEOUT_SECONDS: ${{ inputs.timeout_seconds }}
       PREFLIGHT_TIMEOUT_SECONDS: '30'
       OMPI_ALLOW_RUN_AS_ROOT: '1'
@@ -175,6 +196,15 @@ jobs:
           auto-activate: true
           activate-environment: base
           use-mamba: true
+
+      - name: Configure MPI environment
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${VLX_FI_PROVIDER:-}" ]]; then
+            echo "FI_PROVIDER=${VLX_FI_PROVIDER}" >> "${GITHUB_ENV}"
+            echo "Setting FI_PROVIDER=${VLX_FI_PROVIDER}"
+          fi
 
       - name: Create placeholder test results
         run: |
@@ -252,6 +282,13 @@ jobs:
             openblas)
               INSTALL_ARGS+=("libblas=*=*openblas" "liblapack=*=*openblas")
               ;;
+            openblas-0.3.33)
+              INSTALL_ARGS+=(
+                "libblas=*=*openblas"
+                "liblapack=*=*openblas"
+                "libopenblas=0.3.33"
+              )
+              ;;
             mkl)
               INSTALL_ARGS+=("libblas=*=*mkl" "liblapack=*=*mkl")
               ;;
@@ -298,6 +335,8 @@ jobs:
           print("NumPy:", numpy.__version__)
           print("SciPy:", scipy.__version__)
           print("Conda prefix:", os.environ.get("CONDA_PREFIX", ""))
+          print("UCX_TLS:", os.environ.get("UCX_TLS", ""))
+          print("FI_PROVIDER:", os.environ.get("FI_PROVIDER", ""))
 
           print("--- NumPy configuration ---")
           numpy.show_config()
