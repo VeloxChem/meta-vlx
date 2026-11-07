@@ -154,8 +154,11 @@ jobs:
       VLX_MPI: ${{ matrix.mpi }}
       VLX_MATH: ${{ matrix.math }}
       TEST_TIMEOUT_SECONDS: ${{ inputs.timeout_seconds }}
+      PREFLIGHT_TIMEOUT_SECONDS: '30'
       OMPI_ALLOW_RUN_AS_ROOT: '1'
       OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: '1'
+      OMPI_MCA_pml: 'ob1'
+      OMPI_MCA_btl: 'self,vader,tcp'
       KMP_DUPLICATE_LIB_OK: 'TRUE'
       PYTHONUNBUFFERED: '1'
 
@@ -171,8 +174,29 @@ jobs:
           miniforge-version: latest
           conda-remove-defaults: true
           auto-update-conda: true
-          auto-activate-base: true
+          auto-activate: true
+          activate-environment: base
           use-mamba: true
+
+      - name: Create placeholder test results
+        run: |
+          set -euo pipefail
+
+          for config in "1 1" "1 2" "2 1"; do
+            read -r ranks threads <<< "${config}"
+            name="${VLX_OS}_${VLX_MPI}_${VLX_MATH}_mpi${ranks}_omp${threads}"
+
+            python .github/run-timed-test.py \
+              --status "NOT RUN" \
+              --no-step-summary \
+              --name "${name}" \
+              --metadata "os=${VLX_OS}" \
+              --metadata "platform=${VLX_PLATFORM}" \
+              --metadata "mpi_backend=${VLX_MPI}" \
+              --metadata "math_backend=${VLX_MATH}" \
+              --metadata "mpi_ranks=${ranks}" \
+              --metadata "omp_threads=${threads}"
+          done
 
       - name: Install VeloxChem package
         id: install
@@ -283,13 +307,95 @@ jobs:
 
           grep -n "def test_hf_ecd" tests/test_cpp_unrest.py
 
+      - name: Preflight MPI check
+        id: preflight
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+
+          eval "$(conda shell.bash hook)"
+          set +u
+          conda activate vlx-quick-test
+          set -u
+
+          PREFLIGHT_TIMEOUT="${PREFLIGHT_TIMEOUT_SECONDS:-30}"
+          if ! [[ "${PREFLIGHT_TIMEOUT}" =~ ^[0-9]+$ ]] || (( PREFLIGHT_TIMEOUT < 1 )); then
+            echo "Invalid preflight timeout: ${PREFLIGHT_TIMEOUT}" >&2
+            exit 1
+          fi
+
+          export OMP_NUM_THREADS=1
+
+          MPIEXEC=(mpiexec)
+          case "${VLX_MPI}" in
+            openmpi|mpich)
+              MPIEXEC+=(--bind-to none)
+              ;;
+          esac
+
+          echo "| Preflight | Status | Duration (s) |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "|---|---:|---:|" >> "${GITHUB_STEP_SUMMARY}"
+
+          overall_status=0
+          for ranks in 1 2; do
+            name="${VLX_OS}_${VLX_MPI}_${VLX_MATH}_preflight_mpi${ranks}"
+
+            echo "::group::${name}"
+            python .github/run-timed-test.py \
+              --name "${name}" \
+              --timeout "${PREFLIGHT_TIMEOUT}" \
+              --result-dir test-results/preflight \
+              --metadata "os=${VLX_OS}" \
+              --metadata "platform=${VLX_PLATFORM}" \
+              --metadata "mpi_backend=${VLX_MPI}" \
+              --metadata "math_backend=${VLX_MATH}" \
+              --metadata "mpi_ranks=${ranks}" \
+              --metadata "omp_threads=1" \
+              -- \
+              "${MPIEXEC[@]}" -n "${ranks}" \
+              python -c 'from mpi4py import MPI; print("MPI library:", MPI.Get_library_version().splitlines()[0]); print("MPI size:", MPI.COMM_WORLD.Get_size())' \
+              || overall_status=1
+            echo "::endgroup::"
+          done
+
+          exit "${overall_status}"
+
+      - name: Record setup failure
+        if: failure()
+        run: |
+          set -euo pipefail
+
+          reason="A setup step failed before the tests started; see the job log for details."
+
+          echo "| Test | Status | Duration (s) |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "|---|---:|---:|" >> "${GITHUB_STEP_SUMMARY}"
+
+          for config in "1 1" "1 2" "2 1"; do
+            read -r ranks threads <<< "${config}"
+            name="${VLX_OS}_${VLX_MPI}_${VLX_MATH}_mpi${ranks}_omp${threads}"
+
+            python .github/run-timed-test.py \
+              --status "SETUP FAILED" \
+              --message "${reason}" \
+              --name "${name}" \
+              --metadata "os=${VLX_OS}" \
+              --metadata "platform=${VLX_PLATFORM}" \
+              --metadata "mpi_backend=${VLX_MPI}" \
+              --metadata "math_backend=${VLX_MATH}" \
+              --metadata "mpi_ranks=${ranks}" \
+              --metadata "omp_threads=${threads}"
+          done
+
       - name: Run timed quick tests
+        if: steps.preflight.outcome == 'success'
         timeout-minutes: 15
         run: |
           set -euo pipefail
 
           eval "$(conda shell.bash hook)"
+          set +u
           conda activate vlx-quick-test
+          set -u
 
           TIMEOUT="${TEST_TIMEOUT_SECONDS:-90}"
           if ! [[ "${TIMEOUT}" =~ ^[0-9]+$ ]] || (( TIMEOUT < 1 )); then
@@ -303,9 +409,11 @@ jobs:
           mpiexec --version || true
 
           MPIEXEC=(mpiexec)
-          if [[ "${VLX_MPI}" == "openmpi" ]]; then
-            MPIEXEC+=(--bind-to none)
-          fi
+          case "${VLX_MPI}" in
+            openmpi|mpich)
+              MPIEXEC+=(--bind-to none)
+              ;;
+          esac
 
           echo "| Test | Status | Duration (s) |" >> "${GITHUB_STEP_SUMMARY}"
           echo "|---|---:|---:|" >> "${GITHUB_STEP_SUMMARY}"
@@ -334,7 +442,7 @@ jobs:
                 --metadata "omp_threads=${threads}" \
                 -- \
                 "${MPIEXEC[@]}" -n "${ranks}" \
-                python -m pytest -vv --durations=5 -p no:cacheprovider \
+                python -m pytest -vv --capture=no --durations=5 -p no:cacheprovider \
                 "tests/test_cpp_unrest.py::TestCppUnrestricted::test_hf_ecd" \
               || overall_status=1
             echo "::endgroup::"

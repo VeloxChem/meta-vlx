@@ -120,9 +120,11 @@ def main():
     for key in all_keys:
         record = records.get(key)
         status = str(record["status"]) if record else "NOT RUN"
-        duration = (
-            float(record.get("duration_seconds", 0.0)) if record else None
-        )
+        raw_duration = record.get("duration_seconds") if record else None
+        try:
+            duration = float(raw_duration) if raw_duration is not None else None
+        except (TypeError, ValueError):
+            duration = None
         rows.append((key, status, duration))
 
     lines = ["## VeloxChem quick test summary", ""]
@@ -155,6 +157,25 @@ def main():
         "Status counts: "
         + (", ".join(f"{name}={count}" for name, count in sorted(status_counts.items())))
     )
+
+    details = []
+    for key, status, _ in rows:
+        record = records.get(key)
+        if not record or status == "PASS":
+            continue
+        message = str(record.get("message", "")).strip()
+        if not message:
+            continue
+        details.append((key, status, " ".join(message.splitlines())))
+
+    if details:
+        lines += ["", "### Failure details", ""]
+        for key, status, message in details:
+            os_name, mpi, math, ranks, threads = key
+            lines.append(
+                f"- {os_name} / {mpi} / {math} / mpi {ranks} / omp {threads}: "
+                f"**{status}** — {message}"
+            )
 
     summary = "\n".join(lines) + "\n"
     print(summary)
