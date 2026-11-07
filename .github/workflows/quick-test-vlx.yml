@@ -92,8 +92,13 @@ jobs:
           default_math = {
               "linux": ["mkl", "openblas"],
               "osx-arm": ["openblas"],
-              # Test both the current OpenBLAS (0.3.34) and the older
-              # 0.3.33 release, which is known to work on Windows.
+              # Windows OpenBLAS 0.3.34 (pthreads) deterministically crashes
+              # on affected AMD Zen 4/5 runners when AVX-512 is exposed:
+              # https://github.com/conda-forge/openblas-feedstock/issues/196
+              # It only looks intermittent across CI runs because GitHub
+              # schedules jobs on different CPU models. Keep 0.3.34 in the
+              # matrix to expose it. OpenBLAS 0.3.33 is included separately
+              # as a control because it is known to work on affected CPUs.
               "win": ["mkl", "openblas", "openblas-0.3.33"],
           }
 
@@ -282,6 +287,8 @@ jobs:
             openblas)
               INSTALL_ARGS+=("libblas=*=*openblas" "liblapack=*=*openblas")
               ;;
+            # Control for conda-forge/openblas-feedstock#196: pin the last
+            # known-good Windows OpenBLAS while keeping latest visible above.
             openblas-0.3.33)
               INSTALL_ARGS+=(
                 "libblas=*=*openblas"
