@@ -169,7 +169,7 @@ def main():
         details.append((key, status, " ".join(message.splitlines())))
 
     if details:
-        lines += ["", "### Failure details", ""]
+        lines += ["", "### Result details", ""]
         for key, status, message in details:
             os_name, mpi, math, ranks, threads = key
             lines.append(

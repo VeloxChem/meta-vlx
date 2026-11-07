@@ -157,8 +157,6 @@ jobs:
       PREFLIGHT_TIMEOUT_SECONDS: '30'
       OMPI_ALLOW_RUN_AS_ROOT: '1'
       OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: '1'
-      OMPI_MCA_pml: 'ob1'
-      OMPI_MCA_btl: 'self,vader,tcp'
       KMP_DUPLICATE_LIB_OK: 'TRUE'
       PYTHONUNBUFFERED: '1'
 
@@ -274,6 +272,55 @@ jobs:
 
           conda list -n vlx-quick-test
 
+      - name: Log runtime diagnostics
+        run: |
+          set -euo pipefail
+
+          eval "$(conda shell.bash hook)"
+          set +u
+          conda activate vlx-quick-test
+          set -u
+
+          python - <<'PY' || echo "::warning::Runtime diagnostics failed; continuing."
+          import os
+          import platform
+          import sys
+          import sysconfig
+          from pathlib import Path
+
+          import numpy
+          import scipy
+
+          print("Platform:", platform.platform())
+          print("Machine:", platform.machine())
+          print("Processor:", platform.processor())
+          print("Python:", sys.version.replace("\\n", " "))
+          print("NumPy:", numpy.__version__)
+          print("SciPy:", scipy.__version__)
+          print("Conda prefix:", os.environ.get("CONDA_PREFIX", ""))
+
+          print("--- NumPy configuration ---")
+          numpy.show_config()
+
+          prefix = Path(os.environ.get("CONDA_PREFIX", ""))
+          site_packages = Path(sysconfig.get_paths()["purelib"])
+          search_dirs = [
+              prefix / "Library" / "bin",
+              prefix / "lib",
+              site_packages.parent / "numpy.libs",
+              site_packages / "numpy" / ".libs",
+          ]
+
+          print("--- BLAS/LAPACK/MKL files ---")
+          for search_dir in search_dirs:
+              if not search_dir.is_dir():
+                  continue
+              for path in sorted(search_dir.iterdir()):
+                  lower_name = path.name.lower()
+                  if any(token in lower_name for token in ("blas", "lapack", "mkl")):
+                      print(path)
+          PY
+
       - name: Download test files
         timeout-minutes: 5
         run: |
@@ -336,11 +383,11 @@ jobs:
           echo "| Preflight | Status | Duration (s) |" >> "${GITHUB_STEP_SUMMARY}"
           echo "|---|---:|---:|" >> "${GITHUB_STEP_SUMMARY}"
 
-          overall_status=0
           for ranks in 1 2; do
             name="${VLX_OS}_${VLX_MPI}_${VLX_MATH}_preflight_mpi${ranks}"
 
             echo "::group::${name}"
+            helper_status=0
             python .github/run-timed-test.py \
               --name "${name}" \
               --timeout "${PREFLIGHT_TIMEOUT}" \
@@ -354,11 +401,14 @@ jobs:
               -- \
               "${MPIEXEC[@]}" -n "${ranks}" \
               python -c 'from mpi4py import MPI; print("MPI library:", MPI.Get_library_version().splitlines()[0]); print("MPI size:", MPI.COMM_WORLD.Get_size())' \
-              || overall_status=1
+              || helper_status=$?
+            echo "helper exit code: ${helper_status}"
             echo "::endgroup::"
           done
 
-          exit "${overall_status}"
+          # Derive success from the recorded results rather than from the
+          # helper's process exit status, which has been unreliable on Linux.
+          python .github/check-quick-test-results.py test-results/preflight/*.json
 
       - name: Record setup failure
         if: failure()
@@ -418,14 +468,13 @@ jobs:
           echo "| Test | Status | Duration (s) |" >> "${GITHUB_STEP_SUMMARY}"
           echo "|---|---:|---:|" >> "${GITHUB_STEP_SUMMARY}"
 
-          overall_status=0
-
           # Fixed quick-test matrix: 1x1, 1x2, and 2x1 MPI x OpenMP.
           for config in "1 1" "1 2" "2 1"; do
             read -r ranks threads <<< "${config}"
             name="${VLX_OS}_${VLX_MPI}_${VLX_MATH}_mpi${ranks}_omp${threads}"
 
             echo "::group::${name}"
+            helper_status=0
             env \
               OMP_NUM_THREADS="${threads}" \
               OPENBLAS_NUM_THREADS="${threads}" \
@@ -444,11 +493,14 @@ jobs:
                 "${MPIEXEC[@]}" -n "${ranks}" \
                 python -m pytest -vv --capture=no --durations=5 -p no:cacheprovider \
                 "tests/test_cpp_unrest.py::TestCppUnrestricted::test_hf_ecd" \
-              || overall_status=1
+              || helper_status=$?
+            echo "helper exit code: ${helper_status}"
             echo "::endgroup::"
           done
 
-          exit "${overall_status}"
+          # Derive success from the recorded results rather than from the
+          # helper's process exit status, which has been unreliable on Linux.
+          python .github/check-quick-test-results.py test-results/*.json
 
       - name: Upload quick test results
         if: always()
