@@ -1,0 +1,383 @@
+name: Quick test VeloxChem conda packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      label:
+        description: 'Label of the conda package (e.g. main or test)'
+        required: true
+        default: 'main'
+        type: string
+      version:
+        description: 'Version of the conda package (e.g. 1.0rc4)'
+        required: true
+        type: string
+      build:
+        description: 'Build number (e.g. 284) or full build string (e.g. py313h62dc4fe_284)'
+        required: true
+        type: string
+      os:
+        description: 'Operating system to test'
+        required: true
+        default: 'linux'
+        type: choice
+        options:
+          - linux
+          - osx-arm
+          - win
+          - all
+      python:
+        description: 'Python version (optional; inferred from the build string or left to the solver)'
+        required: false
+        default: ''
+        type: string
+      commit:
+        description: 'VeloxChem source commit for the test file (optional; default: commit embedded in the package)'
+        required: false
+        default: ''
+        type: string
+      timeout_seconds:
+        description: 'Timeout per test run in seconds'
+        required: false
+        default: '90'
+        type: string
+      mpi_backends:
+        description: 'MPI backends, comma-separated (optional; defaults: linux=mpich,openmpi,impi_rt; osx-arm=mpich,openmpi; win=msmpi)'
+        required: false
+        default: ''
+        type: string
+      math_backends:
+        description: 'Math backends, comma-separated (optional; defaults: linux=mkl,openblas; osx-arm=openblas; win=mkl,openblas)'
+        required: false
+        default: ''
+        type: string
+
+concurrency:
+  group: quick-test-vlx-${{ inputs.label }}-${{ inputs.version }}-${{ inputs.build }}-${{ inputs.os }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-matrix:
+    name: Prepare test matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - name: Build test matrix
+        id: set-matrix
+        env:
+          OS_INPUT: ${{ inputs.os }}
+          MPI_BACKENDS_INPUT: ${{ inputs.mpi_backends }}
+          MATH_BACKENDS_INPUT: ${{ inputs.math_backends }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+
+          runners = {
+              "linux": {"runner": "ubuntu-latest", "platform": "linux-64"},
+              "osx-arm": {"runner": "macos-15", "platform": "osx-arm64"},
+              "win": {"runner": "windows-2022", "platform": "win-64"},
+          }
+          default_mpi = {
+              "linux": ["mpich", "openmpi", "impi_rt"],
+              "osx-arm": ["mpich", "openmpi"],
+              # Add impi_rt here in the future, if applicable.
+              "win": ["msmpi"],
+          }
+          default_math = {
+              "linux": ["mkl", "openblas"],
+              "osx-arm": ["openblas"],
+              "win": ["mkl", "openblas"],
+          }
+
+          def split_csv(value):
+              return [item.strip() for item in value.split(",") if item.strip()]
+
+          selected = os.environ["OS_INPUT"].strip()
+          if selected == "all":
+              selected_os = ["linux", "osx-arm", "win"]
+          elif selected in runners:
+              selected_os = [selected]
+          else:
+              raise SystemExit(f"Unknown operating system: {selected}")
+
+          mpi_override = split_csv(os.environ.get("MPI_BACKENDS_INPUT", ""))
+          math_override = split_csv(os.environ.get("MATH_BACKENDS_INPUT", ""))
+
+          include = []
+          for os_name in selected_os:
+              for mpi in mpi_override or default_mpi[os_name]:
+                  for math in math_override or default_math[os_name]:
+                      include.append({
+                          "os": os_name,
+                          "runner": runners[os_name]["runner"],
+                          "platform": runners[os_name]["platform"],
+                          "mpi": mpi,
+                          "math": math,
+                      })
+
+          if not include:
+              raise SystemExit("The generated test matrix is empty.")
+
+          matrix = {"include": include}
+          print(json.dumps(matrix, indent=2))
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(
+                  "matrix=" + json.dumps(matrix, separators=(",", ":")) + "\n"
+              )
+          PY
+
+  test:
+    name: ${{ matrix.os }} / ${{ matrix.mpi }} / ${{ matrix.math }}
+    needs: prepare-matrix
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash -l -o pipefail {0}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare-matrix.outputs.matrix) }}
+    env:
+      VLX_LABEL: ${{ inputs.label }}
+      VLX_VERSION: ${{ inputs.version }}
+      VLX_BUILD: ${{ inputs.build }}
+      VLX_PYTHON: ${{ inputs.python }}
+      VLX_COMMIT: ${{ inputs.commit }}
+      VLX_OS: ${{ matrix.os }}
+      VLX_PLATFORM: ${{ matrix.platform }}
+      VLX_MPI: ${{ matrix.mpi }}
+      VLX_MATH: ${{ matrix.math }}
+      TEST_TIMEOUT_SECONDS: ${{ inputs.timeout_seconds }}
+      OMPI_ALLOW_RUN_AS_ROOT: '1'
+      OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: '1'
+      KMP_DUPLICATE_LIB_OK: 'TRUE'
+      PYTHONUNBUFFERED: '1'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        timeout-minutes: 30
+        with:
+          miniforge-version: latest
+          conda-remove-defaults: true
+          auto-update-conda: true
+          auto-activate-base: true
+          use-mamba: true
+
+      - name: Install VeloxChem package
+        id: install
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+
+          BUILD_SPEC="${VLX_BUILD}"
+          if [[ "${BUILD_SPEC}" =~ ^[0-9]+$ ]]; then
+            BUILD_SPEC="*_${BUILD_SPEC}"
+          fi
+
+          PYTHON_SPEC="${VLX_PYTHON}"
+          if [[ -z "${PYTHON_SPEC}" && "${BUILD_SPEC}" =~ py([0-9])([0-9]+) ]]; then
+            PYTHON_SPEC="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+          fi
+
+          INSTALL_ARGS=(
+            create
+            --yes
+            --name vlx-quick-test
+            --override-channels
+            --channel "veloxchem/label/${VLX_LABEL}"
+            --channel conda-forge
+            "veloxchem=${VLX_VERSION}=${BUILD_SPEC}"
+            pytest
+          )
+
+          if [[ -n "${PYTHON_SPEC}" ]]; then
+            INSTALL_ARGS+=("python=${PYTHON_SPEC}")
+          fi
+
+          case "${VLX_MPI}" in
+            mpich)
+              INSTALL_ARGS+=(mpich)
+              ;;
+            openmpi)
+              INSTALL_ARGS+=(openmpi)
+              ;;
+            msmpi)
+              INSTALL_ARGS+=(msmpi)
+              ;;
+            impi|impi_rt)
+              INSTALL_ARGS+=(impi_rt)
+              ;;
+            default)
+              ;;
+            *)
+              echo "Unknown MPI backend: ${VLX_MPI}" >&2
+              exit 1
+              ;;
+          esac
+
+          case "${VLX_MATH}" in
+            openblas)
+              INSTALL_ARGS+=("libblas=*=*openblas" "liblapack=*=*openblas")
+              ;;
+            mkl)
+              INSTALL_ARGS+=("libblas=*=*mkl" "liblapack=*=*mkl")
+              ;;
+            default)
+              ;;
+            *)
+              echo "Unknown math backend: ${VLX_MATH}" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "Creating conda environment with:"
+          printf '  %q\n' "${INSTALL_ARGS[@]}"
+          conda "${INSTALL_ARGS[@]}"
+
+          conda run --no-capture-output -n vlx-quick-test python -c \
+            'import veloxchem; print("VeloxChem version:", veloxchem.__version__); print("VeloxChem commit:", getattr(veloxchem, "__commit__", "unknown"))'
+
+          conda list -n vlx-quick-test
+
+      - name: Download test files
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+
+          TEST_COMMIT="${VLX_COMMIT}"
+          if [[ -z "${TEST_COMMIT}" ]]; then
+            TEST_COMMIT="$(
+              conda run -n vlx-quick-test python -c \
+                'import veloxchem; print(getattr(veloxchem, "__commit__", "unknown"))' \
+                | tail -n 1
+            )"
+          fi
+          if [[ -z "${TEST_COMMIT}" || "${TEST_COMMIT}" == "unknown" ]]; then
+            TEST_COMMIT="master"
+          fi
+
+          echo "Using VeloxChem source commit: ${TEST_COMMIT}"
+          mkdir -p tests
+
+          for file in tests/conftest.py tests/test_cpp_unrest.py; do
+            if ! curl -fsSL --retry 3 \
+              "https://raw.githubusercontent.com/VeloxChem/VeloxChem/${TEST_COMMIT}/${file}" \
+              -o "${file}"; then
+              echo "::warning::Could not download ${file} at ${TEST_COMMIT}; falling back to master"
+              curl -fsSL --retry 3 \
+                "https://raw.githubusercontent.com/VeloxChem/VeloxChem/master/${file}" \
+                -o "${file}"
+            fi
+          done
+
+          grep -n "def test_hf_ecd" tests/test_cpp_unrest.py
+
+      - name: Run timed quick tests
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+
+          eval "$(conda shell.bash hook)"
+          conda activate vlx-quick-test
+
+          TIMEOUT="${TEST_TIMEOUT_SECONDS:-90}"
+          if ! [[ "${TIMEOUT}" =~ ^[0-9]+$ ]] || (( TIMEOUT < 1 )); then
+            echo "Invalid test timeout: ${TIMEOUT}" >&2
+            exit 1
+          fi
+
+          which python
+          which mpiexec
+          python --version
+          mpiexec --version || true
+
+          MPIEXEC=(mpiexec)
+          if [[ "${VLX_MPI}" == "openmpi" ]]; then
+            MPIEXEC+=(--bind-to none)
+          fi
+
+          echo "| Test | Status | Duration (s) |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "|---|---:|---:|" >> "${GITHUB_STEP_SUMMARY}"
+
+          overall_status=0
+
+          # Fixed quick-test matrix: 1x1, 1x2, and 2x1 MPI x OpenMP.
+          for config in "1 1" "1 2" "2 1"; do
+            read -r ranks threads <<< "${config}"
+            name="${VLX_OS}_${VLX_MPI}_${VLX_MATH}_mpi${ranks}_omp${threads}"
+
+            echo "::group::${name}"
+            env \
+              OMP_NUM_THREADS="${threads}" \
+              OPENBLAS_NUM_THREADS="${threads}" \
+              MKL_NUM_THREADS="${threads}" \
+              NUMEXPR_NUM_THREADS="${threads}" \
+              python .github/run-timed-test.py \
+                --name "${name}" \
+                --timeout "${TIMEOUT}" \
+                --metadata "os=${VLX_OS}" \
+                --metadata "platform=${VLX_PLATFORM}" \
+                --metadata "mpi_backend=${VLX_MPI}" \
+                --metadata "math_backend=${VLX_MATH}" \
+                --metadata "mpi_ranks=${ranks}" \
+                --metadata "omp_threads=${threads}" \
+                -- \
+                "${MPIEXEC[@]}" -n "${ranks}" \
+                python -m pytest -vv --durations=5 -p no:cacheprovider \
+                "tests/test_cpp_unrest.py::TestCppUnrestricted::test_hf_ecd" \
+              || overall_status=1
+            echo "::endgroup::"
+          done
+
+          exit "${overall_status}"
+
+      - name: Upload quick test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quick-test-results-${{ matrix.os }}-${{ matrix.mpi }}-${{ matrix.math }}
+          path: test-results/*.json
+          if-no-files-found: warn
+          retention-days: 1
+
+  summary:
+    name: Summarize quick tests
+    runs-on: ubuntu-latest
+    needs:
+      - prepare-matrix
+      - test
+    if: always()
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Download all quick test results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          path: artifacts
+          pattern: quick-test-results-*
+          merge-multiple: true
+
+      - name: Summarize results
+        env:
+          EXPECTED_MATRIX: ${{ needs.prepare-matrix.outputs.matrix }}
+        run: |
+          python3 .github/summarize-quick-tests.py \
+            --results-dir artifacts \
+            --matrix "${EXPECTED_MATRIX}" \
+            --package-info "Package: \`veloxchem=${{ inputs.version }}=${{ inputs.build }}\` from label \`${{ inputs.label }}\`"
