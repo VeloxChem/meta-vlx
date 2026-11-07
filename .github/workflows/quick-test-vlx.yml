@@ -318,47 +318,8 @@ jobs:
           conda activate vlx-quick-test
           set -u
 
-          python - <<'PY' || echo "::warning::Runtime diagnostics failed; continuing."
-          import os
-          import platform
-          import sys
-          import sysconfig
-          from pathlib import Path
-
-          import numpy
-          import scipy
-
-          print("Platform:", platform.platform())
-          print("Machine:", platform.machine())
-          print("Processor:", platform.processor())
-          print("Python:", sys.version.replace("\\n", " "))
-          print("NumPy:", numpy.__version__)
-          print("SciPy:", scipy.__version__)
-          print("Conda prefix:", os.environ.get("CONDA_PREFIX", ""))
-          print("UCX_TLS:", os.environ.get("UCX_TLS", ""))
-          print("FI_PROVIDER:", os.environ.get("FI_PROVIDER", ""))
-
-          print("--- NumPy configuration ---")
-          numpy.show_config()
-
-          prefix = Path(os.environ.get("CONDA_PREFIX", ""))
-          site_packages = Path(sysconfig.get_paths()["purelib"])
-          search_dirs = [
-              prefix / "Library" / "bin",
-              prefix / "lib",
-              site_packages.parent / "numpy.libs",
-              site_packages / "numpy" / ".libs",
-          ]
-
-          print("--- BLAS/LAPACK/MKL files ---")
-          for search_dir in search_dirs:
-              if not search_dir.is_dir():
-                  continue
-              for path in sorted(search_dir.iterdir()):
-                  lower_name = path.name.lower()
-                  if any(token in lower_name for token in ("blas", "lapack", "mkl")):
-                      print(path)
-          PY
+          python .github/runtime-diagnostics.py \
+            || echo "::warning::Runtime diagnostics failed; continuing."
 
       - name: Download test files
         timeout-minutes: 5
