@@ -42,7 +42,7 @@ on:
         default: '90'
         type: string
       mpi_backends:
-        description: 'MPI backends, comma-separated (optional; defaults: linux=mpich,openmpi,impi_rt; osx-arm=mpich,openmpi; win=msmpi)'
+        description: 'MPI backends, comma-separated (optional; defaults: linux=mpich,openmpi,impi_rt; osx-arm=mpich,openmpi; win=msmpi,impi_rt)'
         required: false
         default: ''
         type: string
@@ -86,8 +86,7 @@ jobs:
           default_mpi = {
               "linux": ["mpich", "openmpi", "impi_rt"],
               "osx-arm": ["mpich", "openmpi"],
-              # Add impi_rt here in the future, if applicable.
-              "win": ["msmpi"],
+              "win": ["msmpi", "impi_rt"],
           }
           default_math = {
               "linux": ["mkl", "openblas"],
