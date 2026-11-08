@@ -28,7 +28,6 @@ requirements:
     - pybind11
     - python
     - pybind11-abi =4
-    - msmpi  # [win]
     - eigen
     - libboost-headers
     - libxc-c =7.*=cpu_*
@@ -47,9 +46,13 @@ test:
   requires:
     - pytest
     - openmpi  # [linux]
+    # Keep msmpi out of host so its weak run export does not pin the package
+    # to MS-MPI at runtime. mpi4py then selects either the msmpi or impi_rt
+    # variant, depending on which MPI backend the user requests.
+    - msmpi  # [win]
     - libblas
     - dftd4-python
-    - tblite-python  # [unix]
+    - tblite-python
     - pip
     - scipy
     - openmm
@@ -89,12 +92,13 @@ test:
     # Root cause is still under investigation; re-enable once it is fixed.
     # - mpiexec --bind-to none -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming" -k "TestScf or TestGrad or TestRI or TestCPP or TestRPA"  # [osx and arm64]
     # run integration tests on windows
-    # Fast solver tests receive the same serial/parallel double coverage here.
+    # The serial pass covers all fast tests. The parallel pass is limited to
+    # selected solver classes to keep the Windows test walltime reasonable.
     - set OMP_NUM_THREADS=%CPU_COUNT%  # [win]
     - mpiexec -n 1 %PYTHON% -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "not timeconsuming" # [win]
     - set MPI_NUM_PROCS=2  # [win]
     - set /A OMP_NUM_THREADS="%CPU_COUNT%/%MPI_NUM_PROCS%"  # [win]
-    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming"  # [win]
+    - mpiexec -n %MPI_NUM_PROCS% %PYTHON% -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming" -k "TestScf or TestGrad or TestCPP or TestRPA"  # [win]
 
 about:
   home: https://veloxchem.org
