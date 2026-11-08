@@ -10,8 +10,6 @@ source:
 
 build:
   number: @_build_@
-  script_env:
-    - OMPI_MCA_plm_rsh_agent=  # [mpi == 'openmpi' and linux]
   entry_points:
     - vlx=veloxchem.main:main
 
@@ -46,6 +44,7 @@ test:
   requires:
     - pytest
     - openmpi  # [linux]
+    - mpich    # [osx]
     # Keep msmpi out of host so its weak run export does not pin the package
     # to MS-MPI at runtime. mpi4py then selects either the msmpi or impi_rt
     # variant, depending on which MPI backend the user requests.
@@ -72,25 +71,24 @@ test:
     - ldd -v $SP_DIR/veloxchem/veloxchemlib*.so  # [linux]
     - otool -L $SP_DIR/veloxchem/veloxchemlib*.so  # [osx]
     # prepare envvars
-    - export OMPI_ALLOW_RUN_AS_ROOT=1  # [mpi == 'openmpi']
-    - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1  # [mpi == 'openmpi']
+    - export OMPI_ALLOW_RUN_AS_ROOT=1  # [linux]
+    - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1  # [linux]
+    # MPICH on macOS uses libfabric; force its TCP provider.
+    - export FI_PROVIDER=tcp  # [osx]
     # run integration tests on unix-like systems
     # for now we only run selected tests on osx-arm64 due to time and resources
     # record the slowest tests to help track down CI timing changes
-    # On linux and win, fast solver tests are intentionally run twice: once
-    # with one MPI rank below and once with multiple MPI ranks in the solver
-    # pass, to cover both serial and parallel paths. On osx-arm64 only the
-    # serial pass currently runs; the parallel pass is temporarily disabled
-    # because the 2-rank OpenMPI solver pass hangs.
+    # On linux, osx-arm64 and win, fast solver tests are intentionally run
+    # twice: once with one MPI rank below and once with multiple MPI ranks in
+    # the solver pass. The osx-arm64 parallel pass is scoped to selected solver
+    # classes to keep walltime reasonable.
     - export OMP_NUM_THREADS=$CPU_COUNT  # [unix]
     - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "not timeconsuming"  # [linux]
     - mpiexec -n 1 $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "not timeconsuming"  # [osx and arm64]
     - export MPI_NUM_PROCS=2  # [unix]
     - export OMP_NUM_THREADS=$(($CPU_COUNT/$MPI_NUM_PROCS))  # [unix]
     - mpiexec --bind-to none -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming"  # [linux]
-    # TEMPORARILY DISABLED on osx-arm64: this multi-rank solver pass hangs.
-    # Root cause is still under investigation; re-enable once it is fixed.
-    # - mpiexec --bind-to none -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming" -k "TestScf or TestGrad or TestRI or TestCPP or TestRPA"  # [osx and arm64]
+    - mpiexec --bind-to none -n $MPI_NUM_PROCS $PYTHON -m pytest --capture=no --log-cli-level=INFO --durations=100 -m "solvers and not timeconsuming" -k "TestScf or TestGrad or TestCPP or TestRPA"  # [osx and arm64]
     # run integration tests on windows
     # The serial pass covers all fast tests. The parallel pass is limited to
     # selected solver classes to keep the Windows test walltime reasonable.
