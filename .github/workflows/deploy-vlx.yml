@@ -93,7 +93,7 @@ jobs:
             OS_TYPES="${{ inputs.ostypes }}"
           fi
 
-          python3 $GITHUB_WORKSPACE/.github/generate-matrix.py $PY_VERSIONS $OS_TYPES > matrix.json
+          python3 $GITHUB_WORKSPACE/.github/generate-matrix.py --skip-mpi $PY_VERSIONS $OS_TYPES > matrix.json
 
           echo "Build matrix for veloxchem"
           echo "MATRIX={\"include\": $(cat matrix.json)}"
@@ -125,7 +125,7 @@ jobs:
           echo " > Conda package channel: veloxchem"
           echo " > Conda package label: ${{ inputs.label }}"
           echo " > Conda package build number: ${{ needs.prepare-build-matrix.outputs.build_number }}"
-          echo " > OS, Python version, MPI implementation: ${{ matrix.os }}, ${{ matrix.python }}, ${{ matrix.mpi }}"
+          echo " > OS, Python version: ${{ matrix.os }}, ${{ matrix.python }}"
 
       - name: Clone veloxchem and get commit hash
         run: |
@@ -171,7 +171,7 @@ jobs:
                  --file \
                  $GITHUB_WORKSPACE/conda-recipes/veloxchem/meta.yaml
 
-      - name: Build and upload veloxchem for triplet ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+      - name: Build and upload veloxchem for ${{ matrix.os }} and Python ${{ matrix.python }}
         id: condabuild
         timeout-minutes: 350
         continue-on-error: true
@@ -182,7 +182,7 @@ jobs:
           conda info --envs
           which conda-build
           conda-build \
-                --variants "{'python': ['${{ matrix.python }}'], 'mpi': ['${{ matrix.mpi }}']}" \
+                --variants "{'python': ['${{ matrix.python }}']}" \
                 --token $ANACONDA_TOKEN \
                 --user veloxchem \
                 --label ${{ inputs.label }} \
@@ -195,16 +195,16 @@ jobs:
         run: |
           rm -rf veloxchem
 
-      - name: Write deployment summary of veloxchem for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}
+      - name: Write deployment summary of veloxchem for ${{ matrix.os }} and Python ${{ matrix.python }}
         run: |
-          line="OS=${{ matrix.os }}, Python=${{ matrix.python }}, MPI=${{ matrix.mpi }}, Outcome=${{ steps.condabuild.outcome }}"
+          line="OS=${{ matrix.os }}, Python=${{ matrix.python }}, Outcome=${{ steps.condabuild.outcome }}"
           echo "$line"
           echo "- $line" >> $GITHUB_STEP_SUMMARY
 
       - name: Fail job if build or upload failed
         if: ${{ steps.condabuild.outcome != 'success' }}
         run: |
-          echo "Build or upload failed for ${{ matrix.os }}, Python ${{ matrix.python }}, and ${{ matrix.mpi }}" >&2
+          echo "Build or upload failed for ${{ matrix.os }} and Python ${{ matrix.python }}" >&2
           exit 1
 
   delete-old-builds:
