@@ -406,7 +406,7 @@ jobs:
               --metadata "omp_threads=1" \
               -- \
               "${MPIEXEC[@]}" -n "${ranks}" \
-              python -c 'from mpi4py import MPI; print("MPI library:", MPI.Get_library_version().splitlines()[0]); print("MPI size:", MPI.COMM_WORLD.Get_size())' \
+              python .github/mpi-preflight.py \
               || helper_status=$?
             echo "helper exit code: ${helper_status}"
             echo "::endgroup::"
