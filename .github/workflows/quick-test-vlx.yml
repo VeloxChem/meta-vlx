@@ -47,7 +47,7 @@ on:
         default: ''
         type: string
       math_backends:
-        description: 'Math backends, comma-separated (optional; defaults: linux=mkl,openblas; osx-arm=openblas; win=mkl,openblas,openblas-0.3.33)'
+        description: 'Math backends, comma-separated (optional; defaults: linux=mkl,openblas; osx-arm=openblas; win=mkl,openblas)'
         required: false
         default: ''
         type: string
@@ -94,11 +94,11 @@ jobs:
               # Windows OpenBLAS 0.3.34 (pthreads) deterministically crashes
               # on affected AMD Zen 4/5 runners when AVX-512 is exposed:
               # https://github.com/conda-forge/openblas-feedstock/issues/196
-              # It only looks intermittent across CI runs because GitHub
-              # schedules jobs on different CPU models. Keep 0.3.34 in the
-              # matrix to expose it. OpenBLAS 0.3.33 is included separately
-              # as a control because it is known to work on affected CPUs.
-              "win": ["mkl", "openblas", "openblas-0.3.33"],
+              # The VeloxChem recipe adds `libopenblas <0.3.34  # [win]` as a
+              # run_constrained, so this OpenBLAS job resolves to the known-good
+              # 0.3.33 backend and should pass on affected CPUs. A package built
+              # without that constraint would still pull in 0.3.34 and fail.
+              "win": ["mkl", "openblas"],
           }
 
           def split_csv(value):
@@ -284,16 +284,10 @@ jobs:
 
           case "${VLX_MATH}" in
             openblas)
+              # On Windows, the package's run_constrained keeps libopenblas
+              # below 0.3.34, so this resolves to 0.3.33 and avoids
+              # conda-forge/openblas-feedstock#196.
               INSTALL_ARGS+=("libblas=*=*openblas" "liblapack=*=*openblas")
-              ;;
-            # Control for conda-forge/openblas-feedstock#196: pin the last
-            # known-good Windows OpenBLAS while keeping latest visible above.
-            openblas-0.3.33)
-              INSTALL_ARGS+=(
-                "libblas=*=*openblas"
-                "liblapack=*=*openblas"
-                "libopenblas=0.3.33"
-              )
               ;;
             mkl)
               INSTALL_ARGS+=("libblas=*=*mkl" "liblapack=*=*mkl")

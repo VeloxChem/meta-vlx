@@ -39,6 +39,12 @@ requirements:
     - networkx
   run_constrained:
     - libxc-c =7.*=cpu_*
+    # OpenBLAS 0.3.34 (pthreads) crashes on affected Windows Zen 4/5 CPUs
+    # when AVX-512 is exposed:
+    # https://github.com/conda-forge/openblas-feedstock/issues/196
+    # This only constrains environments that use the OpenBLAS backend; MKL
+    # environments do not contain libopenblas and are therefore unaffected.
+    - libopenblas <0.3.34  # [win]
 
 test:
   requires:

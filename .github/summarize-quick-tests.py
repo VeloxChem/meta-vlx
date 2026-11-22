@@ -23,7 +23,6 @@ MATH_ORDER = {
     "default": 0,
     "mkl": 1,
     "openblas": 2,
-    "openblas-0.3.33": 3,
 }
 
 
