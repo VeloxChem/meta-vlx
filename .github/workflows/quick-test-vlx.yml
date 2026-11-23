@@ -178,6 +178,12 @@ jobs:
       VLX_MATH: ${{ matrix.math }}
       VLX_FI_PROVIDER: ${{ matrix.fi_provider }}
       UCX_TLS: ${{ matrix.ucx_tls }}
+      # Runners with an Azure MANA NIC can defeat OpenMPI's transport
+      # selection: UCX_TLS keeps UCX away from the device, but libfabric
+      # still offers it and the resulting OFI path fails on the first
+      # collective with MPI_ERR_OTHER. Force OpenMPI onto ob1.
+      # See https://github.com/Pyomo/mpi-sppy/issues/938
+      OMPI_MCA_pml: ob1
       TEST_TIMEOUT_SECONDS: ${{ inputs.timeout_seconds }}
       PREFLIGHT_TIMEOUT_SECONDS: '30'
       OMPI_ALLOW_RUN_AS_ROOT: '1'
